@@ -1,0 +1,45 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Linked AI - Job Listings{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2 mb-0">Job Listings</h1>
+    {% if user.is_authenticated %}
+        <a href="{% url 'chatbot' %}" class="btn btn-linkedin">
+            <i class="fas fa-robot me-1"></i>Ask AI for Job Recommendations
+        </a>
+    {% endif %}
+</div>
+
+{% if user.is_authenticated and profile_incomplete %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        Please complete your profile to access the AI chatbot. 
+        <a href="{% url 'profile' %}" class="alert-link">Click here to complete your profile</a>.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endif %}
+
+<div class="card">
+    <div class="card-body p-0">
+        {% for job in jobs %}
+            <a href="{% url 'job_detail' job.id %}" class="text-decoration-none">
+                <div class="job-card {% if not forloop.last %}border-bottom{% endif %}">
+                    <div class="job-title">{{ job.title }}</div>
+                    <div class="company-name">{{ job.company }}</div>
+                    <div class="job-description">{{ job.description|truncatewords:30 }}</div>
+                    <div class="job-meta">
+                        <i class="far fa-clock me-1"></i>Posted on {{ job.posted_at|date:"F j, Y" }}
+                    </div>
+                </div>
+            </a>
+        {% empty %}
+            <div class="job-card text-center text-muted">
+                <i class="fas fa-briefcase fa-2x mb-3"></i>
+                <p class="mb-0">No jobs available at the moment.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
