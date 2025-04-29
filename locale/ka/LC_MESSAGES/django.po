@@ -1,0 +1,261 @@
+# Georgian translations for Jobsy.
+# Copyright (C) 2023
+# This file is distributed under the same license as the Jobsy package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Jobsy 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-05-20 12:00+0000\n"
+"PO-Revision-Date: 2023-05-20 12:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Georgian\n"
+"Language: ka\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: templates/core/base.html templates/core/job_detail.html
+msgid "Jobsy"
+msgstr "Jobsy"
+
+#: templates/core/base.html
+msgid "მთავარი"
+msgstr "მთავარი"
+
+#: templates/core/base.html
+msgid "ვაკანსიები"
+msgstr "ვაკანსიები"
+
+#: templates/core/base.html
+msgid "გამოქვეყნება"
+msgstr "გამოქვეყნება"
+
+#: templates/core/base.html
+msgid "დამატება CV"
+msgstr "დამატება CV"
+
+#: templates/core/base.html
+msgid "გასვლა"
+msgstr "გასვლა"
+
+#: templates/core/base.html
+msgid "შესვლა"
+msgstr "შესვლა"
+
+#: templates/core/base.html
+msgid "რეგისტრაცია"
+msgstr "რეგისტრაცია"
+
+#: templates/core/job_list.html
+msgid "Jobsy - ვაკანსიები"
+msgstr "Jobsy - ვაკანსიები"
+
+#: templates/core/job_list.html
+msgid "ჩვენი ვაკანსიები დაგეხმარება!"
+msgstr "ჩვენი ვაკანსიები დაგეხმარება!"
+
+#: templates/core/job_list.html
+msgid "საუკეთესო სამსახურის მოძიებაში ჯობსის ვაკანსიები დაგეხმარება"
+msgstr "საუკეთესო სამსახურის მოძიებაში ჯობსის ვაკანსიები დაგეხმარება"
+
+#: templates/core/job_list.html
+msgid "ყველა ვაკანსია"
+msgstr "ყველა ვაკანსია"
+
+#: templates/core/job_list.html
+msgid "მოძებნა / კომპანია"
+msgstr "მოძებნა / კომპანია"
+
+#: templates/core/job_list.html
+msgid "კატეგორია"
+msgstr "კატეგორია"
+
+#: templates/core/job_list.html
+msgid "ლოკაცია"
+msgstr "ლოკაცია"
+
+#: templates/core/job_list.html
+msgid "გამოცდილება"
+msgstr "გამოცდილება"
+
+#: templates/core/job_list.html
+msgid "დამწყები"
+msgstr "დამწყები"
+
+#: templates/core/job_list.html
+msgid "საშუალო"
+msgstr "საშუალო"
+
+#: templates/core/job_list.html
+msgid "პროფესიონალი"
+msgstr "პროფესიონალი"
+
+#: templates/core/job_list.html
+msgid "მინიმალური ანაზღაურება"
+msgstr "მინიმალური ანაზღაურება"
+
+#: templates/core/job_list.html
+msgid "სრული განაკვეთი"
+msgstr "სრული განაკვეთი"
+
+#: templates/core/job_list.html
+msgid "ნახევარი განაკვეთი"
+msgstr "ნახევარი განაკვეთი"
+
+#: templates/core/job_list.html
+msgid "დისტანციური"
+msgstr "დისტანციური"
+
+#: templates/core/job_list.html
+msgid "სტაჟირება"
+msgstr "სტაჟირება"
+
+#: templates/core/job_list.html
+msgid "გასუფთავება"
+msgstr "გასუფთავება"
+
+#: templates/core/job_list.html
+msgid "შედეგი"
+msgstr "შედეგი"
+
+#: templates/core/job_list.html
+msgid "ფილტრები"
+msgstr "ფილტრები"
+
+#: templates/core/job_list.html
+msgid "გჭირდებათ თანამშრომელი?"
+msgstr "გჭირდებათ თანამშრომელი?"
+
+#: templates/core/job_list.html
+msgid "გამოაქვეყნეთ ვაკანსია ჯობსიზე და იპოვეთ საუკეთესო კანდიდატები თქვენი კომპანიისთვის."
+msgstr "გამოაქვეყნეთ ვაკანსია ჯობსიზე და იპოვეთ საუკეთესო კანდიდატები თქვენი კომპანიისთვის."
+
+#: templates/core/job_list.html
+msgid "ათასობით პროფესიონალი ეძებს ახალ შესაძლებლობებს ყოველდღე."
+msgstr "ათასობით პროფესიონალი ეძებს ახალ შესაძლებლობებს ყოველდღე."
+
+#: templates/core/job_list.html
+msgid "განათავსეთ ვაკანსია"
+msgstr "განათავსეთ ვაკანსია"
+
+#: templates/core/job_list.html
+msgid "Stay in Touch"
+msgstr "Stay in Touch"
+
+#: templates/core/job_list.html
+msgid "გამოაქვეყნეთ"
+msgstr "გამოაქვეყნეთ"
+
+#: templates/core/job_detail.html
+msgid "გამოქვეყნებულია"
+msgstr "გამოქვეყნებულია"
+
+#: templates/core/job_detail.html
+msgid "ანაზღაურება შეთანხმებით"
+msgstr "ანაზღაურება შეთანხმებით"
+
+#: templates/core/job_detail.html
+msgid "აღწერა"
+msgstr "აღწერა"
+
+#: templates/core/job_detail.html
+msgid "განაცხადის გაგზავნა"
+msgstr "განაცხადის გაგზავნა"
+
+#: templates/core/job_detail.html
+msgid "შესვლა განაცხადის გასაგზავნად"
+msgstr "შესვლა განაცხადის გასაგზავნად"
+
+#: templates/core/job_detail.html
+msgid "კომპანიის შესახებ"
+msgstr "კომპანიის შესახებ"
+
+#: templates/core/job_detail.html
+msgid "კომპანიის აღწერა არ არის მითითებული."
+msgstr "კომპანიის აღწერა არ არის მითითებული."
+
+#: templates/core/job_detail.html
+msgid "კომპანიის პროფილი"
+msgstr "კომპანიის პროფილი"
+
+#: templates/core/job_detail.html
+msgid "მსგავსი ვაკანსიები"
+msgstr "მსგავსი ვაკანსიები"
+
+#: templates/core/job_detail.html
+msgid "შეთანხმებით"
+msgstr "შეთანხმებით"
+
+#: templates/core/job_detail.html
+msgid "მსგავსი ვაკანსიები არ მოიძებნა."
+msgstr "მსგავსი ვაკანსიები არ მოიძებნა."
+
+#: templates/core/job_detail.html
+msgid "განაცხადი"
+msgstr "განაცხადი"
+
+#: templates/core/job_detail.html
+msgid "მოტივაციის წერილი"
+msgstr "მოტივაციის წერილი"
+
+#: templates/core/job_detail.html
+msgid "CV / რეზიუმე"
+msgstr "CV / რეზიუმე"
+
+#: templates/core/job_detail.html
+msgid "დასაშვები ფორმატი: PDF, DOC, DOCX"
+msgstr "დასაშვები ფორმატი: PDF, DOC, DOCX"
+
+#: templates/core/job_detail.html
+msgid "გაუქმება"
+msgstr "გაუქმება"
+
+#: templates/core/login.html templates/core/register.html
+msgid "ელ-ფოსტა"
+msgstr "ელ-ფოსტა"
+
+#: templates/core/login.html
+msgid "გთხოვთ შეიყვანოთ თქვენი ელ-ფოსტა."
+msgstr "გთხოვთ შეიყვანოთ თქვენი ელ-ფოსტა."
+
+#: templates/core/login.html templates/core/register.html
+msgid "პაროლი"
+msgstr "პაროლი"
+
+#: templates/core/login.html
+msgid "გთხოვთ შეიყვანოთ თქვენი პაროლი."
+msgstr "გთხოვთ შეიყვანოთ თქვენი პაროლი."
+
+#: templates/core/login.html templates/core/register.html
+msgid "ან"
+msgstr "ან"
+
+#: templates/core/login.html templates/core/register.html
+msgid "Google-ით შესვლა"
+msgstr "Google-ით შესვლა"
+
+#: templates/core/login.html
+msgid "არ გაქვთ ანგარიში?"
+msgstr "არ გაქვთ ანგარიში?"
+
+#: templates/core/register.html
+msgid "შექმენით ანგარიში"
+msgstr "შექმენით ანგარიში"
+
+#: templates/core/register.html
+msgid "გაიმეორეთ პაროლი"
+msgstr "გაიმეორეთ პაროლი"
+
+#: templates/core/register.html
+msgid "სახელი"
+msgstr "სახელი"
+
+#: templates/core/register.html
+msgid "გვარი"
+msgstr "გვარი"
+
+#: templates/core/register.html
+msgid "უკვე გაქვთ ანგარიში?"
+msgstr "უკვე გაქვთ ანგარიში?"

@@ -1,310 +1,322 @@
 <!DOCTYPE html>
-<html>
+<html lang="{{ LANGUAGE_CODE }}">
+{% load static %}
+{% load i18n %}
+
 <head>
-    <title>{% block title %}Linked AI{% endblock %}</title>
+    <title>{% block title %}Jobsy{% endblock %}</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --linkedin-blue: #0a66c2;
-            --linkedin-light-blue: #e8f3ff;
-            --linkedin-gray: #666666;
-            --linkedin-light-gray: #f3f2f1;
+            --jobsy-blue: #0a2342;
+            --jobsy-yellow: #ffd600;
+            --jobsy-light: #f6f8fa;
+            --jobsy-card: #fffbe6;
+            --jobsy-purple: #7c4dff;
         }
-
         body {
-            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell, "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Lucida Grande", Helvetica, Arial, sans-serif;
-            background-color: var(--linkedin-light-gray);
+            font-family: 'Fira Sans', 'Segoe UI', Arial, sans-serif;
+            background: var(--jobsy-light);
         }
-
-        .navbar {
-            background-color: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 0.5rem 1rem;
+        .jobsy-navbar {
+            background: var(--jobsy-blue);
+            color: #fff;
+            padding: 0.75rem 0;
+            position: relative;
+            z-index: 10;
         }
-
-        .navbar-brand {
-            color: var(--linkedin-blue) !important;
-            font-weight: 600;
-            font-size: 1.5rem;
+        .jobsy-navbar .navbar-brand {
+            font-weight: bold;
+            font-size: 2rem;
+            color: #fff !important;
         }
-
-        .nav-link {
-            color: var(--linkedin-gray) !important;
-            font-weight: 400;
-            padding: 0.5rem 1rem;
+        .jobsy-navbar .nav-link {
+            color: #fff !important;
+            font-weight: 500;
+            margin-right: 1.5rem;
+            padding: 0.5rem 0.75rem;
+            display: block;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
-
-        .nav-link:hover {
-            color: var(--linkedin-blue) !important;
+        .jobsy-navbar .nav-link.active, .jobsy-navbar .nav-link:hover {
+            color: var(--jobsy-yellow) !important;
+            text-decoration: none;
+            transform: translateY(-2px);
         }
-
-        .btn-linkedin {
-            background-color: var(--linkedin-blue);
+        .jobsy-navbar .btn {
+            border-radius: 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .navbar-toggler {
             color: white;
-            border: none;
-            padding: 0.5rem 1.5rem;
-            border-radius: 24px;
-            font-weight: 600;
+            border-color: rgba(255,255,255,0.5);
         }
-
-        .btn-linkedin:hover {
-            background-color: #004182;
-            color: white;
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.7%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
         }
-
-        .main-container {
-            max-width: 1128px;
-            margin: 24px auto;
-            padding: 0 24px;
+        .hero-section {
+            background: var(--jobsy-blue);
+            color: #fff;
+            padding: 3rem 0 2rem 0;
+            position: relative;
+            overflow: hidden;
+            margin-top: 0;
         }
-
-        .card {
-            border: none;
-            border-radius: 8px;
-            box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
-            background-color: white;
-        }
-
-        .card-header {
-            background-color: white;
-            border-bottom: 1px solid rgba(0,0,0,0.15);
-            padding: 16px 24px;
-        }
-
-        .form-control {
-            border-radius: 4px;
-            border: 1px solid rgba(0,0,0,0.15);
-            padding: 8px 12px;
-        }
-
-        .form-control:focus {
-            border-color: var(--linkedin-blue);
-            box-shadow: 0 0 0 1px var(--linkedin-blue);
-        }
-
-        .alert {
-            border-radius: 8px;
-            border: none;
-        }
-
-        .job-card {
-            padding: 16px 24px;
-            margin-bottom: 8px;
-        }
-
-        .job-title {
-            color: var(--linkedin-blue);
-            font-weight: 600;
-            font-size: 1.1rem;
-            margin-bottom: 4px;
-        }
-
-        .company-name {
-            color: var(--linkedin-gray);
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .job-description {
-            color: rgba(0,0,0,0.9);
-            margin-bottom: 8px;
-        }
-
-        .job-meta {
-            color: var(--linkedin-gray);
-            font-size: 0.9rem;
-        }
-
-        .chat-container {
-            height: calc(100vh - 200px);
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
+        .hero-content {
+            max-width: 600px;
             display: flex;
             flex-direction: column;
+            justify-content: center;
+            height: 100%;
         }
-
-        .chat-messages {
-            flex: 1;
-            padding: 24px;
-            overflow-y: auto;
+        .hero-cta {
+            background: var(--jobsy-yellow);
+            color: #0a2342;
+            border-radius: 28px;
+            padding: 2.2rem 2.5rem;
+            font-size: 2.1rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
         }
-
-        .chat-message {
-            margin-bottom: 16px;
-            max-width: 70%;
+        .hero-btn {
+            background: var(--jobsy-blue);
+            color: #fff;
+            border: none;
+            font-weight: 600;
+            border-radius: 20px;
+            padding: 0.75rem 2.5rem;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transition: all 0.3s ease;
         }
-
-        .chat-message.user {
-            margin-left: auto;
+        .hero-btn:hover {
+            background: #021024;
+            color: #ffd600;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
         }
-
-        .chat-message.ai {
-            margin-right: auto;
+        .hero-img {
+            position: absolute;
+            right: 5%;
+            top: 55%;
+            transform: translateY(-50%);
+            max-width: 300px;
+            width: 28vw;
+            z-index: 1;
         }
-
-        .message-content {
-            padding: 12px 16px;
-            border-radius: 16px;
-            line-height: 1.5;
+        @media (max-width: 991px) {
+            .hero-img { display: none; }
+            .jobsy-navbar .nav-link {
+                padding: 0.5rem 1rem;
+                margin-right: 0;
+                border-radius: 4px;
+            }
+            .jobsy-navbar .nav-link:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+            .navbar-nav {
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+            }
         }
-
-        .chat-message.user .message-content {
-            background-color: var(--linkedin-blue);
-            color: white;
-            border-bottom-right-radius: 4px;
+        .main-bg {
+            background: #f3f6fd;
+            min-height: 100vh;
+            padding-top: 0;
         }
-
-        .chat-message.ai .message-content {
-            background-color: var(--linkedin-light-gray);
-            color: rgba(0,0,0,0.9);
-            border-bottom-left-radius: 4px;
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem 1rem 1rem;
         }
-
-        .chat-input {
-            padding: 16px;
-            border-top: 1px solid rgba(0,0,0,0.15);
+        .facebook-icon {
+            color: #1877f3;
+            font-size: 1.7rem;
+            margin-left: 0.5rem;
         }
-
-        .chat-input form {
-            display: flex;
-            gap: 8px;
+        /* Custom button styles and hover effects */
+        .btn {
+            transition: all 0.3s ease;
+            overflow: hidden;
+            position: relative;
         }
-
-        .chat-input input {
-            flex: 1;
-            border-radius: 24px;
-            padding: 12px 16px;
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
-
-        .profile-section {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
-            padding: 24px;
-            margin-bottom: 24px;
+        .btn-primary, .btn-dark {
+            position: relative;
+            z-index: 1;
         }
-
-        .profile-header {
+        .btn-primary:before, .btn-dark:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.2);
+            transition: all 0.4s ease;
+            z-index: -1;
+        }
+        .btn-primary:hover:before, .btn-dark:hover:before {
+            left: 0;
+        }
+        .btn-yellow {
+            background-color: var(--jobsy-yellow);
+            color: var(--jobsy-blue);
+            font-weight: 600;
+            border: none;
+        }
+        .btn-yellow:hover {
+            background-color: #ffe033;
+            color: #021024;
+        }
+        .auth-buttons .btn {
+            margin-left: 10px;
+            font-weight: 600;
+            padding: 8px 18px;
+        }
+        .auth-buttons .btn-yellow {
+            border: 2px solid var(--jobsy-yellow);
+        }
+        .auth-buttons .btn-outline-light {
+            border: 2px solid rgba(255,255,255,0.6);
+        }
+        .auth-buttons .btn-outline-light:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: var(--jobsy-yellow);
+            border-color: var(--jobsy-yellow);
+        }
+        .language-switcher {
+            margin-left: 15px;
             display: flex;
             align-items: center;
-            margin-bottom: 24px;
         }
-
-        .profile-avatar {
-            width: 152px;
-            height: 152px;
-            border-radius: 50%;
-            background-color: var(--linkedin-light-gray);
-            margin-right: 24px;
+        .language-switcher a {
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9rem;
+            text-decoration: none;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
         }
-
-        .profile-info h1 {
-            font-size: 2rem;
-            font-weight: 600;
-            margin-bottom: 8px;
+        .language-switcher a:hover,
+        .language-switcher a.active {
+            color: var(--jobsy-yellow);
+            background-color: rgba(255,255,255,0.1);
         }
-
-        .profile-info p {
-            color: var(--linkedin-gray);
-            margin-bottom: 16px;
+        .language-switcher span {
+            color: rgba(255,255,255,0.4);
+            margin: 0 0.2rem;
         }
     </style>
+    {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg">
+    <nav class="navbar jobsy-navbar navbar-expand-lg">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'job_list' %}">
-                <i class="fas fa-robot me-2"></i>Linked AI
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <a class="navbar-brand" href="{% url 'job_list' %}">Jobsy.</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'job_list' %}">
-                            <i class="fas fa-briefcase me-1"></i>Jobs
-                        </a>
-                    </li>
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'job_list' %}">{% trans "მთავარი" %}</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'job_list' %}?show_filters=1#filters">{% trans "ვაკანსიები" %}</a></li>
+                    
                     {% if user.is_authenticated %}
                         {% if user.userprofile.role == 'employer' %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'employer_dashboard' %}">
-                                <i class="fas fa-building me-1"></i>Employer Dashboard
-                            </a>
-                        </li>
+                            <li class="nav-item"><a class="btn btn-primary px-3 py-1" style="border-radius:18px; font-weight:600; background:var(--jobsy-blue); border:none;" href="{% url 'post_job' %}">{% trans "გამოქვეყნება" %}</a></li>
+                        {% else %}
+                            <li class="nav-item"><a class="nav-link" href="#">{% trans "დამატება CV" %}</a></li>
                         {% endif %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'chatbot' %}">
-                                <i class="fas fa-comments me-1"></i>AI Chat
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'profile' %}">
-                                <i class="fas fa-user me-1"></i>Profile
-                            </a>
-                        </li>
                     {% endif %}
+                    <li class="nav-item d-none d-lg-block"><a href="#" class="facebook-icon"><i class="fab fa-facebook-square"></i></a></li>
                 </ul>
-                <div class="d-flex">
+                
+                <div class="language-switcher me-3">
+                    <form action="{% url 'set_language' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <input name="next" type="hidden" value="{{ request.path }}">
+                        <input name="language" type="hidden" value="en">
+                        <button type="submit" class="btn btn-link p-0 {% if LANGUAGE_CODE == 'en' %}active{% endif %}" style="color: rgba(255,255,255,0.8); font-size: 0.9rem; text-decoration: none; background: none; border: none;">EN</button>
+                    </form>
+                    <span>|</span>
+                    <form action="{% url 'set_language' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <input name="next" type="hidden" value="{{ request.path }}">
+                        <input name="language" type="hidden" value="ka">
+                        <button type="submit" class="btn btn-link p-0 {% if LANGUAGE_CODE == 'ka' %}active{% endif %}" style="color: rgba(255,255,255,0.8); font-size: 0.9rem; text-decoration: none; background: none; border: none;">KA</button>
+                    </form>
+                </div>
+                
+                <div class="auth-buttons d-flex align-items-center">
                     {% if user.is_authenticated %}
-                        <div class="dropdown">
-                            <button class="btn nav-link dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
-                                <i class="fas fa-user-circle me-1"></i>{{ user.first_name }}
-                                {% if user.userprofile.role == 'employer' %}
-                                    <span class="badge bg-primary ms-1">Employer</span>
-                                {% endif %}
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'profile' %}">
-                                        <i class="fas fa-user me-2"></i>Profile
-                                    </a>
-                                </li>
-                                {% if user.userprofile.role == 'employer' %}
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'employer_dashboard' %}">
-                                        <i class="fas fa-building me-2"></i>Employer Dashboard
-                                    </a>
-                                </li>
-                                {% endif %}
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <a class="dropdown-item text-danger" href="{% url 'logout' %}">
-                                        <i class="fas fa-sign-out-alt me-2"></i>Sign Out
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
+                        <a class="btn btn-outline-light" href="{% url 'logout' %}">{% trans "გასვლა" %}</a>
                     {% else %}
-                        <a href="{% url 'login' %}" class="btn btn-linkedin me-2">
-                            <i class="fas fa-sign-in-alt me-1"></i>Sign In
-                        </a>
-                        <a href="{% url 'register' %}" class="btn btn-outline-primary">
-                            <i class="fas fa-user-plus me-1"></i>Sign Up
-                        </a>
+                        <a class="btn btn-outline-light" href="{% url 'login' %}">{% trans "შესვლა" %}</a>
+                        <a class="btn btn-yellow" href="{% url 'register' %}">{% trans "რეგისტრაცია" %}</a>
                     {% endif %}
                 </div>
             </div>
         </div>
     </nav>
-
-    <div class="main-container">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
-
-        {% block content %}{% endblock %}
+    
+    {% block hero_section %}{% endblock %}
+    
+    <div class="main-bg">
+        <div class="main-container">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {% block content %}{% endblock %}
+        </div>
     </div>
-
+    
+    {% block bottom_section %}{% endblock %}
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ensure Bootstrap's navbar toggler works properly
+        var navbarToggler = document.querySelector('.navbar-toggler');
+        var navbarCollapse = document.querySelector('#navbarNav');
+        
+        if (navbarToggler && navbarCollapse) {
+            navbarToggler.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                navbarCollapse.classList.toggle('show');
+            });
+            
+            // Fix for mobile nav links
+            var navLinks = navbarCollapse.querySelectorAll('.nav-link');
+            navLinks.forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    // If we're on mobile and the menu is open, close it after clicking
+                    if (window.innerWidth < 992 && navbarCollapse.classList.contains('show')) {
+                        navbarCollapse.classList.remove('show');
+                    }
+                });
+            });
+        }
+    });
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html> 

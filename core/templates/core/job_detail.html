@@ -1,141 +1,221 @@
 {% extends 'core/base.html' %}
+{% load static %}
+{% load i18n %}
 
-{% block title %}Linked AI - {{ job.title }}{% endblock %}
+{% block title %}{{ job.title }} - {% trans "Jobsy" %}{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Hide hero section only on job detail pages */
+    .hero-section {
+        display: none;
+    }
+    
+    /* Add custom styling for job details page */
+    .main-bg {
+        background-color: var(--jobsy-light);
+        padding-top: 20px;
+    }
+    
+    .job-detail-header {
+        background-color: var(--jobsy-blue);
+        color: white;
+        padding: 40px 0;
+        margin-bottom: 30px;
+    }
+    
+    .company-badge {
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: white;
+        border-radius: 50%;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
+<div class="job-detail-header">
 <div class="container">
-    <div class="row">
-        <!-- Main Job Content -->
-        <div class="col-lg-8">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start mb-4">
-                        <div>
-                            <h1 class="h2 mb-2">{{ job.title }}</h1>
-                            <div class="d-flex align-items-center mb-3">
-                                <span class="company-name me-3">
-                                    <i class="fas fa-building me-1"></i>{{ job.company }}
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 style="font-size:2.2rem; font-weight:700; margin-bottom:15px;">{{ job.title }}</h1>
+                <div class="d-flex align-items-center mb-2">
+                    <span style="font-size:1.2rem; font-weight:600; opacity:0.9;">{{ job.company }}</span>
+                    <span class="mx-2 text-white">•</span>
+                    <span style="opacity:0.9;">{{ job.location|default:_("თბილისი") }}</span>
+                </div>
+                <div class="d-flex gap-2 mb-1">
+                    <span class="badge rounded-pill" style="background-color:var(--jobsy-yellow); color:var(--jobsy-blue); font-weight:500; padding:0.5em 1em;">
+                        {{ job.category|default:_("IT / კომპიუტერები") }}
                                 </span>
-                                <span class="text-muted">
-                                    <i class="far fa-clock me-1"></i>Posted {{ job.posted_at|timesince }} ago
+                    <span class="badge rounded-pill" style="background-color:white; color:var(--jobsy-blue); font-weight:500; padding:0.5em 1em;">
+                        {{ job.get_experience_display|default:_("სრული განაკვეთი") }}
                                 </span>
                             </div>
                         </div>
-                        {% if is_job_owner %}
-                        <div class="dropdown">
-                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-ellipsis-v"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li>
-                                    <button class="dropdown-item" onclick="editJob({{ job.id }})">
-                                        <i class="fas fa-edit me-1"></i>Edit
-                                    </button>
-                                </li>
-                                <li>
-                                    <button class="dropdown-item text-danger" onclick="deleteJob({{ job.id }})">
-                                        <i class="fas fa-trash me-1"></i>Delete
-                                    </button>
-                                </li>
-                            </ul>
+            <div class="col-md-4 text-center text-md-end">
+                {% if job.employer and job.employer.company_logo %}
+                <div class="company-badge ms-auto me-0">
+                    <img src="{{ job.employer.company_logo.url }}" alt="{{ job.company }}" style="width:60px; height:60px; object-fit:contain;">
+                </div>
+                {% else %}
+                <div class="company-badge ms-auto me-0">
+                    <span style="font-size:2rem; color:var(--jobsy-blue); font-weight:700;">{{ job.company|slice:":1" }}</span>
                         </div>
                         {% endif %}
-                    </div>
-
-                    <div class="job-meta mb-4">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-briefcase me-2 text-muted"></i>
-                                    <span>{{ job.get_experience_display }}</span>
+                <div class="text-white">
+                    <i class="far fa-clock me-1"></i>
+                    {% trans "გამოქვეყნებულია" %} {{ job.posted_at|date:"d/m/Y" }}
                                 </div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-map-marker-alt me-2 text-muted"></i>
-                                    <span>{{ job.job_preferences }}</span>
-                                </div>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-graduation-cap me-2 text-muted"></i>
-                                    <span>{{ job.fields }}</span>
-                                </div>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-lightbulb me-2 text-muted"></i>
-                                    <span>{{ job.interests }}</span>
                                 </div>
                             </div>
                         </div>
+
+<div class="container">
+    <div class="row">
+        <!-- Main content area -->
+        <div class="col-lg-8 pe-lg-4">
+            <!-- Job Content -->
+            <div class="card mb-4 border-0 shadow-sm" style="border-radius:18px; background-color:#fff;">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                        <i class="fas fa-wallet me-2" style="color:var(--jobsy-blue);"></i>
+                        <span style="font-weight:600; font-size:1.2rem;">
+                            {% if job.salary_min and job.salary_max %}
+                            {{ job.salary_min }} - {{ job.salary_max }} ₾ {{ job.salary_type }}
+                            {% elif job.salary_min %}
+                            {{ job.salary_min }} ₾ {{ job.salary_type }}
+                            {% elif job.salary_max %}
+                            {{ job.salary_max }} ₾ {{ job.salary_type }}
+                            {% else %}
+                            {% trans "ანაზღაურება შეთანხმებით" %}
+                            {% endif %}
+                        </span>
                     </div>
 
+                    <div class="job-details">
+                        <h3 style="font-size:1.4rem; font-weight:700; color:var(--jobsy-blue);">{% trans "აღწერა" %}</h3>
                     <div class="job-description mb-4">
-                        <h3 class="h4 mb-3">Job Description</h3>
-                        <div class="description-content">
                             {{ job.description|linebreaks }}
                         </div>
                     </div>
 
+                    <div class="apply-section mt-4 pt-3 border-top">
+                        {% if user.is_authenticated %}
                     {% if not is_employer %}
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-linkedin" data-bs-toggle="modal" data-bs-target="#applyModal">
-                            <i class="fas fa-paper-plane me-1"></i>Apply Now
+                                <button class="btn btn-lg w-100" data-bs-toggle="modal" data-bs-target="#applyModal" style="background-color:var(--jobsy-blue); color:white; border-radius:12px; font-weight:600; padding:0.8rem;">
+                                    <i class="fas fa-paper-plane me-2"></i> {% trans "განაცხადის გაგზავნა" %}
                         </button>
+                            {% endif %}
+                        {% else %}
+                            <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-lg w-100" style="background-color:var(--jobsy-blue); color:white; border-radius:12px; font-weight:600; padding:0.8rem;">
+                                <i class="fas fa-sign-in-alt me-2"></i> {% trans "შესვლა განაცხადის გასაგზავნად" %}
+                            </a>
+                        {% endif %}
                     </div>
-                    {% endif %}
                 </div>
             </div>
         </div>
 
         <!-- Sidebar -->
         <div class="col-lg-4">
-            <!-- Company Info Card -->
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h3 class="h5 mb-3">About the Company</h3>
-                    <div class="company-info">
-                        <p class="mb-3">{{ job.employer.company_description }}</p>
-                        <div class="d-flex flex-column gap-2">
-                            {% if job.employer.company_website %}
-                            <a href="{{ job.employer.company_website }}" target="_blank" class="btn btn-outline-primary">
-                                <i class="fas fa-globe me-1"></i>Visit Website
-                            </a>
+            <!-- Company Card -->
+            <div class="card mb-4 border-0 shadow-sm" style="border-radius:18px; background-color:#fff;">
+                <div class="card-body p-4">
+                    <h3 style="font-size:1.4rem; font-weight:700; color:var(--jobsy-blue);">{% trans "კომპანიის შესახებ" %}</h3>
+                    
+                    <div class="d-flex align-items-center mb-3 mt-4">
+                        {% if job.employer and job.employer.company_logo %}
+                        <img src="{{ job.employer.company_logo.url }}" alt="{{ job.company }}" class="rounded-circle me-3" style="width:50px; height:50px; object-fit:cover;">
+                        {% else %}
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width:50px; height:50px; background-color:var(--jobsy-light);">
+                            <span style="font-size:1.4rem; color:var(--jobsy-blue); font-weight:700;">{{ job.company|slice:":1" }}</span>
+                        </div>
                             {% endif %}
-                            <div class="d-flex align-items-center">
-                                <i class="fas fa-users me-2 text-muted"></i>
+                        <div>
+                            <h4 style="font-size:1.1rem; font-weight:600; margin-bottom:0;">{{ job.company }}</h4>
+                            <p class="text-muted mb-0" style="font-size:0.9rem;">{{ job.employer.industry|default:_("IT სფერო") }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <p>{{ job.employer.company_description|default:_("კომპანიის აღწერა არ არის მითითებული.")|linebreaks }}</p>
+                    </div>
+                    
+                    <div class="company-meta mb-4">
+                        {% if job.employer %}
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-user-friends me-2 text-muted"></i>
                                 <span>{{ job.employer.get_company_size_display }}</span>
                             </div>
-                            <div class="d-flex align-items-center">
-                                <i class="fas fa-industry me-2 text-muted"></i>
-                                <span>{{ job.employer.industry }}</span>
-                            </div>
-                            <div class="d-flex align-items-center">
+                        <div class="d-flex align-items-center mb-2">
                                 <i class="fas fa-map-marker-alt me-2 text-muted"></i>
                                 <span>{{ job.employer.location }}</span>
                             </div>
+                        {% if job.employer.company_website %}
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-globe me-2 text-muted"></i>
+                            <a href="{{ job.employer.company_website }}" target="_blank" class="text-decoration-none">{{ job.employer.company_website }}</a>
                         </div>
+                        {% endif %}
+                        {% endif %}
                     </div>
+                    
+                    <a href="#" class="btn w-100" style="background-color:var(--jobsy-card); color:var(--jobsy-blue); border-radius:12px; font-weight:600; padding:0.8rem;">
+                        <i class="fas fa-building me-2"></i> {% trans "კომპანიის პროფილი" %}
+                    </a>
                 </div>
             </div>
 
             <!-- Similar Jobs Card -->
-            <div class="card">
-                <div class="card-body">
-                    <h3 class="h5 mb-3">Similar Jobs</h3>
-                    <div class="similar-jobs">
-                        {% for similar_job in similar_jobs %}
-                        <div class="similar-job-item mb-3">
+            <div class="card border-0 shadow-sm" style="border-radius:18px; background-color:#fff;">
+                <div class="card-body p-4">
+                    <h3 style="font-size:1.4rem; font-weight:700; color:var(--jobsy-blue); margin-bottom:1.5rem;">{% trans "მსგავსი ვაკანსიები" %}</h3>
+                    
+                    {% for similar_job in similar_jobs|slice:":3" %}
+                    <div class="similar-job-item mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
                             <a href="{% url 'job_detail' similar_job.id %}" class="text-decoration-none">
-                                <h4 class="h6 mb-1">{{ similar_job.title }}</h4>
-                                <p class="small text-muted mb-0">{{ similar_job.company }}</p>
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h4 style="font-size:1.1rem; font-weight:600; color:#000; margin-bottom:5px;">{{ similar_job.title }}</h4>
+                                    <p class="text-muted mb-1" style="font-size:0.95rem;">{{ similar_job.company }}</p>
+                                    <div class="d-flex align-items-center" style="font-size:0.9rem;">
+                                        <i class="fas fa-wallet me-1" style="color:#666;"></i>
+                                        <span style="font-weight:500;">
+                                            {% if similar_job.salary_min and similar_job.salary_max %}
+                                            {{ similar_job.salary_min }} - {{ similar_job.salary_max }} ₾
+                                            {% elif similar_job.salary_min %}
+                                            {{ similar_job.salary_min }} ₾
+                                            {% elif similar_job.salary_max %}
+                                            {{ similar_job.salary_max }} ₾
+                                            {% else %}
+                                            {% trans "შეთანხმებით" %}
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="badge rounded-pill" style="background-color:var(--jobsy-card); color:#333; padding:0.4em 0.8em; font-size:0.8rem;">
+                                    {{ similar_job.job_preferences|default:_("სრული განაკვეთი")|truncatechars:12 }}
+                                </div>
+                            </div>
                             </a>
                         </div>
                         {% empty %}
-                        <p class="text-muted">No similar jobs found.</p>
-                        {% endfor %}
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-briefcase fa-2x mb-3"></i>
+                        <p>{% trans "მსგავსი ვაკანსიები არ მოიძებნა." %}</p>
                     </div>
+                    {% endfor %}
+                    
+                    <a href="{% url 'job_list' %}" class="btn w-100 mt-3" style="background-color:var(--jobsy-light); color:#333; border-radius:12px; font-weight:600; padding:0.8rem;">
+                        <i class="fas fa-search me-2"></i> {% trans "ყველა ვაკანსია" %}
+                    </a>
                 </div>
             </div>
         </div>
@@ -144,28 +224,28 @@
 
 <!-- Apply Modal -->
 <div class="modal fade" id="applyModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Apply for {{ job.title }}</h5>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="border-radius:16px;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" style="font-size:1.5rem; font-weight:700; color:var(--jobsy-blue);">{% trans "განაცხადი" %} - {{ job.title }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="post" action="{% url 'apply_job' job.id %}" enctype="multipart/form-data">
                 {% csrf_token %}
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="id_cover_letter" class="form-label">Cover Letter</label>
-                        <textarea class="form-control" id="id_cover_letter" name="cover_letter" rows="5" required></textarea>
+                <div class="modal-body p-4">
+                    <div class="mb-4">
+                        <label for="id_cover_letter" class="form-label" style="font-weight:600;">{% trans "მოტივაციის წერილი" %}</label>
+                        <textarea class="form-control" id="id_cover_letter" name="cover_letter" rows="5" style="border-radius:12px;"></textarea>
                     </div>
-                    <div class="mb-3">
-                        <label for="id_resume" class="form-label">Resume/CV</label>
-                        <input type="file" class="form-control" id="id_resume" name="resume" accept=".pdf,.doc,.docx" required>
-                        <div class="form-text">Accepted formats: PDF, DOC, DOCX</div>
+                    <div class="mb-4">
+                        <label for="id_resume" class="form-label" style="font-weight:600;">{% trans "CV / რეზიუმე" %}</label>
+                        <input type="file" class="form-control" id="id_resume" name="resume" accept=".pdf,.doc,.docx" style="border-radius:12px;">
+                        <div class="form-text">{% trans "დასაშვები ფორმატი: PDF, DOC, DOCX" %}</div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-linkedin">Submit Application</button>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn" data-bs-dismiss="modal" style="border-radius:12px;">{% trans "გაუქმება" %}</button>
+                    <button type="submit" class="btn" style="background-color:var(--jobsy-blue); color:white; border-radius:12px; font-weight:600;">{% trans "განაცხადის გაგზავნა" %}</button>
                 </div>
             </form>
         </div>
@@ -175,45 +255,15 @@
 
 {% block extra_js %}
 <script>
-function editJob(jobId) {
-    fetch(`/employer/jobs/${jobId}/edit/`)
-        .then(response => response.json())
-        .then(job => {
-            const form = document.getElementById('jobForm');
-            form.action = `/employer/jobs/${jobId}/edit/`;
-            Object.keys(job).forEach(key => {
-                const input = form.querySelector(`#id_${key}`);
-                if (input) input.value = job[key];
-            });
-            const modal = new bootstrap.Modal(document.getElementById('newJobModal'));
+document.addEventListener('DOMContentLoaded', function() {
+    // Activate apply modal when apply button is clicked
+    const applyBtn = document.querySelector('.apply-section button');
+    if (applyBtn) {
+        applyBtn.addEventListener('click', function() {
+            const modal = new bootstrap.Modal(document.getElementById('applyModal'));
             modal.show();
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Failed to load job details. Please try again.');
-        });
-}
-
-function deleteJob(jobId) {
-    if (confirm('Are you sure you want to delete this job listing?')) {
-        fetch(`/employer/jobs/${jobId}/delete/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-            },
-        })
-        .then(response => {
-            if (response.ok) {
-                window.location.href = "{% url 'employer_dashboard' %}";
-            } else {
-                throw new Error('Failed to delete job');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Failed to delete job. Please try again.');
         });
     }
-}
+});
 </script>
 {% endblock %} 

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import main, chatbot
+from .views import main
 
 urlpatterns = [
     path('', main.job_list, name='job_list'),
@@ -7,13 +7,13 @@ urlpatterns = [
     path('logout/', main.logout_view, name='logout'),
     path('register/', main.register, name='register'),
     path('profile/', main.profile, name='profile'),
-    path('chatbot/', chatbot.chatbot, name='chatbot'),
     
     # Employer routes
     path('employer/dashboard/', main.employer_dashboard, name='employer_dashboard'),
     path('employer/jobs/post/', main.post_job, name='post_job'),
     path('employer/jobs/<int:job_id>/edit/', main.edit_job, name='edit_job'),
     path('employer/jobs/<int:job_id>/delete/', main.delete_job, name='delete_job'),
+    path('employer/home/', main.employer_home, name='employer_home'),
     
     # Job routes
     path('jobs/<int:job_id>/', main.job_detail, name='job_detail'),

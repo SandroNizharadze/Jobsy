@@ -7,21 +7,8 @@ from django.core.files.uploadedfile import UploadedFile
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['profile_picture', 'interests', 'fields', 'experience', 'job_preferences']
+        fields = ['profile_picture']
         widgets = {
-            'interests': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'E.g., AI, web development, cybersecurity'
-            }),
-            'fields': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'E.g., software engineering, data science'
-            }),
-            'experience': forms.Select(attrs={'class': 'form-control'}),
-            'job_preferences': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'E.g., remote, full-time, startup'
-            }),
             'profile_picture': forms.FileInput(attrs={
                 'class': 'form-control',
                 'accept': 'image/*'
@@ -85,12 +72,13 @@ class EmployerProfileForm(forms.ModelForm):
 class JobListingForm(forms.ModelForm):
     class Meta:
         model = JobListing
-        fields = ('title', 'description', 'interests', 'fields', 'experience', 'job_preferences')
+        fields = ('title', 'description', 'location', 'salary_min', 'salary_max', 'salary_type', 'category')
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
-            'interests': forms.TextInput(attrs={'class': 'form-control'}),
-            'fields': forms.TextInput(attrs={'class': 'form-control'}),
-            'experience': forms.Select(attrs={'class': 'form-control'}),
-            'job_preferences': forms.TextInput(attrs={'class': 'form-control'}),
+            'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'თბილისი'}),
+            'salary_min': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '1500'}),
+            'salary_max': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '2600'}),
+            'salary_type': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'თვეში'}),
+            'category': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Category'}),
         }

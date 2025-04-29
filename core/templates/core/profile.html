@@ -140,58 +140,6 @@
             </div>
         {% endif %}
 
-        <div class="mb-4">
-            <label class="form-label" for="{{ user_form.interests.id_for_label }}">Interests</label>
-            {{ user_form.interests }}
-            {% if user_form.interests.errors %}
-                <div class="invalid-feedback d-block">
-                    {{ user_form.interests.errors|join:", " }}
-                </div>
-            {% endif %}
-            <div class="form-text">
-                <i class="fas fa-lightbulb me-1"></i>E.g., AI, web development, cybersecurity
-            </div>
-        </div>
-
-        <div class="mb-4">
-            <label class="form-label" for="{{ user_form.fields.id_for_label }}">Fields</label>
-            {{ user_form.fields }}
-            {% if user_form.fields.errors %}
-                <div class="invalid-feedback d-block">
-                    {{ user_form.fields.errors|join:", " }}
-                </div>
-            {% endif %}
-            <div class="form-text">
-                <i class="fas fa-graduation-cap me-1"></i>E.g., software engineering, data science
-            </div>
-        </div>
-
-        <div class="mb-4">
-            <label class="form-label" for="{{ user_form.experience.id_for_label }}">Experience Level</label>
-            {{ user_form.experience }}
-            {% if user_form.experience.errors %}
-                <div class="invalid-feedback d-block">
-                    {{ user_form.experience.errors|join:", " }}
-                </div>
-            {% endif %}
-            <div class="form-text">
-                <i class="fas fa-briefcase me-1"></i>Select your current experience level
-            </div>
-        </div>
-
-        <div class="mb-4">
-            <label class="form-label" for="{{ user_form.job_preferences.id_for_label }}">Job Preferences</label>
-            {{ user_form.job_preferences }}
-            {% if user_form.job_preferences.errors %}
-                <div class="invalid-feedback d-block">
-                    {{ user_form.job_preferences.errors|join:", " }}
-                </div>
-            {% endif %}
-            <div class="form-text">
-                <i class="fas fa-sliders-h me-1"></i>E.g., remote, full-time, startup
-            </div>
-        </div>
-
         <div class="d-flex gap-2">
             <button type="submit" class="btn btn-linkedin">
                 <i class="fas fa-save me-1"></i>Save Profile

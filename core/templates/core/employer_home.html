@@ -1,0 +1,84 @@
+{% extends 'core/base.html' %}
+{% block title %}Employer Home | Jobsy{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">Welcome, {{ employer_profile.company_name|default:employer_profile.user_profile.user.username }}</h1>
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Active Jobs</h5>
+                    <p class="display-5 fw-bold">{{ total_jobs }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Total Applicants</h5>
+                    <p class="display-5 fw-bold">{{ total_applicants }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Avg. Applicants/Job</h5>
+                    <p class="display-5 fw-bold">{{ avg_applicants }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Jobs Expiring Soon</h5>
+                    <p class="display-5 fw-bold">{{ jobs_expiring_soon|length }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">Recent Applicants</div>
+                <ul class="list-group list-group-flush">
+                    {% for app in recent_applicants %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>
+                            <strong>{{ app.user.get_full_name|default:app.user.username }}</strong> <br>
+                            <small>for <b>{{ app.job.title }}</b></small>
+                        </span>
+                        <span class="badge bg-secondary">{{ app.applied_at|date:"M d, H:i" }}</span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item">No recent applicants.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-warning text-dark">Jobs Expiring Soon</div>
+                <ul class="list-group list-group-flush">
+                    {% for job in jobs_expiring_soon %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>{{ job.title }}</span>
+                        <span class="badge bg-light text-dark">{{ job.posted_at|date:"M d" }}</span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item">No jobs expiring soon.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 text-end">
+        <a href="{% url 'employer_dashboard' %}" class="btn btn-primary">Manage Jobs</a>
+        <a href="{% url 'profile' %}" class="btn btn-outline-secondary">Edit Company Profile</a>
+        <a href="{% url 'post_job' %}" class="btn btn-success">Post New Job</a>
+    </div>
+</div>
+{% endblock %} 

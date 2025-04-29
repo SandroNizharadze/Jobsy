@@ -21,9 +21,6 @@
                         <div class="job-description">{{ job.description }}</div>
                         <div class="job-meta">
                             <span class="me-3"><i class="far fa-clock me-1"></i>Posted on {{ job.posted_at|date:"F j, Y" }}</span>
-                            <span class="me-3"><i class="fas fa-graduation-cap me-1"></i>{{ job.fields }}</span>
-                            <span class="me-3"><i class="fas fa-briefcase me-1"></i>{{ job.get_experience_display }}</span>
-                            <span><i class="fas fa-sliders-h me-1"></i>{{ job.job_preferences }}</span>
                         </div>
                     </div>
                     <div class="dropdown">
@@ -75,29 +72,30 @@
                         {{ form.description }}
                     </div>
                     <div class="mb-3">
-                        <label for="id_interests" class="form-label">Required Skills/Interests</label>
-                        {{ form.interests }}
-                        <div class="form-text">
-                            <i class="fas fa-lightbulb me-1"></i>Skills that candidates should have
+                        <label for="id_location" class="form-label">Location</label>
+                        {{ form.location }}
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_salary_min" class="form-label">Minimum Salary</label>
+                            {{ form.salary_min }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_salary_max" class="form-label">Maximum Salary</label>
+                            {{ form.salary_max }}
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="id_fields" class="form-label">Fields</label>
-                        {{ form.fields }}
-                        <div class="form-text">
-                            <i class="fas fa-graduation-cap me-1"></i>Relevant fields for this position
-                        </div>
+                        <label for="id_salary_type" class="form-label">Salary Type</label>
+                        {{ form.salary_type }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_category" class="form-label">Category</label>
+                        {{ form.category }}
                     </div>
                     <div class="mb-3">
                         <label for="id_experience" class="form-label">Required Experience</label>
                         {{ form.experience }}
-                    </div>
-                    <div class="mb-3">
-                        <label for="id_job_preferences" class="form-label">Job Type</label>
-                        {{ form.job_preferences }}
-                        <div class="form-text">
-                            <i class="fas fa-sliders-h me-1"></i>E.g., remote, full-time, contract
-                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">

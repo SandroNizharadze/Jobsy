@@ -1,45 +1,520 @@
 {% extends 'core/base.html' %}
+{% load static %}
+{% load i18n %}
 
-{% block title %}Linked AI - Job Listings{% endblock %}
+{% block title %}{% trans "Jobsy - ვაკანსიები" %}{% endblock %}
+
+{% block extra_head %}
+<!-- Remove loading overlay styles -->
+{% endblock %}
+
+{% block hero_section %}
+<section class="hero-section">
+    <div class="container position-relative">
+        <div class="row align-items-center" style="min-height:400px;">
+            <div class="col-lg-6 col-md-12">
+                <div class="hero-box mb-4" style="background-color:var(--jobsy-yellow); border-radius:18px; padding:40px 30px; height:100%;">
+                    <h1 style="font-weight:800; font-size:2.6rem; color:white; margin-bottom:15px;">{% trans "ჩვენი ვაკანსიები დაგეხმარება!" %}</h1>
+                    <p style="font-size:1.3rem; color:white; margin-bottom:25px;">{% trans "საუკეთესო სამსახურის მოძიებაში ჯობსის ვაკანსიები დაგეხმარება" %}</p>
+                    <a href="{% url 'job_list' %}?show_filters=1#filters" class="btn btn-dark" style="font-weight:600; border-radius:12px; padding:12px 30px; font-size:1.1rem; background-color:#0a2342; border:none;">{% trans "ყველა ვაკანსია" %}</a>
+                </div>
+            </div>
+            <div class="col-lg-6 d-none d-lg-block position-relative" style="min-height:400px;">
+                <img src="{% static 'hero_woman.png' %}" alt="Hero" class="img-fluid" style="position:absolute; bottom:-33px; right:0; max-height:128%; z-index:1;">
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h2 mb-0">Job Listings</h1>
-    {% if user.is_authenticated %}
-        <a href="{% url 'chatbot' %}" class="btn btn-linkedin">
-            <i class="fas fa-robot me-1"></i>Ask AI for Job Recommendations
-        </a>
-    {% endif %}
-</div>
-
-{% if user.is_authenticated and profile_incomplete %}
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        <i class="fas fa-exclamation-triangle me-2"></i>
-        Please complete your profile to access the AI chatbot. 
-        <a href="{% url 'profile' %}" class="alert-link">Click here to complete your profile</a>.
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-{% endif %}
-
-<div class="card">
-    <div class="card-body p-0">
-        {% for job in jobs %}
-            <a href="{% url 'job_detail' job.id %}" class="text-decoration-none">
-                <div class="job-card {% if not forloop.last %}border-bottom{% endif %}">
-                    <div class="job-title">{{ job.title }}</div>
-                    <div class="company-name">{{ job.company }}</div>
-                    <div class="job-description">{{ job.description|truncatewords:30 }}</div>
-                    <div class="job-meta">
-                        <i class="far fa-clock me-1"></i>Posted on {{ job.posted_at|date:"F j, Y" }}
+<!-- Filtering Section -->
+<div id="filters" class="card mb-4 shadow-sm {% if not request.GET.show_filters %}d-none{% endif %}" style="border-radius:18px; background-color:var(--jobsy-yellow); border:none; scroll-margin-top: 100px;">
+    <div class="card-body p-4">
+        <form method="get" action="{% url 'job_list' %}" id="filter-form" onsubmit="return false;">
+            <input type="hidden" name="show_filters" value="1">
+            <div class="row g-3">
+                <div class="col-12">
+                    <input type="text" class="form-control filter-auto-submit" name="search" placeholder="{% trans "მოძებნა / კომპანია" %}" value="{{ request.GET.search|default:'' }}" style="border-radius:8px; padding:10px 15px;">
+                </div>
+                
+                <div class="col-md-4">
+                    <select class="form-select filter-auto-submit" name="category" style="border-radius:8px; padding:10px 15px;">
+                        <option value="">{% trans "კატეგორია" %}</option>
+                        {% for category in categories %}
+                            <option value="{{ category }}" {% if request.GET.category == category %}selected{% endif %}>{{ category }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-4">
+                    <select class="form-select filter-auto-submit" name="location" style="border-radius:8px; padding:10px 15px;">
+                        <option value="">{% trans "ლოკაცია" %}</option>
+                        {% for location in locations %}
+                            <option value="{{ location }}" {% if request.GET.location == location %}selected{% endif %}>{{ location }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-4">
+                    <select class="form-select filter-auto-submit" name="experience" style="border-radius:8px; padding:10px 15px;">
+                        <option value="">{% trans "გამოცდილება" %}</option>
+                        <option value="entry" {% if request.GET.experience == "entry" %}selected{% endif %}>{% trans "დამწყები" %}</option>
+                        <option value="mid" {% if request.GET.experience == "mid" %}selected{% endif %}>{% trans "საშუალო" %}</option>
+                        <option value="senior" {% if request.GET.experience == "senior" %}selected{% endif %}>{% trans "პროფესიონალი" %}</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="mt-3">
+                <label class="form-label">{% trans "მინიმალური ანაზღაურება" %}</label>
+                <input type="range" class="form-range filter-auto-submit" min="0" max="10000" step="500" name="salary_min" value="{{ request.GET.salary_min|default:0 }}" id="salary-slider">
+                <div class="d-flex justify-content-between">
+                    <span id="salary-value">₾ {{ request.GET.salary_min|default:0 }}</span>
+                    <span>₾ 10,000+</span>
+                </div>
+            </div>
+            
+            <div class="mt-3">
+                <div class="d-flex flex-wrap gap-2">
+                    <div class="form-check">
+                        <input class="form-check-input filter-auto-submit" type="checkbox" name="job_preferences" value="სრული განაკვეთი" id="full-time" {% if 'სრული განაკვეთი' in job_preferences %}checked{% endif %}>
+                        <label class="form-check-label" for="full-time">{% trans "სრული განაკვეთი" %}</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input filter-auto-submit" type="checkbox" name="job_preferences" value="ნახევარი განაკვეთი" id="part-time" {% if 'ნახევარი განაკვეთი' in job_preferences %}checked{% endif %}>
+                        <label class="form-check-label" for="part-time">{% trans "ნახევარი განაკვეთი" %}</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input filter-auto-submit" type="checkbox" name="job_preferences" value="დისტანციური" id="remote" {% if 'დისტანციური' in job_preferences %}checked{% endif %}>
+                        <label class="form-check-label" for="remote">{% trans "დისტანციური" %}</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input filter-auto-submit" type="checkbox" name="job_preferences" value="სტაჟირება" id="internship" {% if 'სტაჟირება' in job_preferences %}checked{% endif %}>
+                        <label class="form-check-label" for="internship">{% trans "სტაჟირება" %}</label>
                     </div>
                 </div>
-            </a>
-        {% empty %}
-            <div class="job-card text-center text-muted">
-                <i class="fas fa-briefcase fa-2x mb-3"></i>
-                <p class="mb-0">No jobs available at the moment.</p>
+            </div>
+            
+            <div class="d-flex justify-content-end mt-4">
+                <a href="{% url 'job_list' %}?show_filters=1" class="btn btn-outline-secondary" style="border-radius:12px; padding:10px 20px;">
+                    <i class="fas fa-redo me-2"></i>{% trans "გასუფთავება" %}
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 style="font-weight:700; font-size:1.8rem;">{% trans "ვაკანსიები" %} 
+        {% if filtered %}
+            <small>({{ jobs|length }} {% trans "შედეგი" %})</small>
+        {% elif show_filters %}
+            <small>({{ jobs|length }} {% trans "შედეგი" %})</small>
+        {% endif %}
+    </h2>
+    {% if not request.GET.show_filters %}
+    <a href="{% url 'job_list' %}?show_filters=1#filters" class="btn btn-primary">
+        <i class="fas fa-filter me-2"></i>{% trans "ფილტრები" %}
+    </a>
+    {% endif %}
+    {% if filtered %}
+    <div class="active-filters d-flex flex-wrap gap-2">
+        {% for filter_name, filter_value in active_filters.items %}
+            <div class="badge bg-light text-dark p-2">
+                {{ filter_name }}: {{ filter_value }}
+                <a href="{% url 'job_list' %}?show_filters=1" class="ms-1 text-danger"><i class="fas fa-times"></i></a>
             </div>
         {% endfor %}
     </div>
+    {% endif %}
 </div>
+
+<div class="row g-4">
+    {% for job in jobs %}
+    <div class="col-12 col-md-6 col-lg-{% if show_filters %}4{% else %}4{% endif %}">
+        <a href="{% url 'job_detail' job.id %}" class="text-decoration-none h-100">
+            <div class="card shadow-sm h-100" style="background:var(--jobsy-card); border-radius:18px; border:1px solid #ffe066; padding: 1.2rem 1.5rem; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.1)';" onmouseout="this.style.transform=''; this.style.boxShadow='';">
+                <div class="card-body p-2 d-flex flex-column">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="mb-1" style="font-weight:600; color:#333; font-size:1.3rem;">{{ job.title }}</h5>
+                            <p class="mb-1" style="font-size:1.1rem;">{{ job.company }}</p>
+                        </div>
+                        <div class="d-flex align-items-start">
+                            <span class="badge rounded-pill" style="background-color:#7c4dff; padding:0.4em 0.8em; margin-right:4px;"><i class="fas fa-star"></i></span>
+                            <span class="badge rounded-pill text-dark" style="background-color:#f6f8fa; padding:0.4em 0.8em;"><i class="fas fa-map-marker-alt"></i> {{ job.location|default:"თბილისი" }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3 mb-3">
+                        <p class="mb-1" style="color:#666; font-size:1.1rem;"><i class="fas fa-wallet me-1"></i> {{ job.salary_min|default:"1500" }} - {{ job.salary_max|default:"2600" }} ₾ {{ job.salary_type|default:"თვეში" }}</p>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-auto">
+                        <div>
+                            <span class="badge bg-light text-dark" style="font-size:0.9rem; color:#666; margin-right:5px;">{{ job.job_preferences|default:"სრული განაკვეთი" }}</span>
+                            <span class="badge bg-light text-dark" style="font-size:0.9rem; color:#666;">{{ job.experience|default:"პროფესიონალი" }}</span>
+                        </div>
+                        {% if job.employer and job.employer.company_logo %}
+                        <img src="{{ job.employer.company_logo.url }}" alt="{{ job.company }}" style="width:40px; height:40px; border-radius:50%;">
+                        {% else %}
+                        <img src="https://via.placeholder.com/40" alt="{{ job.company }}" style="width:40px; height:40px; border-radius:50%;">
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center text-muted py-5">
+        <i class="fas fa-search fa-3x mb-3"></i>
+        <h4 class="mb-2">ვაკანსიები ვერ მოიძებნა</h4>
+        <p class="mb-3">შეცვალეთ ფილტრები უფრო მეტი შედეგის სანახავად</p>
+        <a href="{% url 'job_list' %}?show_filters=1#filters" class="btn btn-primary">ყველა ვაკანსია</a>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination (only shown on main page) -->
+{% if not show_filters and jobs.paginator.num_pages > 1 %}
+<div class="d-flex justify-content-center mt-5">
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {% if jobs.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="First">
+                    <span aria-hidden="true">&laquo;&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ jobs.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% endif %}
+            
+            {% for num in jobs.paginator.page_range %}
+                {% if jobs.number == num %}
+                <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                {% elif num > jobs.number|add:'-3' and num < jobs.number|add:'3' %}
+                <li class="page-item"><a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if jobs.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ jobs.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ jobs.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Last">
+                    <span aria-hidden="true">&raquo;&raquo;</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endif %}
+
+<!-- Bottom Section -->
+<div class="container-fluid py-5 mt-5" style="background-color: var(--jobsy-blue); color: white;">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <h2 class="display-5 fw-bold mb-4">ვერ იპოვეთ სასურველი ვაკანსია?</h2>
+                <p class="lead mb-4">გამოიწერეთ ჩვენი სიახლეები და მიიღეთ შეტყობინებები ახალი ვაკანსიების შესახებ თქვენს ელფოსტაზე.</p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <input type="email" class="form-control" style="max-width: 300px; border-radius: 20px;" placeholder="თქვენი ელფოსტა">
+                    <button class="btn btn-yellow px-4 py-2" style="border-radius: 20px; font-weight: 600;">გამოწერა</button>
+                </div>
+            </div>
+            <div class="col-lg-5 text-center d-none d-lg-block">
+                <img src="{% static 'core/images/notification.svg' %}" alt="Notifications" class="img-fluid" style="max-width: 300px;">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block bottom_section %}
+<section class="bottom-section mt-5">
+    <div class="container position-relative">
+        <div class="row align-items-center" style="min-height:300px; background-color:var(--jobsy-yellow); border-radius:18px; padding:25px;">
+            <div class="col-lg-7 col-md-12">
+                <h2 class="mb-3" style="font-weight:700;">{% trans "გჭირდებათ თანამშრომელი?" %}</h2>
+                <div class="mb-4">
+                    {% trans "გამოაქვეყნეთ ვაკანსია ჯობსიზე და იპოვეთ საუკეთესო კანდიდატები თქვენი კომპანიისთვის." %}<br>
+                    {% trans "ათასობით პროფესიონალი ეძებს ახალ შესაძლებლობებს ყოველდღე." %}
+                </div>
+                <a href="{% url 'employer_dashboard' %}" class="btn btn-dark" style="border-radius:12px; padding:10px 25px;">{% trans "განათავსეთ ვაკანსია" %}</a>
+            </div>
+            <div class="col-lg-5 d-none d-lg-block position-relative" style="height:250px;">
+                <img src="{% static 'employer_cta.png' %}" alt="Employer CTA" class="img-fluid" style="position:absolute; bottom:0; right:0; max-height:100%;">
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="mt-5" style="background-color:var(--jobsy-blue); color:white; padding:40px 0;">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h3>{% trans "Stay in Touch" %}</h3>
+            <hr style="width:80px; margin:15px auto; border-top:2px solid white;">
+        </div>
+        
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h4 class="mb-0">Jobsy.</h4>
+            </div>
+            <div class="d-flex gap-4">
+                <a href="{% url 'job_list' %}" class="text-white text-decoration-none footer-link">{% trans "მთავარი" %}</a>
+                <a href="{% url 'job_list' %}?show_filters=1" class="text-white text-decoration-none footer-link">{% trans "ვაკანსიები" %}</a>
+                <a href="{% url 'job_list' %}#cv" class="text-white text-decoration-none footer-link">{% trans "დაამატეთ CV" %}</a>
+                <a href="{% url 'employer_dashboard' %}" class="text-white text-decoration-none footer-link">{% trans "გამოაქვეყნეთ" %}</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<style>
+    .footer-link {
+        position: relative;
+        padding-bottom: 2px;
+        transition: all 0.3s ease;
+    }
+    
+    .footer-link:after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: 0;
+        left: 0;
+        background-color: var(--jobsy-yellow);
+        transition: width 0.3s ease;
+    }
+    
+    .footer-link:hover {
+        color: var(--jobsy-yellow) !important;
+        transform: translateY(-2px);
+    }
+    
+    .footer-link:hover:after {
+        width: 100%;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if URL has show_filters parameter and filters should be visible
+    if (window.location.href.includes('show_filters=1') && window.location.hash === '#filters') {
+        const filtersSection = document.getElementById('filters');
+        if (filtersSection) {
+            filtersSection.classList.remove('d-none');
+        }
+    }
+
+    // Salary slider
+    const salarySlider = document.getElementById('salary-slider');
+    const salaryValue = document.getElementById('salary-value');
+    
+    if (salarySlider && salaryValue) {
+        // Update display value while sliding
+        salarySlider.addEventListener('input', function() {
+            salaryValue.textContent = '₾ ' + salarySlider.value;
+        });
+        
+        // Filter after slider stops (when user releases mouse)
+        salarySlider.addEventListener('change', function() {
+            applyFiltersWithAjax();
+        });
+    }
+    
+    // Auto-submit on select changes
+    const filterSelects = document.querySelectorAll('select.filter-auto-submit');
+    filterSelects.forEach(function(select) {
+        select.addEventListener('change', function() {
+            applyFiltersWithAjax();
+        });
+    });
+    
+    // Auto-submit on text input (with debounce)
+    const searchInput = document.querySelector('input[name="search"]');
+    if (searchInput) {
+        let searchTimeout;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(function() {
+                applyFiltersWithAjax();
+            }, 500); // Wait 500ms after user stops typing
+        });
+    }
+    
+    // Auto-submit on checkbox changes
+    const filterCheckboxes = document.querySelectorAll('.filter-auto-submit[type="checkbox"]');
+    filterCheckboxes.forEach(function(checkbox) {
+        checkbox.addEventListener('change', function() {
+            applyFiltersWithAjax();
+        });
+    });
+    
+    // Variables to track AJAX state
+    let currentRequest = null;
+    
+    // AJAX-based filtering to avoid page refreshes
+    function applyFiltersWithAjax() {
+        const form = document.getElementById('filter-form');
+        if (!form) return;
+        
+        // Cancel any in-progress request
+        if (currentRequest) {
+            currentRequest.abort();
+        }
+        
+        // Create form data object
+        const formData = new FormData(form);
+        const searchParams = new URLSearchParams();
+        
+        // Add all form values to search params
+        for (const [key, value] of formData.entries()) {
+            // Skip empty values
+            if (value !== '' && key !== 'job_preferences') {
+                searchParams.append(key, value);
+            }
+        }
+        
+        // Handle job preferences checkboxes (combine them)
+        const checkedPreferences = [];
+        form.querySelectorAll('input[name="job_preferences"]:checked').forEach(function(checkbox) {
+            checkedPreferences.push(checkbox.value);
+        });
+        
+        if (checkedPreferences.length > 0) {
+            searchParams.append('job_preferences', checkedPreferences.join(','));
+        }
+        
+        // Ensure the filters stay visible
+        searchParams.append('show_filters', '1');
+        searchParams.append('ajax', '1'); // Add indicator for AJAX request
+        
+        // Show a subtle loading indicator within the job results container
+        const jobsContainer = document.querySelector('.row.g-4');
+        if (jobsContainer) {
+            // Add subtle opacity transition
+            jobsContainer.style.opacity = '0.6';
+            jobsContainer.style.transition = 'opacity 0.2s';
+        }
+        
+        // Update URL without refreshing the page (for bookmarking and sharing)
+        const newUrl = window.location.pathname + '?' + searchParams.toString();
+        window.history.pushState({ path: newUrl }, '', newUrl);
+        
+        // Make AJAX request
+        currentRequest = new XMLHttpRequest();
+        currentRequest.open('GET', '{% url "job_list" %}?' + searchParams.toString(), true);
+        
+        currentRequest.onload = function() {
+            if (this.status >= 200 && this.status < 400) {
+                // Success!
+                const response = this.responseText;
+                
+                // Parse the HTML response
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(response, 'text/html');
+                
+                // Extract just the job results
+                const newJobsContainer = doc.querySelector('.row.g-4');
+                
+                // Update the job count if present
+                const resultCount = doc.querySelector('h2 small');
+                if (resultCount) {
+                    const currentHeading = document.querySelector('h2');
+                    if (currentHeading) {
+                        const currentSmall = currentHeading.querySelector('small');
+                        if (currentSmall) {
+                            currentSmall.textContent = resultCount.textContent;
+                        } else {
+                            const newSmall = document.createElement('small');
+                            newSmall.textContent = resultCount.textContent;
+                            currentHeading.appendChild(newSmall);
+                        }
+                    }
+                }
+                
+                // Replace the job listings with a smooth transition
+                if (newJobsContainer && jobsContainer) {
+                    // Extract all job cards
+                    const jobCards = newJobsContainer.querySelectorAll('.col-12');
+                    
+                    // Clear existing content
+                    jobsContainer.innerHTML = '';
+                    
+                    // Add new job cards with a staggered delay for a smoother effect
+                    jobCards.forEach(function(card, index) {
+                        setTimeout(function() {
+                            jobsContainer.appendChild(card.cloneNode(true));
+                            
+                            // If this is the last card, restore opacity
+                            if (index === jobCards.length - 1) {
+                                jobsContainer.style.opacity = '1';
+                            }
+                        }, index * 50); // Stagger card appearance by 50ms
+                    });
+                    
+                    // If there are no cards, restore opacity immediately
+                    if (jobCards.length === 0) {
+                        jobsContainer.innerHTML = newJobsContainer.innerHTML;
+                        jobsContainer.style.opacity = '1';
+                    }
+                }
+                
+                currentRequest = null;
+            } else {
+                // Error handler
+                console.error('Server returned an error');
+                if (jobsContainer) {
+                    jobsContainer.style.opacity = '1';
+                }
+                currentRequest = null;
+            }
+        };
+        
+        currentRequest.onerror = function() {
+            // Connection error
+            console.error('Connection error');
+            if (jobsContainer) {
+                jobsContainer.style.opacity = '1';
+            }
+            currentRequest = null;
+        };
+        
+        currentRequest.send();
+    }
+    
+    // Handle filter reset button without page refresh
+    const resetButton = document.querySelector('a[href*="show_filters=1"]:not([href*="#filters"])');
+    if (resetButton) {
+        resetButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Reset all form fields
+            const form = document.getElementById('filter-form');
+            if (form) {
+                form.reset();
+                // Manually update the salary value display
+                if (salaryValue && salarySlider) {
+                    salarySlider.value = 0;
+                    salaryValue.textContent = '₾ 0';
+                }
+                // Apply filters with empty values
+                applyFiltersWithAjax();
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

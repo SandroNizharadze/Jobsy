@@ -7,7 +7,7 @@ class UserProfileInline(admin.StackedInline):
     model = UserProfile
     can_delete = False
     verbose_name_plural = 'User Profile'
-    fields = ('role', 'profile_picture', 'interests', 'fields', 'experience', 'job_preferences')
+    fields = ('role', 'profile_picture')
 
 class CustomUserAdmin(UserAdmin):
     inlines = (UserProfileInline,)
@@ -16,7 +16,14 @@ class CustomUserAdmin(UserAdmin):
 
     def get_role(self, obj):
         try:
-            return obj.userprofile.get_role_display()
+            role = obj.userprofile.role
+            # Manual mapping instead of relying on get_role_display
+            role_display = {
+                'candidate': 'Candidate',
+                'employer': 'Employer',
+                'admin': 'Admin',
+            }.get(role, role)
+            return role_display
         except UserProfile.DoesNotExist:
             return '-'
     get_role.short_description = 'Role'
@@ -59,10 +66,20 @@ class EmployerProfileAdmin(admin.ModelAdmin):
 
 @admin.register(JobListing)
 class JobListingAdmin(admin.ModelAdmin):
-    list_display = ('title', 'company', 'get_employer', 'experience', 'posted_at')
-    list_filter = ('experience', 'employer__company_name')
-    search_fields = ('title', 'company', 'description')
+    list_display = ('title', 'company', 'get_employer', 'salary_range', 'location', 'posted_at')
+    list_filter = ('employer__company_name', 'location')
+    search_fields = ('title', 'company', 'description', 'location')
     date_hierarchy = 'posted_at'
+
+    def salary_range(self, obj):
+        if obj.salary_min and obj.salary_max:
+            return f"{obj.salary_min} - {obj.salary_max} ₾ {obj.salary_type}"
+        elif obj.salary_min:
+            return f"{obj.salary_min} ₾ {obj.salary_type}"
+        elif obj.salary_max:
+            return f"{obj.salary_max} ₾ {obj.salary_type}"
+        return '-'
+    salary_range.short_description = 'Salary'
 
     def get_employer(self, obj):
         if obj.employer:

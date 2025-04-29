@@ -6,11 +6,13 @@ from django.urls import reverse
 from django.http import JsonResponse
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.http import require_POST
-from ..models import JobListing, UserProfile, EmployerProfile
+from ..models import JobListing, UserProfile, EmployerProfile, JobApplication
 from ..forms import UserProfileForm, EmployerProfileForm, JobListingForm
 import logging
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.db.models import Q, Count
 
 logger = logging.getLogger(__name__)
 
@@ -30,16 +32,123 @@ def is_admin(user):
     return user.is_superuser or (hasattr(user, 'userprofile') and user.userprofile.role == 'admin')
 
 def job_list(request):
+    # Start with all job listings
     jobs = JobListing.objects.all().order_by('-posted_at')
+    
+    # Initialize filtering context variables
+    filtered = False
+    active_filters = {}
+    filter_remove_urls = {}
+    show_filters = 'show_filters' in request.GET
+    
+    # Search by title or company
+    if 'search' in request.GET and request.GET['search']:
+        search_term = request.GET['search']
+        jobs = jobs.filter(
+            Q(title__icontains=search_term) | 
+            Q(company__icontains=search_term) |
+            Q(description__icontains=search_term)
+        )
+        filtered = True
+        active_filters['საძიებო სიტყვა'] = search_term
+        filter_remove_urls['საძიებო სიტყვა'] = remove_from_query_string(request.GET, 'search')
+    
+    # Filter by location
+    if 'location' in request.GET and request.GET['location']:
+        location = request.GET['location']
+        jobs = jobs.filter(location=location)
+        filtered = True
+        active_filters['ლოკაცია'] = location
+        filter_remove_urls['ლოკაცია'] = remove_from_query_string(request.GET, 'location')
+    
+    # Filter by category
+    if 'category' in request.GET and request.GET['category']:
+        category = request.GET['category']
+        jobs = jobs.filter(category=category)
+        filtered = True
+        active_filters['კატეგორია'] = category
+        filter_remove_urls['კატეგორია'] = remove_from_query_string(request.GET, 'category')
+    
+    # Filter by experience
+    if 'experience' in request.GET and request.GET['experience']:
+        experience = request.GET['experience']
+        jobs = jobs.filter(experience=experience)
+        filtered = True
+        active_filters['გამოცდილება'] = {
+            'entry': 'დამწყები',
+            'mid': 'საშუალო',
+            'senior': 'პროფესიონალი'
+        }.get(experience, experience)
+        filter_remove_urls['გამოცდილება'] = remove_from_query_string(request.GET, 'experience')
+    
+    # Filter by minimum salary
+    if 'salary_min' in request.GET and request.GET['salary_min'] and int(request.GET['salary_min']) > 0:
+        salary_min = request.GET['salary_min']
+        jobs = jobs.filter(salary_min__gte=salary_min)
+        filtered = True
+        active_filters['მინიმალური ანაზღაურება'] = f"₾ {salary_min}"
+        filter_remove_urls['მინიმალური ანაზღაურება'] = remove_from_query_string(request.GET, 'salary_min')
+    
+    # Filter by job preferences (employment type)
+    if 'job_preferences' in request.GET and request.GET['job_preferences']:
+        preferences = request.GET['job_preferences'].split(',')
+        jobs = jobs.filter(job_preferences__in=preferences)
+        filtered = True
+        active_filters['სამუშაოს ტიპი'] = ', '.join(preferences)
+        filter_remove_urls['სამუშაოს ტიპი'] = remove_from_query_string(request.GET, 'job_preferences')
+    
+    # Get unique categories and locations for filter dropdowns
+    all_categories = JobListing.objects.order_by('category').values_list('category', flat=True).distinct()
+    all_locations = JobListing.objects.order_by('location').values_list('location', flat=True).distinct()
+    
+    # Get job preferences for checkboxes
+    job_preferences = []
+    if 'job_preferences' in request.GET:
+        job_preferences = request.GET['job_preferences'].split(',')
+    
+    # Only use pagination on the main page (when filters are NOT being shown)
+    if not show_filters:
+        # Pagination for main page only
+        paginator = Paginator(jobs, 9)  # Show 9 jobs per page
+        page_number = request.GET.get('page', 1)
+        try:
+            jobs_page = paginator.page(page_number)
+        except (PageNotAnInteger, EmptyPage):
+            jobs_page = paginator.page(1)
+    else:
+        # No pagination when filters are shown - display all jobs
+        jobs_page = jobs
+    
     is_employer_user = is_employer(request.user)
     
-    return render(request, 'core/job_list.html', {
-        'jobs': jobs,
+    context = {
+        'jobs': jobs_page,
         'is_employer': is_employer_user,
-    })
+        'categories': all_categories,
+        'locations': all_locations,
+        'job_preferences': job_preferences,
+        'filtered': filtered,
+        'active_filters': active_filters,
+        'filter_remove_urls': filter_remove_urls,
+        'show_filters': show_filters,
+    }
+    
+    # If this is an AJAX request, only render the job listings partial
+    if request.GET.get('ajax') == '1':
+        return render(request, 'core/job_list.html', context)
+    else:
+        return render(request, 'core/job_list.html', context)
+
+def remove_from_query_string(query_dict, param):
+    """Helper function to remove a parameter from query string"""
+    query_dict = query_dict.copy()
+    query_dict.pop(param, None)
+    return '?' + query_dict.urlencode() if query_dict else '?'
 
 def login_view(request):
     if request.user.is_authenticated:
+        if is_employer(request.user):
+            return redirect('employer_home')
         return redirect('job_list')
     
     if request.method == 'POST':
@@ -50,6 +159,8 @@ def login_view(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
+                if is_employer(user):
+                    return redirect('employer_home')
                 return redirect('job_list')
             else:
                 messages.error(request, "Invalid email or password.")
@@ -261,11 +372,10 @@ def assign_employer(request, user_id):
     messages.success(request, f"{user_profile.user.get_full_name()} has been assigned as an employer.")
     return JsonResponse({'status': 'success'})
 
-@login_required
 def job_detail(request, job_id):
     job = get_object_or_404(JobListing, id=job_id)
-    is_employer_user = is_employer(request.user)
-    is_job_owner = is_employer_user and job.employer == request.user.userprofile.employer_profile
+    is_employer_user = request.user.is_authenticated and is_employer(request.user)
+    is_job_owner = is_employer_user and job.employer == request.user.userprofile.employer_profile if is_employer_user else False
     
     # Get similar jobs based on fields and interests
     similar_jobs = JobListing.objects.exclude(id=job_id).filter(
@@ -284,6 +394,11 @@ def job_detail(request, job_id):
 def apply_job(request, job_id):
     job = get_object_or_404(JobListing, id=job_id)
     
+    # Check if user is employer - employers shouldn't apply to jobs
+    if is_employer(request.user):
+        messages.error(request, "Employers cannot apply for jobs.")
+        return redirect('job_detail', job_id=job_id)
+    
     if request.method == 'POST':
         cover_letter = request.POST.get('cover_letter', '')
         resume = request.FILES.get('resume')
@@ -301,3 +416,27 @@ def apply_job(request, job_id):
         return redirect('job_detail', job_id=job_id)
     
     return redirect('job_detail', job_id=job_id)
+
+@login_required
+@user_passes_test(is_employer)
+def employer_home(request):
+    employer_profile = request.user.userprofile.employer_profile
+    jobs = JobListing.objects.filter(employer=employer_profile)
+    total_jobs = jobs.count()
+    total_applicants = JobApplication.objects.filter(job__in=jobs).count()
+    recent_applicants = JobApplication.objects.filter(job__in=jobs).order_by('-applied_at')[:5]
+    jobs_expiring_soon = jobs.order_by('posted_at')[:3]
+    
+    # Applicants per job
+    applicants_per_job = jobs.annotate(num_applicants=Count('applications'))
+    avg_applicants = applicants_per_job.aggregate(avg=Count('applications'))['avg'] or 0
+
+    context = {
+        'employer_profile': employer_profile,
+        'total_jobs': total_jobs,
+        'total_applicants': total_applicants,
+        'recent_applicants': recent_applicants,
+        'jobs_expiring_soon': jobs_expiring_soon,
+        'avg_applicants': avg_applicants,
+    }
+    return render(request, 'core/employer_home.html', context)
