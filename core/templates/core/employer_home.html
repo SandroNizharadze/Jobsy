@@ -47,9 +47,25 @@
                 <ul class="list-group list-group-flush">
                     {% for app in recent_applicants %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span>
-                            <strong>{{ app.user.get_full_name|default:app.user.username }}</strong> <br>
+                        <span style="width:100%">
+                            <strong>{% if app.user %}{{ app.user.get_full_name|default:app.user.username }}{% else %}{{ app.guest_name }}{% endif %}</strong> <br>
+                            <small class="text-muted">{% if app.user %}{{ app.user.email }}{% else %}{{ app.guest_email }}{% endif %}</small><br>
                             <small>{% trans "for" %} <b>{{ app.job.title }}</b></small>
+                            {% if app.resume %}
+                                <br><a href="{{ app.resume.url }}" target="_blank" class="btn btn-sm btn-outline-primary mt-1"><i class="fas fa-file-alt me-1"></i>View CV</a>
+                            {% endif %}
+                            {% if app.cover_letter %}
+                                <div class="mt-2">
+                                    <span style="font-weight:600;">{% trans "Cover Message:" %}</span>
+                                    {% if app.cover_letter|length > 120 %}
+                                        <span class="cover-preview" id="cover-preview-{{ app.id }}">{{ app.cover_letter|slice:":120" }}...</span>
+                                        <span class="cover-full d-none" id="cover-full-{{ app.id }}">{{ app.cover_letter }}</span>
+                                        <a href="#" class="ms-2" onclick="toggleCover({{ app.id }}); return false;" id="cover-toggle-{{ app.id }}">Show more</a>
+                                    {% else %}
+                                        <span>{{ app.cover_letter }}</span>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
                         </span>
                         <span class="badge bg-secondary">{{ app.applied_at|date:"M d, H:i" }}</span>
                     </li>
@@ -82,4 +98,21 @@
         <a href="{% url 'post_job' %}" class="btn btn-success">{% trans "Post New Job" %}</a>
     </div>
 </div>
+
+<script>
+function toggleCover(appId) {
+    var preview = document.getElementById('cover-preview-' + appId);
+    var full = document.getElementById('cover-full-' + appId);
+    var toggle = document.getElementById('cover-toggle-' + appId);
+    if (preview.classList.contains('d-none')) {
+        preview.classList.remove('d-none');
+        full.classList.add('d-none');
+        toggle.textContent = 'Show more';
+    } else {
+        preview.classList.add('d-none');
+        full.classList.remove('d-none');
+        toggle.textContent = 'Show less';
+    }
+}
+</script>
 {% endblock %} 

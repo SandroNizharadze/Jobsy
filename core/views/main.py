@@ -441,31 +441,69 @@ def job_detail(request, job_id):
         'similar_jobs': similar_jobs,
     })
 
-@login_required
 def apply_job(request, job_id):
     job = get_object_or_404(JobListing, id=job_id)
-    
-    # Check if user is employer - employers shouldn't apply to jobs
+
+    # Check if user is employer - employers shouldn't apply for jobs
     if is_employer(request.user):
         messages.error(request, "Employers cannot apply for jobs.")
         return redirect('job_detail', job_id=job_id)
-    
-    if request.method == 'POST':
-        cover_letter = request.POST.get('cover_letter', '')
-        resume = request.FILES.get('resume')
-        
-        if not cover_letter or not resume:
-            messages.error(request, "Please provide both a cover letter and resume.")
-            return redirect('job_detail', job_id=job_id)
-        
-        # Here you would typically:
-        # 1. Save the application to a database
-        # 2. Send notifications
-        # 3. Process the resume file
-        
-        messages.success(request, "Your application has been submitted successfully!")
+
+    user_profile = request.user.userprofile if request.user.is_authenticated else None
+
+    # Prevent duplicate applications for authenticated users
+    if request.user.is_authenticated and JobApplication.objects.filter(job=job, user=request.user).exists():
+        messages.error(request, "You have already applied to this job.")
         return redirect('job_detail', job_id=job_id)
-    
+
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            cover_letter = request.POST.get('cover_letter', '').strip()
+            if user_profile and user_profile.cv:
+                JobApplication.objects.create(
+                    job=job,
+                    user=request.user,
+                    resume=user_profile.cv,
+                    cover_letter=cover_letter
+                )
+                if not cover_letter:
+                    messages.success(request, "Your application was submitted. (Cover letter was optional and not provided.)")
+                else:
+                    messages.success(request, "Your application was submitted successfully.")
+                return redirect('job_detail', job_id=job_id)
+            else:
+                resume = request.FILES.get('resume')
+                if not resume:
+                    messages.error(request, "Please provide a resume.")
+                    return redirect('job_detail', job_id=job_id)
+                JobApplication.objects.create(
+                    job=job,
+                    user=request.user,
+                    cover_letter=cover_letter,
+                    resume=resume
+                )
+                messages.success(request, "Your application has been submitted successfully!")
+                return redirect('job_detail', job_id=job_id)
+        else:
+            applicant_name = request.POST.get('applicant_name', '').strip()
+            applicant_email = request.POST.get('applicant_email', '').strip()
+            cover_letter = request.POST.get('cover_letter', '').strip()
+            resume = request.FILES.get('resume')
+            
+            if not applicant_name or not applicant_email or not resume:
+                messages.error(request, "Please provide your name, email, and resume.")
+                return redirect('job_detail', job_id=job_id)
+                
+            JobApplication.objects.create(
+                job=job,
+                guest_name=applicant_name,
+                guest_email=applicant_email,
+                cover_letter=cover_letter,
+                resume=resume,
+                status='pending'
+            )
+            messages.success(request, "Your application has been submitted successfully!")
+            return redirect('job_detail', job_id=job_id)
     return redirect('job_detail', job_id=job_id)
 
 @login_required
@@ -479,8 +517,7 @@ def employer_home(request):
     jobs_expiring_soon = jobs.order_by('posted_at')[:3]
     
     # Applicants per job
-    applicants_per_job = jobs.annotate(num_applicants=Count('applications'))
-    avg_applicants = applicants_per_job.aggregate(avg=Count('applications'))['avg'] or 0
+    avg_applicants = round(total_applicants / total_jobs, 3) if total_jobs > 0 else 0
 
     context = {
         'employer_profile': employer_profile,

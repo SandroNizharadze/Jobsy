@@ -47,7 +47,9 @@ class JobApplication(models.Model):
     ]
     
     job = models.ForeignKey(JobListing, on_delete=models.CASCADE, related_name='applications')
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='applications')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='applications', null=True, blank=True)
+    guest_name = models.CharField(max_length=255, blank=True, null=True)
+    guest_email = models.EmailField(blank=True, null=True)
     cover_letter = models.TextField()
     resume = models.FileField(upload_to='resumes/')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
@@ -55,11 +57,10 @@ class JobApplication(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
-        unique_together = ('job', 'user')
         ordering = ['-applied_at']
     
     def __str__(self):
-        return f"Application for {self.job.title} by {self.user.username}"
+        return f"Application for {self.job.title} by {self.user.username if self.user else 'Guest'}"
 
 class UserProfile(models.Model):
     ROLE_CHOICES = [
