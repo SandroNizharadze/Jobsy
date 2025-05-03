@@ -80,6 +80,18 @@
                                         <span class="badge bg-light text-dark me-2">{{ interest }}</span>
                                     {% endfor %}
                                 </div>
+                                <div class="job-status mb-2">
+                                    {% if job.status == 'pending_review' %}
+                                        <span class="badge bg-warning text-dark">In Review</span>
+                                    {% elif job.status == 'approved' %}
+                                        <span class="badge bg-success">Approved</span>
+                                    {% elif job.status == 'rejected' %}
+                                        <span class="badge bg-danger">Rejected</span>
+                                    {% endif %}
+                                    {% if job.status == 'rejected' and job.admin_feedback %}
+                                        <div class="text-danger small mt-1"><i class="fas fa-info-circle me-1"></i>{{ job.admin_feedback }}</div>
+                                    {% endif %}
+                                </div>
                             </div>
                             <div class="dropdown">
                                 <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
@@ -124,37 +136,67 @@
             <form method="post" id="jobForm" action="{% url 'post_job' %}">
                 {% csrf_token %}
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="id_title" class="form-label">Job Title</label>
-                        {{ form.title }}
+                    <div class="row g-3">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_title" class="form-label">Job Title</label>
+                            {{ form.title }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_category" class="form-label">Category</label>
+                            {{ form.category }}
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label for="id_description" class="form-label">Job Description</label>
                         {{ form.description }}
                     </div>
-                    <div class="mb-3">
-                        <label for="id_interests" class="form-label">Required Skills/Interests</label>
-                        {{ form.interests }}
-                        <div class="form-text">
-                            <i class="fas fa-lightbulb me-1"></i>Skills that candidates should have (space-separated)
+                    <div class="row g-3">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_location" class="form-label">Location</label>
+                            {{ form.location }}
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="id_salary_min" class="form-label">Min Salary</label>
+                            {{ form.salary_min }}
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="id_salary_max" class="form-label">Max Salary</label>
+                            {{ form.salary_max }}
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="id_fields" class="form-label">Fields</label>
-                        {{ form.fields }}
-                        <div class="form-text">
-                            <i class="fas fa-graduation-cap me-1"></i>Relevant fields for this position
+                        <label for="id_salary_type" class="form-label">Salary Type</label>
+                        {{ form.salary_type }}
+                        <div class="form-text">e.g. per month, per hour</div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_interests" class="form-label">Required Skills/Interests</label>
+                            {{ form.interests }}
+                            <div class="form-text">
+                                <i class="fas fa-lightbulb me-1"></i>Skills that candidates should have (comma-separated)
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_fields" class="form-label">Relevant Fields</label>
+                            {{ form.fields }}
+                            <div class="form-text">
+                                <i class="fas fa-graduation-cap me-1"></i>Relevant fields for this position
+                            </div>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="id_experience" class="form-label">Required Experience</label>
-                        {{ form.experience }}
-                    </div>
-                    <div class="mb-3">
-                        <label for="id_job_preferences" class="form-label">Job Type</label>
-                        {{ form.job_preferences }}
-                        <div class="form-text">
-                            <i class="fas fa-sliders-h me-1"></i>E.g., remote, full-time, contract
+                    <div class="row g-3">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_experience" class="form-label">Required Experience</label>
+                            {{ form.experience }}
+                            <div class="form-text">e.g. Entry, Mid, Senior</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_job_preferences" class="form-label">Job Type</label>
+                            {{ form.job_preferences }}
+                            <div class="form-text">
+                                <i class="fas fa-sliders-h me-1"></i>E.g., remote, full-time, contract
+                            </div>
                         </div>
                     </div>
                 </div>

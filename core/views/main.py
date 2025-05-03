@@ -31,9 +31,14 @@ def is_employer(user):
 def is_admin(user):
     return user.is_superuser or (hasattr(user, 'userprofile') and user.userprofile.role == 'admin')
 
+def home_redirect(request):
+    if request.user.is_authenticated and is_employer(request.user):
+        return redirect('employer_home')
+    return redirect('job_list')
+
 def job_list(request):
-    # Start with all job listings
-    jobs = JobListing.objects.all().order_by('-posted_at')
+    # Only show approved jobs to the public
+    jobs = JobListing.objects.filter(status='approved').order_by('-posted_at')
     
     # Initialize filtering context variables
     filtered = False
@@ -212,33 +217,76 @@ def register(request):
 def profile(request):
     user_profile = request.user.userprofile
     
+    # Show a single success message if CV was removed
+    if request.GET.get('cv_removed') == '1':
+        messages.success(request, "Your CV has been removed.")
+    
+    employer_form = None  # Always define this, even for candidates
+
     if request.method == 'POST':
         if is_employer(request.user):
             employer_profile, created = EmployerProfile.objects.get_or_create(user_profile=user_profile)
             user_form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
             employer_form = EmployerProfileForm(request.POST, request.FILES, instance=employer_profile)
             
+            # AJAX CV upload
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                if user_form.is_valid() and employer_form.is_valid():
+                    user_form.save()
+                    employer_form.save()
+                    return JsonResponse({
+                        'success': True,
+                        'cv_url': user_profile.cv.url if user_profile.cv else '',
+                        'remove_cv_url': reverse('remove_cv')
+                    })
+                else:
+                    errors = []
+                    for field, error_list in user_form.errors.items():
+                        errors.extend(error_list)
+                    for field, error_list in employer_form.errors.items():
+                        errors.extend(error_list)
+                    return JsonResponse({'success': False, 'errors': ' '.join(errors)}, status=400)
+
             if user_form.is_valid() and employer_form.is_valid():
                 user_form.save()
                 employer_form.save()
-                messages.success(request, "Profile updated successfully!")
+                # Only show profile updated message if not redirected from CV removal
+                if not request.GET.get('cv_removed'):
+                    messages.success(request, "Profile updated successfully!")
                 return redirect('profile')
             else:
                 messages.error(request, "Please correct the errors below.")
         else:
             user_form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
+            # AJAX CV upload
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                if user_form.is_valid():
+                    user_form.save()
+                    return JsonResponse({
+                        'success': True,
+                        'cv_url': user_profile.cv.url if user_profile.cv else '',
+                        'remove_cv_url': reverse('remove_cv')
+                    })
+                else:
+                    errors = []
+                    for field, error_list in user_form.errors.items():
+                        errors.extend(error_list)
+                    return JsonResponse({'success': False, 'errors': ' '.join(errors)}, status=400)
             if user_form.is_valid():
                 user_form.save()
-                messages.success(request, "Profile updated successfully!")
+                if not request.GET.get('cv_removed'):
+                    messages.success(request, "Profile updated successfully!")
                 return redirect('profile')
             else:
                 messages.error(request, "Please correct the errors below.")
+            employer_form = None  # Explicitly set for candidates
     else:
         user_form = UserProfileForm(instance=user_profile)
-        employer_form = None
         if is_employer(request.user):
             employer_profile, created = EmployerProfile.objects.get_or_create(user_profile=user_profile)
             employer_form = EmployerProfileForm(instance=employer_profile)
+        else:
+            employer_form = None
     
     return render(request, 'core/profile.html', {
         'user_form': user_form,
@@ -301,8 +349,10 @@ def post_job(request):
             job = form.save(commit=False)
             job.employer = request.user.userprofile.employer_profile
             job.company = request.user.userprofile.employer_profile.company_name
+            job.status = 'pending_review'
+            job.admin_feedback = ''
             job.save()
-            messages.success(request, "Job posted successfully!")
+            messages.success(request, "Job submitted for review! An admin will review and approve it soon.")
             return redirect('employer_dashboard')
         else:
             messages.error(request, "Please correct the errors below.")
@@ -377,10 +427,11 @@ def job_detail(request, job_id):
     is_employer_user = request.user.is_authenticated and is_employer(request.user)
     is_job_owner = is_employer_user and job.employer == request.user.userprofile.employer_profile if is_employer_user else False
     
-    # Get similar jobs based on fields and interests
+    # Get similar jobs based on fields and interests, only show approved
     similar_jobs = JobListing.objects.exclude(id=job_id).filter(
         fields=job.fields,
-        interests=job.interests
+        interests=job.interests,
+        status='approved'
     ).order_by('-posted_at')[:5]
     
     return render(request, 'core/job_detail.html', {
@@ -440,3 +491,16 @@ def employer_home(request):
         'avg_applicants': avg_applicants,
     }
     return render(request, 'core/employer_home.html', context)
+
+@login_required
+@require_POST
+def remove_cv(request):
+    user_profile = request.user.userprofile
+    if user_profile.role != 'candidate':
+        messages.error(request, "Only candidates can remove their CV.")
+        return redirect('profile')
+    user_profile.cv.delete(save=False)
+    user_profile.cv = None
+    user_profile.save()
+    # Use Django's redirect with a GET param to show a single success message
+    return redirect(f'{reverse("profile")}?cv_removed=1')

@@ -29,7 +29,6 @@
 <div class="profile-section">
     <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
         {% csrf_token %}
-        
         <div class="profile-header">
             <div class="profile-picture-container">
                 <div class="profile-picture-wrapper">
@@ -139,16 +138,68 @@
                 </div>
             </div>
         {% endif %}
-
-        <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-linkedin">
-                <i class="fas fa-save me-1"></i>Save Profile
-            </button>
-            <a href="{% url 'job_list' %}" class="btn btn-outline-primary">
-                <i class="fas fa-times me-1"></i>Cancel
-            </a>
-        </div>
     </form>
+
+    {% if user.userprofile.role == 'candidate' %}
+<div class="cv-card">
+    <h3 class="cv-title">Your CV</h3>
+    <div class="cv-actions">
+        {% if user.userprofile.cv %}
+            <a href="{{ user.userprofile.cv.url }}" target="_blank" class="btn btn-cv-view">
+                <i class="fas fa-file-alt me-1"></i>View Current CV
+            </a>
+            <form method="post" action="{% url 'remove_cv' %}" class="cv-remove-form" title="Remove CV" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn-cv-remove" aria-label="Remove CV">
+                    <i class="fas fa-times"></i>
+                </button>
+            </form>
+        {% endif %}
+    </div>
+
+    <div id="cv-upload-form" class="cv-upload-form" style="display: {% if user_form.cv.errors or user_form.cv_consent.errors or user_form.cv_share_with_employers.errors %}block{% else %}none{% endif %};">
+        <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate id="cv-upload-form-element" action="{% url 'profile' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label" for="{{ user_form.cv.id_for_label }}">Upload CV</label>
+                {{ user_form.cv }}
+                {% if user_form.cv.help_text %}<div class="form-text">{{ user_form.cv.help_text }}</div>{% endif %}
+                {% if user_form.cv.errors %}
+                    <div class="invalid-feedback d-block">{{ user_form.cv.errors|join:", " }}</div>
+                {% endif %}
+            </div>
+            <div class="mb-3 form-check">
+                {{ user_form.cv_consent }}
+                <label class="form-check-label" for="{{ user_form.cv_consent.id_for_label }}">{{ user_form.cv_consent.help_text }}</label>
+                {% if user_form.cv_consent.errors %}
+                    <div class="invalid-feedback d-block">{{ user_form.cv_consent.errors|join:", " }}</div>
+                {% endif %}
+            </div>
+            <div class="mb-3 form-check">
+                {{ user_form.cv_share_with_employers }}
+                <label class="form-check-label" for="{{ user_form.cv_share_with_employers.id_for_label }}">{{ user_form.cv_share_with_employers.help_text }}</label>
+                {% if user_form.cv_share_with_employers.errors %}
+                    <div class="invalid-feedback d-block">{{ user_form.cv_share_with_employers.errors|join:", " }}</div>
+                {% endif %}
+            </div>
+            <div id="cv-form-error" class="invalid-feedback d-block" style="display: none;"></div>
+            <div class="d-flex gap-2 justify-content-end">
+                <button type="submit" class="btn btn-linkedin">
+                    <i class="fas fa-save me-1"></i>Save
+                </button>
+                <button type="button" id="cancel-cv-form-btn" class="btn btn-outline-secondary">
+                    <i class="fas fa-times me-1"></i>Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+    {% if not user.userprofile.cv %}
+        <button id="show-cv-form-btn" type="button" class="btn btn-cv-upload">
+            <i class="fas fa-upload me-1"></i>Add/Upload CV
+        </button>
+    {% endif %}
+</div>
+{% endif %}
 </div>
 
 <style>
@@ -223,6 +274,84 @@
     border-radius: 8px;
     margin-top: 24px;
 }
+
+.cv-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    padding: 32px 24px;
+    max-width: 420px;
+    margin: 32px auto;
+    text-align: center;
+}
+.cv-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 24px;
+}
+.cv-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+.btn-cv-view {
+    background: #f5faff;
+    color: #0073b1;
+    border: 1px solid #0073b1;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+}
+.btn-cv-view:hover {
+    background: #0073b1;
+    color: #fff;
+}
+.cv-remove-form {
+    display: inline;
+}
+.btn-cv-remove {
+    background: none;
+    border: none;
+    color: #dc3545;
+    font-size: 1.7rem;
+    cursor: pointer;
+    transition: color 0.2s;
+    margin-left: 8px;
+}
+.btn-cv-remove:hover {
+    color: #a71d2a;
+    transform: scale(1.15);
+}
+.btn-cv-upload {
+    background: #0073b1;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 28px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    transition: background 0.2s;
+}
+.btn-cv-upload:hover {
+    background: #005983;
+}
+.cv-upload-form {
+    margin-top: 24px;
+    text-align: left;
+    background: #f8fafd;
+    border-radius: 12px;
+    padding: 24px 18px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.03);
+    animation: fadeIn 0.3s;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(16px);}
+    to { opacity: 1; transform: none;}
+}
 </style>
 {% endblock %}
 
@@ -287,5 +416,24 @@
             }
         });
     }
+
+    // Toggle CV upload form
+    document.addEventListener('DOMContentLoaded', function() {
+        var showBtn = document.getElementById('show-cv-form-btn');
+        var formDiv = document.getElementById('cv-upload-form');
+        var cancelBtn = document.getElementById('cancel-cv-form-btn');
+        if (showBtn && formDiv) {
+            showBtn.addEventListener('click', function() {
+                formDiv.style.display = 'block';
+                showBtn.style.display = 'none';
+            });
+        }
+        if (cancelBtn && formDiv && showBtn) {
+            cancelBtn.addEventListener('click', function() {
+                formDiv.style.display = 'none';
+                showBtn.style.display = 'inline-block';
+            });
+        }
+    });
 </script>
 {% endblock %}

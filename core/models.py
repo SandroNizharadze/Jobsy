@@ -17,6 +17,17 @@ class JobListing(models.Model):
     employer = models.ForeignKey('EmployerProfile', on_delete=models.CASCADE, related_name='job_listings')
     posted_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    interests = models.CharField(max_length=255, blank=True)
+    fields = models.CharField(max_length=255, blank=True)
+    experience = models.CharField(max_length=100, blank=True)
+    job_preferences = models.CharField(max_length=255, blank=True)
+    STATUS_CHOICES = [
+        ('pending_review', 'Pending Review'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending_review')
+    admin_feedback = models.TextField(blank=True)
 
     def __str__(self):
         return f"{self.title} at {self.company}"
@@ -61,6 +72,11 @@ class UserProfile(models.Model):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='candidate')
     profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    # New fields for CV workflow
+    cv = models.FileField(upload_to='cvs/', blank=True, null=True)
+    cv_consent = models.BooleanField(default=False)
+    cv_share_with_employers = models.BooleanField(default=False)
+    cv_visible_to = models.ManyToManyField('EmployerProfile', blank=True, related_name='visible_candidate_cvs')
 
     def __str__(self):
         return self.user.username

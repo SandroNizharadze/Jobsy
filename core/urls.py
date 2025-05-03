@@ -2,11 +2,13 @@ from django.urls import path
 from .views import main
 
 urlpatterns = [
-    path('', main.job_list, name='job_list'),
+    path('', main.home_redirect, name='home_redirect'),
+    path('jobs/', main.job_list, name='job_list'),
     path('login/', main.login_view, name='login'),
     path('logout/', main.logout_view, name='logout'),
     path('register/', main.register, name='register'),
     path('profile/', main.profile, name='profile'),
+    path('profile/remove-cv/', main.remove_cv, name='remove_cv'),
     
     # Employer routes
     path('employer/dashboard/', main.employer_dashboard, name='employer_dashboard'),
