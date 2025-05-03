@@ -1,5 +1,5 @@
 """
-ASGI config for linked_ai project.
+ASGI config for jobsy project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'linked_ai.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'jobsy.settings')
 
-application = get_asgi_application()
+application = get_asgi_application() 

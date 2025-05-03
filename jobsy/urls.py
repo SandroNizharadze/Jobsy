@@ -8,6 +8,8 @@ from django.views.i18n import set_language
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('i18n/setlanguage/', set_language, name='set_language'),  # Use Django's built-in view with correct path
+    path('', include('core.urls')),
+    path('auth/', include('social_django.urls', namespace='social')),
 ]
 
 urlpatterns += i18n_patterns(
