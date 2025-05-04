@@ -107,8 +107,8 @@
                     </div>
 
                     <div class="apply-section mt-4 pt-3 border-top">
-                        <button class="btn btn-lg w-100" data-bs-toggle="modal" data-bs-target="#applyModal" style="background-color:var(--jobsy-blue); color:white; border-radius:12px; font-weight:600; padding:0.8rem;">
-                            <i class="fas fa-paper-plane me-2"></i> {% trans "განაცხადის გაგზავნა" %}
+                                <button class="btn btn-lg w-100" data-bs-toggle="modal" data-bs-target="#applyModal" style="background-color:var(--jobsy-blue); color:white; border-radius:12px; font-weight:600; padding:0.8rem;">
+                                    <i class="fas fa-paper-plane me-2"></i> {% trans "განაცხადის გაგზავნა" %}
                         </button>
                     </div>
                 </div>
@@ -243,9 +243,9 @@
                     </div>
                 </form>
             {% elif user.is_authenticated %}
-                <form method="post" action="{% url 'apply_job' job.id %}" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div class="modal-body p-4">
+            <form method="post" action="{% url 'apply_job' job.id %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body p-4">
                         <div class="mb-4">
                             <label for="id_applicant_name" class="form-label" style="font-weight:600;">{% trans "Name" %}</label>
                             <input type="text" class="form-control" id="id_applicant_name" name="applicant_name" style="border-radius:12px;" required>
@@ -254,22 +254,22 @@
                             <label for="id_applicant_email" class="form-label" style="font-weight:600;">{% trans "Email" %}</label>
                             <input type="email" class="form-control" id="id_applicant_email" name="applicant_email" style="border-radius:12px;" required>
                         </div>
-                        <div class="mb-4">
-                            <label for="id_cover_letter" class="form-label" style="font-weight:600;">{% trans "მოტივაციის წერილი" %}</label>
-                            <textarea class="form-control" id="id_cover_letter" name="cover_letter" rows="5" style="border-radius:12px;"></textarea>
+                    <div class="mb-4">
+                        <label for="id_cover_letter" class="form-label" style="font-weight:600;">{% trans "მოტივაციის წერილი" %}</label>
+                        <textarea class="form-control" id="id_cover_letter" name="cover_letter" rows="5" style="border-radius:12px;"></textarea>
                             <div class="form-text text-muted">{% trans "Cover letter is optional." %}</div>
-                        </div>
-                        <div class="mb-4">
-                            <label for="id_resume" class="form-label" style="font-weight:600;">{% trans "CV / რეზიუმე" %}</label>
+                    </div>
+                    <div class="mb-4">
+                        <label for="id_resume" class="form-label" style="font-weight:600;">{% trans "CV / რეზიუმე" %}</label>
                             <input type="file" class="form-control" id="id_resume" name="resume" accept=".pdf,.doc,.docx" style="border-radius:12px;" required>
-                            <div class="form-text">{% trans "დასაშვები ფორმატი: PDF, DOC, DOCX" %}</div>
-                        </div>
+                        <div class="form-text">{% trans "დასაშვები ფორმატი: PDF, DOC, DOCX" %}</div>
                     </div>
-                    <div class="modal-footer border-0 pt-0">
-                        <button type="button" class="btn" data-bs-dismiss="modal" style="border-radius:12px;">{% trans "გაუქმება" %}</button>
-                        <button type="submit" class="btn" style="background-color:var(--jobsy-blue); color:white; border-radius:12px; font-weight:600;">{% trans "განაცხადის გაგზავნა" %}</button>
-                    </div>
-                </form>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn" data-bs-dismiss="modal" style="border-radius:12px;">{% trans "გაუქმება" %}</button>
+                    <button type="submit" class="btn" style="background-color:var(--jobsy-blue); color:white; border-radius:12px; font-weight:600;">{% trans "განაცხადის გაგზავნა" %}</button>
+                </div>
+            </form>
             {% else %}
                 <form method="post" action="{% url 'apply_job' job.id %}" enctype="multipart/form-data">
                     {% csrf_token %}

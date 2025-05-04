@@ -8,9 +8,12 @@ https://docs.djangoproject.com/en/5.1/howto/deployment/wsgi/
 """
 
 import os
-
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'jobsy.settings')
+# Use production settings if RENDER environment variable is set
+if os.environ.get('RENDER'):
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'jobsy.production_settings')
+else:
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'jobsy.settings')
 
 application = get_wsgi_application() 
