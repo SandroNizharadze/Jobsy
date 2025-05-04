@@ -1,1 +1,1 @@
-web: python -m gunicorn jobsy.wsgi:application 
+web: python manage.py migrate && python -m gunicorn jobsy.wsgi:application 
