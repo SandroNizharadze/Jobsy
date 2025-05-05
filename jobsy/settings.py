@@ -2,6 +2,7 @@
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
 import os
+import dj_database_url
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -69,6 +70,8 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+
+DATABASES["default"] = dj_database_url.parse("postgresql://jobsy_db_5ei3_user:u1JNXggVOp4LGpzk6EbMEohiZ2gfEjnK@dpg-d0b35jeuk2gs73cbdnv0-a.frankfurt-postgres.render.com/jobsy_db_5ei3")
 
 # Authentication
 AUTHENTICATION_BACKENDS = [
