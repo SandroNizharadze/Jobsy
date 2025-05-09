@@ -29,7 +29,20 @@ def create_sample_jobs(apps, schema_editor):
         defaults={'role': 'admin'}
     )
     
-    # Sample companies
+    # Get or create a single employer profile for admin
+    employer_profile, created = EmployerProfile.objects.get_or_create(
+        user_profile=admin_profile,
+        defaults={
+            'company_name': 'Jobsy Admin',
+            'company_website': 'https://jobsy.ge',
+            'company_description': 'Administrator for Jobsy platform',
+            'company_size': '1-10',
+            'industry': 'Technology',
+            'location': 'თბილისი'
+        }
+    )
+    
+    # Sample companies - we'll use these for job creation but not create separate profiles
     companies = [
         {
             'name': 'TBC Bank',
@@ -77,28 +90,6 @@ def create_sample_jobs(apps, schema_editor):
             'location': 'თბილისი'
         }
     ]
-    
-    # Create employer profiles for each company
-    employer_profiles = []
-    for company in companies:
-        # Check if the company already exists for this user profile
-        try:
-            employer_profile = EmployerProfile.objects.get(
-                user_profile=admin_profile,
-                company_name=company['name']
-            )
-        except EmployerProfile.DoesNotExist:
-            # Only create if it doesn't exist
-            employer_profile = EmployerProfile.objects.create(
-                user_profile=admin_profile,
-                company_name=company['name'],
-                company_website=company['website'],
-                company_description=company['description'],
-                company_size=company['size'],
-                industry=company['industry'],
-                location=company['location']
-            )
-        employer_profiles.append(employer_profile)
     
     # Sample tech job data
     tech_jobs = [
@@ -235,35 +226,36 @@ def create_sample_jobs(apps, schema_editor):
     # Combine all jobs
     all_jobs = tech_jobs + finance_jobs + hospitality_jobs
     
-    # Assign jobs to companies by industry match
+    # Create jobs with appropriate company details from our list
     for job in all_jobs:
-        # Choose appropriate employer profile based on job category
+        # Find a matching company by category
         if job['category'] == 'ტექნოლოგია':
-            suitable_profiles = [ep for ep in employer_profiles if ep.industry == 'Technology']
+            matching_companies = [c for c in companies if c['industry'] == 'Technology']
         elif job['category'] == 'ფინანსები':
-            suitable_profiles = [ep for ep in employer_profiles if ep.industry == 'Banking & Finance']
+            matching_companies = [c for c in companies if c['industry'] == 'Banking & Finance']
         elif job['category'] == 'ტურიზმი და მასპინძლობა':
-            suitable_profiles = [ep for ep in employer_profiles if ep.industry == 'Hospitality & Tourism']
+            matching_companies = [c for c in companies if c['industry'] == 'Hospitality & Tourism']
         else:
-            suitable_profiles = employer_profiles
+            matching_companies = companies
         
-        employer = random.choice(suitable_profiles if suitable_profiles else employer_profiles)
+        # Choose a random matching company
+        selected_company = random.choice(matching_companies if matching_companies else companies)
         
         # Create random posted date in the last 30 days
         days_ago = random.randint(1, 30)
         posted_date = timezone.now() - timedelta(days=days_ago)
         
-        # Create the job
+        # Create the job using the employer_profile but with selected company details
         JobListing.objects.create(
             title=job['title'],
-            company=employer.company_name,
+            company=selected_company['name'],
             description=job['description'],
             salary_min=job['salary_min'],
             salary_max=job['salary_max'],
             salary_type=job['salary_type'],
             category=job['category'],
-            location=employer.location,
-            employer=employer,
+            location=selected_company['location'],
+            employer=employer_profile,  # Use the single employer profile we created earlier
             posted_at=posted_date,
             interests=job['interests'],
             fields=job['fields'],
