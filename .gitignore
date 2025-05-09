@@ -55,6 +55,10 @@ static/
 !static/images/**/*.jpeg
 !static/images/**/*.svg
 !static/images/**/*.gif
+!static/core/
+!static/core/images/
+!static/core/images/**/*.svg
+!static/employer_cta.png
 
 # Media and Static files
 media/**/*
@@ -69,6 +73,10 @@ static/**/*
 !static/images/**/*.jpeg
 !static/images/**/*.svg
 !static/images/**/*.gif
+!static/core/
+!static/core/images/
+!static/core/images/**/*.svg
+!static/employer_cta.png
 
 # Coverage reports
 htmlcov/
