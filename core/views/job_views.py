@@ -19,7 +19,8 @@ def job_list(request):
     Display the job listing page with filtering options
     """
     # Only show approved jobs to the public
-    jobs = JobListing.objects.filter(status='approved').order_by('-posted_at')
+    # Use select_related to fetch employer in the same query
+    jobs = JobListing.objects.filter(status='approved').select_related('employer').order_by('-posted_at')
     
     # Initialize filtering context variables
     filtered = False
@@ -78,9 +79,9 @@ def job_list(request):
         active_filters['სამუშაოს ტიპი'] = ', '.join(preferences)
         filter_remove_urls['სამუშაოს ტიპი'] = remove_from_query_string(request.GET, 'job_preferences')
     
-    # Get unique categories and locations for filter dropdowns
-    all_categories = JobListing.objects.order_by('category').values_list('category', flat=True).distinct()
-    all_locations = JobListing.objects.order_by('location').values_list('location', flat=True).distinct()
+    # Get unique categories and locations for filter dropdowns - use distinct() with values_list for optimization
+    all_categories = JobListing.objects.filter(status='approved').values_list('category', flat=True).distinct()
+    all_locations = JobListing.objects.filter(status='approved').values_list('location', flat=True).distinct()
     
     # Get job preferences for checkboxes
     job_preferences = []
@@ -131,9 +132,18 @@ def job_detail(request, job_id):
     """
     Display details for a specific job listing
     """
-    job = get_object_or_404(JobListing, id=job_id, status='approved')
+    # Use select_related to fetch employer in the same query
+    job = get_object_or_404(JobListing.objects.select_related('employer'), id=job_id, status='approved')
+    
+    # Get similar jobs based on category and experience, only show approved
+    similar_jobs = JobListing.objects.filter(
+        status='approved',
+        category=job.category
+    ).exclude(id=job_id).select_related('employer').order_by('-posted_at')[:5]
+    
     context = {
         'job': job,
+        'similar_jobs': similar_jobs,
     }
     return render(request, 'core/job_detail.html', context)
 
@@ -141,7 +151,8 @@ def apply_job(request, job_id):
     """
     Handle job application submission
     """
-    job = get_object_or_404(JobListing, id=job_id, status='approved')
+    # Use select_related to fetch employer in the same query
+    job = get_object_or_404(JobListing.objects.select_related('employer'), id=job_id, status='approved')
     
     if request.method == 'POST':
         # Check if user is authenticated

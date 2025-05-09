@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.views.decorators.http import require_POST
-from django.db.models import Count
-from ..models import JobListing, EmployerProfile, JobApplication
+from django.db.models import Count, Prefetch
+from ..models import JobListing, EmployerProfile, JobApplication, UserProfile
 from ..forms import JobListingForm, EmployerProfileForm
 import logging
 
@@ -27,21 +27,24 @@ def employer_home(request):
     """
     Display the employer dashboard home page
     """
-    # Get the employer profile
+    # Get the employer profile with prefetched related data
     employer_profile = request.user.userprofile.employer_profile
+    
+    # Get jobs with optimized query - fetch all at once
+    jobs = JobListing.objects.filter(employer=employer_profile)
     
     # Get statistics for employer's jobs
     job_stats = {
-        'total': JobListing.objects.filter(employer=employer_profile).count(),
-        'active': JobListing.objects.filter(employer=employer_profile, status='approved').count(),
-        'pending': JobListing.objects.filter(employer=employer_profile, status='pending_review').count(),
+        'total': jobs.count(),
+        'active': jobs.filter(status='approved').count(),
+        'pending': jobs.filter(status='pending_review').count(),
         'applications': JobApplication.objects.filter(job__employer=employer_profile).count(),
     }
     
-    # Recent applications
+    # Recent applications with related jobs - use select_related
     recent_applications = JobApplication.objects.filter(
         job__employer=employer_profile
-    ).order_by('-applied_at')[:5]
+    ).select_related('job', 'user').order_by('-applied_at')[:5]
     
     context = {
         'employer_profile': employer_profile,
@@ -60,10 +63,12 @@ def employer_dashboard(request):
     # Get the employer profile
     employer_profile = request.user.userprofile.employer_profile
     
-    # Get all jobs by this employer
-    jobs = JobListing.objects.filter(employer=employer_profile)
+    # Get all jobs by this employer with prefetched applications
+    jobs = JobListing.objects.filter(employer=employer_profile).prefetch_related(
+        Prefetch('applications', queryset=JobApplication.objects.select_related('user'))
+    )
     
-    # Count applications per job
+    # Count applications per job using annotation for efficiency
     job_applications = JobListing.objects.filter(
         employer=employer_profile
     ).annotate(application_count=Count('applications'))
@@ -85,8 +90,10 @@ def employer_jobs(request):
     # Get the employer profile
     employer_profile = request.user.userprofile.employer_profile
     
-    # Get all jobs by this employer
-    jobs = JobListing.objects.filter(employer=employer_profile).order_by('-posted_at')
+    # Get all jobs by this employer with application counts
+    jobs = JobListing.objects.filter(employer=employer_profile).annotate(
+        application_count=Count('applications')
+    ).order_by('-posted_at')
     
     context = {
         'jobs': jobs,

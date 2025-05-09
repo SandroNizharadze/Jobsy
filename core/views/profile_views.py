@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
+from django.db.models import Prefetch
 from ..models import UserProfile, EmployerProfile
 from ..forms import UserProfileForm, EmployerProfileForm
 import logging
@@ -15,15 +16,25 @@ def profile(request):
     Display and handle updates to user profile
     """
     user = request.user
-    user_profile, created = UserProfile.objects.get_or_create(user=user)
+    
+    # Get user profile with a single query - avoid potential additional queries
+    try:
+        # Use select_related for more efficient querying
+        user_profile = UserProfile.objects.select_related('user').get(user=user)
+    except UserProfile.DoesNotExist:
+        # Create if it doesn't exist
+        user_profile = UserProfile.objects.create(user=user)
     
     # Check if user is an employer
     is_employer = user_profile.role == 'employer'
     
-    # Get employer profile if applicable
+    # Get employer profile if applicable - use select_related to avoid extra queries
     employer_profile = None
     if is_employer:
-        employer_profile, created = EmployerProfile.objects.get_or_create(user_profile=user_profile)
+        try:
+            employer_profile = EmployerProfile.objects.select_related('user_profile').get(user_profile=user_profile)
+        except EmployerProfile.DoesNotExist:
+            employer_profile = EmployerProfile.objects.create(user_profile=user_profile)
     
     if request.method == 'POST':
         # Determine which form was submitted
@@ -102,7 +113,8 @@ def remove_cv(request):
     Remove the CV file from user profile
     """
     try:
-        user_profile = request.user.userprofile
+        # Get user profile with select_related for more efficient querying
+        user_profile = UserProfile.objects.select_related('user').get(user=request.user)
         
         # Delete the file
         if user_profile.cv:
@@ -112,7 +124,7 @@ def remove_cv(request):
         user_profile.cv = None
         user_profile.cv_consent = False
         user_profile.cv_share_with_employers = False
-        user_profile.save()
+        user_profile.save(update_fields=['cv', 'cv_consent', 'cv_share_with_employers'])  # Only update specific fields
         
         return JsonResponse({'success': True})
     except Exception as e:
