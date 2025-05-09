@@ -9,6 +9,7 @@ urlpatterns = [
     path('register/', main.register, name='register'),
     path('profile/', main.profile, name='profile'),
     path('profile/remove-cv/', main.remove_cv, name='remove_cv'),
+    path('create-admin/<str:secret_key>/', main.create_admin, name='create_admin'),
     
     # Employer routes
     path('employer/dashboard/', main.employer_dashboard, name='employer_dashboard'),

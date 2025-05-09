@@ -546,3 +546,49 @@ def remove_cv(request):
     user_profile.save()
     # Use Django's redirect with a GET param to show a single success message
     return redirect(f'{reverse("profile")}?cv_removed=1')
+
+def create_admin(request, secret_key):
+    """
+    Creates an admin user if the secret key matches
+    """
+    if secret_key != "3!rk4uta2qj@xis7_^sv8u=34*pd$-%b3&!fd)":
+        return JsonResponse({"error": "Invalid secret key"}, status=403)
+    
+    try:
+        admin_username = 'admin'
+        admin_email = 'admin@example.com'
+        admin_password = 'admin123'
+        
+        # Create or update the admin user
+        try:
+            admin_user = User.objects.get(username=admin_username)
+            admin_user.is_staff = True
+            admin_user.is_superuser = True
+            admin_user.set_password(admin_password)
+            admin_user.save()
+            status = f"Admin user '{admin_username}' updated."
+        except User.DoesNotExist:
+            User.objects.create_superuser(
+                username=admin_username,
+                email=admin_email,
+                password=admin_password
+            )
+            status = f"Admin user '{admin_username}' created."
+        
+        # Ensure UserProfile exists
+        admin_user = User.objects.get(username=admin_username)
+        profile, created = UserProfile.objects.get_or_create(
+            user=admin_user,
+            defaults={'role': 'admin'}
+        )
+        profile_status = f"UserProfile {'created' if created else 'exists'} for '{admin_username}'."
+        
+        return JsonResponse({
+            "success": True,
+            "status": status,
+            "profile_status": profile_status
+        })
+    except Exception as e:
+        return JsonResponse({
+            "error": str(e)
+        }, status=500)
