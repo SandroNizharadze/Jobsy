@@ -81,17 +81,23 @@ def create_sample_jobs(apps, schema_editor):
     # Create employer profiles for each company
     employer_profiles = []
     for company in companies:
-        employer_profile, created = EmployerProfile.objects.get_or_create(
-            user_profile=admin_profile,
-            company_name=company['name'],
-            defaults={
-                'company_website': company['website'],
-                'company_description': company['description'],
-                'company_size': company['size'],
-                'industry': company['industry'],
-                'location': company['location']
-            }
-        )
+        # Check if the company already exists for this user profile
+        try:
+            employer_profile = EmployerProfile.objects.get(
+                user_profile=admin_profile,
+                company_name=company['name']
+            )
+        except EmployerProfile.DoesNotExist:
+            # Only create if it doesn't exist
+            employer_profile = EmployerProfile.objects.create(
+                user_profile=admin_profile,
+                company_name=company['name'],
+                company_website=company['website'],
+                company_description=company['description'],
+                company_size=company['size'],
+                industry=company['industry'],
+                location=company['location']
+            )
         employer_profiles.append(employer_profile)
     
     # Sample tech job data
