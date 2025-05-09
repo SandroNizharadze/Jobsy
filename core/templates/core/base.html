@@ -270,7 +270,7 @@
                                     <i class="fas fa-user-circle fa-lg me-2"></i>
                                 {% endif %}
                                 <span>
-                                    {{ user.get_full_name|default:user.username }}
+                                    {{ user.first_name|default:user.username }}
                                     {% if user.userprofile.role == 'employer' %}({% trans "Employer" %}){% endif %}
                                 </span>
                             </a>

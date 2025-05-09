@@ -161,8 +161,22 @@ def login_view(request):
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
+            
+            # Try to authenticate with username (which is email in our case)
             user = authenticate(username=username, password=password)
+            
+            # If that fails, try to find user by email and authenticate with their username
+            if user is None:
+                try:
+                    user_by_email = User.objects.get(email=username)
+                    user = authenticate(username=user_by_email.username, password=password)
+                except User.DoesNotExist:
+                    user = None
+            
             if user is not None:
+                # Ensure backend is set
+                if not hasattr(user, 'backend'):
+                    user.backend = 'django.contrib.auth.backends.ModelBackend'
                 login(request, user)
                 if is_employer(user):
                     return redirect('employer_home')
@@ -189,13 +203,14 @@ def register(request):
         if form.is_valid():
             user = form.save()
             
-            # Create user profile with default role
-            user_profile = UserProfile.objects.create(
+            # Check if UserProfile already exists before creating
+            user_profile, created = UserProfile.objects.get_or_create(
                 user=user,
-                role='user'  # Set default role to 'user'
+                defaults={'role': 'user'}  # Only set default role when creating new profile
             )
             
-            # Log the user in
+            # Specify the authentication backend when logging in
+            user.backend = 'django.contrib.auth.backends.ModelBackend'
             login(request, user)
             return redirect('job_list')
     else:
