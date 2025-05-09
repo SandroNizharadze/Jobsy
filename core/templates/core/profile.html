@@ -138,6 +138,12 @@
                 </div>
             </div>
         {% endif %}
+        
+        <div class="d-flex justify-content-end mt-4 mb-4">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-2"></i>Save Profile
+            </button>
+        </div>
     </form>
 
     {% if user.userprofile.role == 'candidate' %}
