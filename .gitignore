@@ -150,4 +150,11 @@ cython_debug/
 .TemporaryItems
 .Trashes
 .VolumeIcon.icns
-.com.apple.timemachine.donotpresent 
+.com.apple.timemachine.donotpresent
+
+# Environment variables
+.env
+
+# macOS system files
+.DS_Store
+**/.DS_Store 
