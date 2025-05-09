@@ -21,33 +21,14 @@
 
                 <form method="post" class="needs-validation" novalidate>
                     {% csrf_token %}
+                    {{ form.username }}
                     
                     <div class="mb-3">
                         <label for="id_email" class="form-label">{% trans "ელ-ფოსტა" %}</label>
                         <input type="email" name="email" id="id_email" class="form-control" required>
                         {% if form.email.errors %}
-                        <div class="invalid-feedback">
+                        <div class="text-danger">
                             {{ form.email.errors|join:", " }}
-                        </div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="id_password1" class="form-label">{% trans "პაროლი" %}</label>
-                        <input type="password" name="password1" id="id_password1" class="form-control" required>
-                        {% if form.password1.errors %}
-                        <div class="invalid-feedback">
-                            {{ form.password1.errors|join:", " }}
-                        </div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="id_password2" class="form-label">{% trans "გაიმეორეთ პაროლი" %}</label>
-                        <input type="password" name="password2" id="id_password2" class="form-control" required>
-                        {% if form.password2.errors %}
-                        <div class="invalid-feedback">
-                            {{ form.password2.errors|join:", " }}
                         </div>
                         {% endif %}
                     </div>
@@ -56,7 +37,7 @@
                         <label for="id_first_name" class="form-label">{% trans "სახელი" %}</label>
                         <input type="text" name="first_name" id="id_first_name" class="form-control" required>
                         {% if form.first_name.errors %}
-                        <div class="invalid-feedback">
+                        <div class="text-danger">
                             {{ form.first_name.errors|join:", " }}
                         </div>
                         {% endif %}
@@ -66,8 +47,33 @@
                         <label for="id_last_name" class="form-label">{% trans "გვარი" %}</label>
                         <input type="text" name="last_name" id="id_last_name" class="form-control" required>
                         {% if form.last_name.errors %}
-                        <div class="invalid-feedback">
+                        <div class="text-danger">
                             {{ form.last_name.errors|join:", " }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_password1" class="form-label">{% trans "პაროლი" %}</label>
+                        <input type="password" name="password1" id="id_password1" class="form-control" required>
+                        {% if form.password1.errors %}
+                        <div class="text-danger">
+                            {{ form.password1.errors|join:", " }}
+                        </div>
+                        {% endif %}
+                        {% if form.password1.help_text %}
+                        <div class="form-text small text-muted">
+                            {{ form.password1.help_text }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_password2" class="form-label">{% trans "გაიმეორეთ პაროლი" %}</label>
+                        <input type="password" name="password2" id="id_password2" class="form-control" required>
+                        {% if form.password2.errors %}
+                        <div class="text-danger">
+                            {{ form.password2.errors|join:", " }}
                         </div>
                         {% endif %}
                     </div>

@@ -4,6 +4,35 @@ from .models import UserProfile, EmployerProfile, JobListing
 from django.contrib.auth.forms import UserCreationForm
 from django.core.files.uploadedfile import UploadedFile
 
+class RegistrationForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+    first_name = forms.CharField(required=True)
+    last_name = forms.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'first_name', 'last_name', 'password1', 'password2']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make username field hidden and populate it with email value
+        self.fields['username'].widget = forms.HiddenInput()
+        self.fields['username'].required = False
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("A user with that email already exists.")
+        return email
+
+    def clean(self):
+        cleaned_data = super().clean()
+        email = cleaned_data.get('email')
+        if email:
+            # Set username to be the same as email
+            cleaned_data['username'] = email
+        return cleaned_data
+
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile

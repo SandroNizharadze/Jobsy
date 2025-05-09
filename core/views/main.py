@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.http import require_POST
 from ..models import JobListing, UserProfile, EmployerProfile, JobApplication
-from ..forms import UserProfileForm, EmployerProfileForm, JobListingForm
+from ..forms import UserProfileForm, EmployerProfileForm, JobListingForm, RegistrationForm
 import logging
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
@@ -185,31 +185,21 @@ def register(request):
         return redirect('job_list')
     
     if request.method == 'POST':
-        form = UserProfileForm(request.POST)
+        form = RegistrationForm(request.POST)
         if form.is_valid():
-            # Create user
-            username = form.cleaned_data.get('email')
-            password = form.cleaned_data.get('password1')
-            user = User.objects.create_user(
-                username=username,
-                email=username,
-                password=password,
-                first_name=form.cleaned_data.get('first_name'),
-                last_name=form.cleaned_data.get('last_name')
-            )
+            user = form.save()
             
             # Create user profile with default role
-            user_profile = form.save(commit=False)
-            user_profile.user = user
-            user_profile.role = 'user'  # Set default role to 'user'
-            user_profile.save()
+            user_profile = UserProfile.objects.create(
+                user=user,
+                role='user'  # Set default role to 'user'
+            )
             
-            # Log the user in with the ModelBackend
-            user.backend = 'django.contrib.auth.backends.ModelBackend'
+            # Log the user in
             login(request, user)
             return redirect('job_list')
     else:
-        form = UserProfileForm()
+        form = RegistrationForm()
     
     return render(request, 'core/register.html', {'form': form})
 
