@@ -49,6 +49,12 @@ Thumbs.db
 company_logos/
 media/
 static/
+!static/images/
+!static/images/**/*.png
+!static/images/**/*.jpg
+!static/images/**/*.jpeg
+!static/images/**/*.svg
+!static/images/**/*.gif
 
 # Media and Static files
 media/**/*
@@ -57,6 +63,12 @@ media/**/*
 static/**/*
 !static/
 !static/.gitkeep
+!static/images/
+!static/images/**/*.png
+!static/images/**/*.jpg
+!static/images/**/*.jpeg
+!static/images/**/*.svg
+!static/images/**/*.gif
 
 # Coverage reports
 htmlcov/
