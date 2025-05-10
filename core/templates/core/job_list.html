@@ -6,10 +6,6 @@
 
 {% block extra_head %}
 <!-- Remove loading overlay styles -->
-<script>
-  // Store URLs as variables to use in JavaScript
-  var registerUrl = "{% url 'register' %}";
-</script>
 {% endblock %}
 
 {% block hero_section %}
@@ -236,9 +232,7 @@
                 </div>
             </div>
             <div class="col-lg-5 text-center d-none d-lg-block">
-                <div class="position-relative overflow-hidden mb-4 bg-primary text-white rounded" style="height: 200px;">
-                    <img src="{% static 'core/images/notification.svg' %}" alt="Notifications" class="img-fluid" style="max-width: 300px;" onerror="this.outerHTML = '<i class=\'fas fa-bell\'></i> New jobs available';">
-                </div>
+                <img src="{% static 'core/images/notification.svg' %}" alt="Notifications" class="img-fluid" style="max-width: 300px;">
             </div>
         </div>
     </div>
@@ -258,10 +252,7 @@
                 <a href="{% url 'employer_dashboard' %}" class="btn btn-dark" style="border-radius:12px; padding:10px 25px;">{% trans "განათავსეთ ვაკანსია" %}</a>
             </div>
             <div class="col-lg-5 d-none d-lg-block position-relative" style="height:250px;">
-                <div class="position-relative overflow-hidden mb-4 bg-primary text-white rounded" style="height: 200px;">
-                    <img src="{% static 'employer_cta.png' %}" alt="Employer CTA" class="img-fluid" style="position:absolute; bottom:0; right:0; max-height:100%;" 
-                         onerror="this.style.display='none'; this.parentNode.innerHTML += '<div class=\'p-4\'><h4>Are you an employer?</h4><p>Join Jobsy to find the best talent in Georgia</p><a href=\'' + registerUrl + '\' class=\'btn btn-light mt-2\'>Register Now</a></div>';">
-                </div>
+                <img src="{% static 'employer_cta.png' %}" alt="Employer CTA" class="img-fluid" style="position:absolute; bottom:0; right:0; max-height:100%;">
             </div>
         </div>
     </div>

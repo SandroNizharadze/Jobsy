@@ -323,13 +323,13 @@
     <div class="main-bg">
         <div class="main-container">
             <div id="alert-container" class="alert-fixed-height">
-                {% if messages %}
-                    {% for message in messages %}
+            {% if messages %}
+                {% for message in messages %}
                         <div class="alert alert-danger fade show auto-dismiss" role="alert">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                {% endif %}
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
             </div>
             {% block content %}{% endblock %}
         </div>
