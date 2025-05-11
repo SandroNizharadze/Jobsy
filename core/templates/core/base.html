@@ -226,20 +226,18 @@
             transition: all 0.3s ease;
             margin-bottom: 1rem;
         }
-        
-        .alert {
-            background-color: #f8d7da; /* Always red background */
-            color: #721c24; /* Dark red text */
+        /* Remove always-red .alert background and color */
+        /* .alert {
+            background-color: #f8d7da; 
+            color: #721c24; 
             border: 1px solid #f5c6cb;
             border-radius: 5px;
             padding: 12px 20px;
             margin-bottom: 0;
-        }
-        
+        } */
         .alert-danger {
             font-weight: 500;
         }
-        
         /* When no alerts are present */
         .alert-fixed-height:empty {
             min-height: 0;
@@ -271,14 +269,14 @@
                 </ul>
                 
                 <div class="language-switcher me-3">
-                    <form action="{% url 'set_language' %}" method="post" style="display:inline;">
+                    <form action="{% url 'set_language' %}" method="post" style="display:inline;" class="lang-switch-form">
                         {% csrf_token %}
                         <input name="next" type="hidden" value="{{ request.path }}">
                         <input name="language" type="hidden" value="en">
                         <button type="submit" class="btn btn-link p-0 {% if LANGUAGE_CODE == 'en' %}active{% endif %}" style="color: rgba(255,255,255,0.8); font-size: 0.9rem; text-decoration: none; background: none; border: none;">EN</button>
                     </form>
                     <span>|</span>
-                    <form action="{% url 'set_language' %}" method="post" style="display:inline;">
+                    <form action="{% url 'set_language' %}" method="post" style="display:inline;" class="lang-switch-form">
                         {% csrf_token %}
                         <input name="next" type="hidden" value="{{ request.path }}">
                         <input name="language" type="hidden" value="ka">
@@ -325,7 +323,12 @@
             <div id="alert-container" class="alert-fixed-height">
             {% if messages %}
                 {% for message in messages %}
-                        <div class="alert alert-danger fade show auto-dismiss" role="alert">
+                    <div class="alert 
+                        {% if message.tags == 'success' %}alert-success
+                        {% elif message.tags == 'error' or message.tags == 'danger' %}alert-danger
+                        {% elif message.tags == 'warning' %}alert-warning
+                        {% else %}alert-info{% endif %}
+                        fade show auto-dismiss" role="alert">
                         {{ message }}
                     </div>
                 {% endfor %}
@@ -385,6 +388,18 @@
                 });
             });
         }
+
+        // Language switcher fix: strip /ka/ from next field when switching to EN
+        document.querySelectorAll('.lang-switch-form').forEach(function(form) {
+            form.addEventListener('submit', function(e) {
+                var langInput = form.querySelector('input[name="language"]');
+                var nextInput = form.querySelector('input[name="next"]');
+                if (langInput && nextInput && langInput.value === 'en') {
+                    // Remove /ka from the start of the path
+                    nextInput.value = nextInput.value.replace(/^\/ka\//, '/');
+                }
+            });
+        });
     });
     </script>
     {% block extra_js %}{% endblock %}

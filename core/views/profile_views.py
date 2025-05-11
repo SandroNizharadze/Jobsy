@@ -13,28 +13,18 @@ logger = logging.getLogger(__name__)
 @login_required
 def profile(request):
     """
-    Display and handle updates to user profile
+    Handle user profile view and updates
     """
-    user = request.user
-    
-    # Get user profile with a single query - avoid potential additional queries
-    try:
-        # Use select_related for more efficient querying
-        user_profile = UserProfile.objects.select_related('user').get(user=user)
-    except UserProfile.DoesNotExist:
-        # Create if it doesn't exist
-        user_profile = UserProfile.objects.create(user=user)
-    
-    # Check if user is an employer
+    user_profile = request.user.userprofile
     is_employer = user_profile.role == 'employer'
     
-    # Get employer profile if applicable - use select_related to avoid extra queries
-    employer_profile = None
+    # Initialize forms
+    user_form = UserProfileForm(instance=user_profile)
+    employer_form = None
+    
     if is_employer:
-        try:
-            employer_profile = EmployerProfile.objects.select_related('user_profile').get(user_profile=user_profile)
-        except EmployerProfile.DoesNotExist:
-            employer_profile = EmployerProfile.objects.create(user_profile=user_profile)
+        employer_profile = user_profile.employer_profile
+        employer_form = EmployerProfileForm(instance=employer_profile)
     
     if request.method == 'POST':
         # Determine which form was submitted
@@ -46,10 +36,17 @@ def profile(request):
             
             if user_form.is_valid():
                 user_form.save()
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({'success': True})
                 messages.success(request, "Your profile has been updated.")
                 return redirect('profile')
             else:
                 # If the form is invalid, display errors
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': False,
+                        'error': ' '.join([error for errors in user_form.errors.values() for error in errors])
+                    })
                 for field, errors in user_form.errors.items():
                     for error in errors:
                         messages.error(request, f"{error}")
@@ -57,7 +54,7 @@ def profile(request):
                 # Create a fresh employer form if needed
                 if is_employer:
                     employer_form = EmployerProfileForm(instance=employer_profile)
-                
+        
         elif form_type == 'employer_profile' and is_employer:
             # Process employer profile form
             employer_form = EmployerProfileForm(request.POST, request.FILES, instance=employer_profile)
@@ -74,35 +71,11 @@ def profile(request):
                 
                 # Create a fresh user profile form
                 user_form = UserProfileForm(instance=user_profile)
-        else:
-            # Invalid form type
-            messages.error(request, "Invalid form submission.")
-            
-            # Create fresh forms
-            user_form = UserProfileForm(instance=user_profile)
-            if is_employer:
-                employer_form = EmployerProfileForm(instance=employer_profile)
-    else:
-        # GET request - initialize forms
-        user_form = UserProfileForm(instance=user_profile)
-        
-        if is_employer:
-            employer_form = EmployerProfileForm(instance=employer_profile)
     
-    # Prepare context for template
     context = {
-        'user': user,
-        'user_profile': user_profile,
         'user_form': user_form,
-        'is_employer': is_employer,
+        'employer_form': employer_form,
     }
-    
-    # Add employer context if applicable
-    if is_employer:
-        context.update({
-            'employer_profile': employer_profile,
-            'employer_form': employer_form,
-        })
     
     return render(request, 'core/profile.html', context)
 

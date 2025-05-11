@@ -1,18 +1,19 @@
 {% extends 'core/base.html' %}
+{% load i18n %}
 
-{% block title %}Linked AI - Your Profile{% endblock %}
+{% block title %}{% trans "Linked AI - Your Profile" %}{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h2 mb-0">Your Profile</h1>
+    <h1 class="h2 mb-0">{% trans "Your Profile" %}</h1>
     <div class="d-flex gap-2">
         {% if user.userprofile.role == 'employer' %}
             <a href="{% url 'employer_dashboard' %}" class="btn btn-linkedin">
-                <i class="fas fa-building me-1"></i>Employer Dashboard
+                <i class="fas fa-building me-1"></i>{% trans "Employer Dashboard" %}
             </a>
         {% endif %}
         <a href="{% url 'job_list' %}" class="btn btn-outline-primary">
-            <i class="fas fa-briefcase me-1"></i>View Jobs
+            <i class="fas fa-briefcase me-1"></i>{% trans "View Jobs" %}
         </a>
     </div>
 </div>
@@ -20,11 +21,12 @@
 <div class="profile-section">
     <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
         {% csrf_token %}
+        <input type="hidden" name="form_type" value="user_profile">
         <div class="profile-header">
             <div class="profile-picture-container">
                 <div class="profile-picture-wrapper">
                     {% if user.userprofile.profile_picture %}
-                        <img src="{{ user.userprofile.profile_picture.url }}" alt="Profile Picture" class="profile-picture">
+                        <img src="{{ user.userprofile.profile_picture.url }}" alt="{% trans 'Profile Picture' %}" class="profile-picture">
                     {% else %}
                         <div class="profile-picture-placeholder">
                             <i class="fas fa-user"></i>
@@ -33,7 +35,7 @@
                     <div class="profile-picture-overlay">
                         <label for="{{ user_form.profile_picture.id_for_label }}" class="profile-picture-edit">
                             <i class="fas fa-camera"></i>
-                            <span>Change Photo</span>
+                            <span>{% trans "Change Photo" %}</span>
                         </label>
                     </div>
                 </div>
@@ -48,21 +50,21 @@
                 <h1>{{ user.get_full_name|default:user.username }}</h1>
                 <p class="text-muted">{{ user.email }}</p>
                 {% if user.userprofile.role == 'employer' %}
-                    <span class="badge bg-primary">Employer</span>
+                    <span class="badge bg-primary">{% trans "Employer" %}</span>
                 {% elif user.userprofile.role == 'admin' %}
-                    <span class="badge bg-danger">Admin</span>
+                    <span class="badge bg-danger">{% trans "Admin" %}</span>
                 {% else %}
-                    <span class="badge bg-success">Job Seeker</span>
+                    <span class="badge bg-success">{% trans "Job Seeker" %}</span>
                 {% endif %}
             </div>
         </div>
 
         {% if user.userprofile.role == 'employer' %}
             <div class="employer-section mb-4">
-                <h3 class="h4 mb-3">Company Information</h3>
+                <h3 class="h4 mb-3">{% trans "Company Information" %}</h3>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label" for="{{ employer_form.company_name.id_for_label }}">Company Name</label>
+                        <label class="form-label" for="{{ employer_form.company_name.id_for_label }}">{% trans "Company Name" %}</label>
                         {{ employer_form.company_name }}
                         {% if employer_form.company_name.errors %}
                             <div class="invalid-feedback d-block">
@@ -71,7 +73,7 @@
                         {% endif %}
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="form-label" for="{{ employer_form.company_website.id_for_label }}">Company Website</label>
+                        <label class="form-label" for="{{ employer_form.company_website.id_for_label }}">{% trans "Company Website" %}</label>
                         {{ employer_form.company_website }}
                         {% if employer_form.company_website.errors %}
                             <div class="invalid-feedback d-block">
@@ -81,7 +83,7 @@
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label" for="{{ employer_form.company_description.id_for_label }}">Company Description</label>
+                    <label class="form-label" for="{{ employer_form.company_description.id_for_label }}">{% trans "Company Description" %}</label>
                     {{ employer_form.company_description }}
                     {% if employer_form.company_description.errors %}
                         <div class="invalid-feedback d-block">
@@ -91,7 +93,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4 mb-3">
-                        <label class="form-label" for="{{ employer_form.company_logo.id_for_label }}">Company Logo</label>
+                        <label class="form-label" for="{{ employer_form.company_logo.id_for_label }}">{% trans "Company Logo" %}</label>
                         {{ employer_form.company_logo }}
                         {% if employer_form.company_logo.errors %}
                             <div class="invalid-feedback d-block">
@@ -100,7 +102,7 @@
                         {% endif %}
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label class="form-label" for="{{ employer_form.company_size.id_for_label }}">Company Size</label>
+                        <label class="form-label" for="{{ employer_form.company_size.id_for_label }}">{% trans "Company Size" %}</label>
                         {{ employer_form.company_size }}
                         {% if employer_form.company_size.errors %}
                             <div class="invalid-feedback d-block">
@@ -109,7 +111,7 @@
                         {% endif %}
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label class="form-label" for="{{ employer_form.industry.id_for_label }}">Industry</label>
+                        <label class="form-label" for="{{ employer_form.industry.id_for_label }}">{% trans "Industry" %}</label>
                         {{ employer_form.industry }}
                         {% if employer_form.industry.errors %}
                             <div class="invalid-feedback d-block">
@@ -119,7 +121,7 @@
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label" for="{{ employer_form.location.id_for_label }}">Location</label>
+                    <label class="form-label" for="{{ employer_form.location.id_for_label }}">{% trans "Location" %}</label>
                     {{ employer_form.location }}
                     {% if employer_form.location.errors %}
                         <div class="invalid-feedback d-block">
@@ -130,69 +132,49 @@
             </div>
         {% endif %}
         
-        <div class="d-flex justify-content-end mt-4 mb-4">
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save me-2"></i>Save Profile
-            </button>
-        </div>
+        
     </form>
 
     {% if user.userprofile.role == 'candidate' %}
 <div class="cv-card">
-    <h3 class="cv-title">Your CV</h3>
-    <div class="cv-actions">
+    <h3 class="cv-title">{% trans "Your CV" %}</h3>
+    <div class="cv-actions" id="cv-actions">
         {% if user.userprofile.cv %}
             <a href="{{ user.userprofile.cv.url }}" target="_blank" class="btn btn-cv-view">
-                <i class="fas fa-file-alt me-1"></i>View Current CV
+                <i class="fas fa-file-alt me-1"></i>{% trans "View Current CV" %}
             </a>
-            <form method="post" action="{% url 'remove_cv' %}" class="cv-remove-form" title="Remove CV" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn-cv-remove" aria-label="Remove CV">
-                    <i class="fas fa-times"></i>
-                </button>
-            </form>
+            <button type="button" class="btn-cv-remove" id="remove-cv-btn" aria-label="{% trans 'Remove CV' %}">
+                <i class="fas fa-times"></i>
+            </button>
         {% endif %}
     </div>
 
     <div id="cv-upload-form" class="cv-upload-form" style="display: {% if user_form.cv.errors or user_form.cv_consent.errors or user_form.cv_share_with_employers.errors %}block{% else %}none{% endif %};">
-        <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate id="cv-upload-form-element" action="{% url 'profile' %}">
+        <form method="post" enctype="multipart/form-data" class="needs-validation" id="cv-upload-form-element" novalidate>
             {% csrf_token %}
+            <input type="hidden" name="form_type" value="user_profile">
             <div class="mb-3">
-                <label class="form-label" for="{{ user_form.cv.id_for_label }}">Upload CV</label>
+                <label class="form-label" for="{{ user_form.cv.id_for_label }}">{% trans "Upload CV" %}</label>
                 {{ user_form.cv }}
-                {% if user_form.cv.help_text %}<div class="form-text">{{ user_form.cv.help_text }}</div>{% endif %}
+                {% if user_form.cv.help_text %}<div class="form-text">{% trans user_form.cv.help_text %}</div>{% endif %}
                 {% if user_form.cv.errors %}
                     <div class="invalid-feedback d-block">{{ user_form.cv.errors|join:", " }}</div>
-                {% endif %}
-            </div>
-            <div class="mb-3 form-check">
-                {{ user_form.cv_consent }}
-                <label class="form-check-label" for="{{ user_form.cv_consent.id_for_label }}">{{ user_form.cv_consent.help_text }}</label>
-                {% if user_form.cv_consent.errors %}
-                    <div class="invalid-feedback d-block">{{ user_form.cv_consent.errors|join:", " }}</div>
-                {% endif %}
-            </div>
-            <div class="mb-3 form-check">
-                {{ user_form.cv_share_with_employers }}
-                <label class="form-check-label" for="{{ user_form.cv_share_with_employers.id_for_label }}">{{ user_form.cv_share_with_employers.help_text }}</label>
-                {% if user_form.cv_share_with_employers.errors %}
-                    <div class="invalid-feedback d-block">{{ user_form.cv_share_with_employers.errors|join:", " }}</div>
                 {% endif %}
             </div>
             <div id="cv-form-error" class="invalid-feedback d-block" style="display: none;"></div>
             <div class="d-flex gap-2 justify-content-end">
                 <button type="submit" class="btn btn-linkedin">
-                    <i class="fas fa-save me-1"></i>Save
+                    <i class="fas fa-save me-1"></i>{% trans "Save" %}
                 </button>
                 <button type="button" id="cancel-cv-form-btn" class="btn btn-outline-secondary">
-                    <i class="fas fa-times me-1"></i>Cancel
+                    <i class="fas fa-times me-1"></i>{% trans "Cancel" %}
                 </button>
             </div>
         </form>
     </div>
     {% if not user.userprofile.cv %}
         <button id="show-cv-form-btn" type="button" class="btn btn-cv-upload">
-            <i class="fas fa-upload me-1"></i>Add/Upload CV
+            <i class="fas fa-upload me-1"></i>{% trans "Add/Upload CV" %}
         </button>
     {% endif %}
 </div>
@@ -306,9 +288,6 @@
     background: #0073b1;
     color: #fff;
 }
-.cv-remove-form {
-    display: inline;
-}
 .btn-cv-remove {
     background: none;
     border: none;
@@ -380,55 +359,92 @@
                     <div class="profile-picture-overlay">
                         <label for="id_profile_picture" class="profile-picture-edit">
                             <i class="fas fa-camera"></i>
-                            <span>Change Photo</span>
+                            <span>{% trans "Change Photo" %}</span>
                         </label>
                     </div>
-                `;
+                `
             }
-            reader.readAsDataURL(this.files[0]);
         }
-    });
+    })
 
-    // Company logo preview
-    const companyLogoInput = document.getElementById('id_company_logo');
-    if (companyLogoInput) {
-        companyLogoInput.addEventListener('change', function(e) {
-            if (this.files && this.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const preview = document.createElement('img');
-                    preview.src = e.target.result;
-                    preview.style.maxWidth = '200px';
-                    preview.style.marginTop = '10px';
-                    preview.className = 'company-logo-preview';
-                    
-                    const existingPreview = document.querySelector('.company-logo-preview');
-                    if (existingPreview) {
-                        existingPreview.remove();
-                    }
-                    
-                    companyLogoInput.parentNode.appendChild(preview);
-                }
-                reader.readAsDataURL(this.files[0]);
-            }
-        });
-    }
-
-    // Toggle CV upload form
     document.addEventListener('DOMContentLoaded', function() {
-        var showBtn = document.getElementById('show-cv-form-btn');
-        var formDiv = document.getElementById('cv-upload-form');
-        var cancelBtn = document.getElementById('cancel-cv-form-btn');
-        if (showBtn && formDiv) {
-            showBtn.addEventListener('click', function() {
-                formDiv.style.display = 'block';
-                showBtn.style.display = 'none';
+        // Show CV upload form
+        const showCvFormBtn = document.getElementById('show-cv-form-btn');
+        const cvUploadForm = document.getElementById('cv-upload-form');
+        const cancelCvFormBtn = document.getElementById('cancel-cv-form-btn');
+        const cvUploadFormElement = document.getElementById('cv-upload-form-element');
+        const removeCvBtn = document.getElementById('remove-cv-btn');
+
+        if (showCvFormBtn) {
+            showCvFormBtn.addEventListener('click', function() {
+                cvUploadForm.style.display = 'block';
+                showCvFormBtn.style.display = 'none';
             });
         }
-        if (cancelBtn && formDiv && showBtn) {
-            cancelBtn.addEventListener('click', function() {
-                formDiv.style.display = 'none';
-                showBtn.style.display = 'inline-block';
+
+        if (cancelCvFormBtn) {
+            cancelCvFormBtn.addEventListener('click', function() {
+                cvUploadForm.style.display = 'none';
+                if (showCvFormBtn) {
+                    showCvFormBtn.style.display = 'block';
+                }
+            });
+        }
+
+        // Handle CV upload form submission
+        if (cvUploadFormElement) {
+            cvUploadFormElement.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+
+                fetch(window.location.href, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                    } else {
+                        const errorDiv = document.getElementById('cv-form-error');
+                        errorDiv.textContent = data.error || 'An error occurred while uploading the CV.';
+                        errorDiv.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    const errorDiv = document.getElementById('cv-form-error');
+                    errorDiv.textContent = 'An error occurred while uploading the CV.';
+                    errorDiv.style.display = 'block';
+                });
+            });
+        }
+
+        // Handle CV removal
+        if (removeCvBtn) {
+            removeCvBtn.addEventListener('click', function() {
+                if (confirm('{% trans "Are you sure you want to remove your CV?" %}')) {
+                    fetch('{% url "remove_cv" %}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.reload();
+                        } else {
+                            alert('{% trans "An error occurred while removing the CV." %}');
+                        }
+                    })
+                    .catch(error => {
+                        alert('{% trans "An error occurred while removing the CV." %}');
+                    });
+                }
             });
         }
     });

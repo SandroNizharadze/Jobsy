@@ -7,17 +7,28 @@ from django.core.files.uploadedfile import UploadedFile
 class RegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True)
     first_name = forms.CharField(required=True)
-    last_name = forms.CharField(required=True)
-
+    
     class Meta:
         model = User
-        fields = ['username', 'email', 'first_name', 'last_name', 'password1', 'password2']
+        fields = ['username', 'email', 'first_name', 'password1']
+        widgets = {
+            'username': forms.HiddenInput(),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Name'}),
+            'password1': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Make username field hidden and populate it with email value
-        self.fields['username'].widget = forms.HiddenInput()
         self.fields['username'].required = False
+        # Remove password2 field
+        del self.fields['password2']
+        # Remove password validation messages
+        self.fields['password1'].help_text = None
+        self.fields['password1'].error_messages = {
+            'required': 'Please enter your password.',
+        }
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -26,6 +37,12 @@ class RegistrationForm(UserCreationForm):
         if User.objects.filter(username=email).exists():
             raise forms.ValidationError("A user with that email already exists.")
         return email
+
+    def clean_password1(self):
+        password = self.cleaned_data.get('password1')
+        if len(password) < 4:
+            raise forms.ValidationError("Password must be at least 4 characters long.")
+        return password
 
     def clean(self):
         cleaned_data = super().clean()
@@ -38,7 +55,7 @@ class RegistrationForm(UserCreationForm):
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['profile_picture', 'cv', 'cv_consent', 'cv_share_with_employers']
+        fields = ['profile_picture', 'cv']
         widgets = {
             'profile_picture': forms.FileInput(attrs={
                 'class': 'form-control',
@@ -48,17 +65,9 @@ class UserProfileForm(forms.ModelForm):
                 'class': 'form-control',
                 'accept': '.pdf,.doc,.docx'
             }),
-            'cv_consent': forms.CheckboxInput(attrs={
-                'class': 'form-check-input'
-            }),
-            'cv_share_with_employers': forms.CheckboxInput(attrs={
-                'class': 'form-check-input'
-            }),
         }
         help_texts = {
             'cv': 'Upload your CV (PDF, DOC, DOCX).',
-            'cv_consent': 'I agree that my CV will be stored in our database.',
-            'cv_share_with_employers': 'Allow my CV to be visible to employers for job matching. If unchecked, your CV will only be used for your own job applications.',
         }
 
     def clean_profile_picture(self):
@@ -70,12 +79,6 @@ class UserProfileForm(forms.ModelForm):
             if not profile_picture.content_type.startswith('image/'):
                 raise forms.ValidationError("File is not an image")
         return profile_picture
-
-    def clean_cv_consent(self):
-        consent = self.cleaned_data.get('cv_consent')
-        if not consent:
-            raise forms.ValidationError('You must agree to store your CV in our database.')
-        return consent
 
 class EmployerProfileForm(forms.ModelForm):
     class Meta:

@@ -1,107 +1,89 @@
 {% extends 'core/base.html' %}
 {% load i18n %}
 
-{% block title %}{% trans "რეგისტრაცია" %} - Jobsy{% endblock %}
+{% block title %}{% trans "Register - Jobsy" %}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-6 col-lg-5">
         <div class="card">
             <div class="card-body p-4">
-                <h2 class="text-center mb-4">{% trans "შექმენით ანგარიში" %}</h2>
+                <h2 class="text-center mb-4">{% trans "Create Account" %}</h2>
                 
                 {% if messages %}
                     {% for message in messages %}
                         <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
                             {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endfor %}
                 {% endif %}
 
                 <form method="post" class="needs-validation" novalidate>
                     {% csrf_token %}
-                    {{ form.username }}
-                    
                     <div class="mb-3">
-                        <label for="id_email" class="form-label">{% trans "ელ-ფოსტა" %}</label>
-                        <input type="email" name="email" id="id_email" class="form-control" required>
-                        {% if form.email.errors %}
-                        <div class="text-danger">
-                            {{ form.email.errors|join:", " }}
-                        </div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="id_first_name" class="form-label">{% trans "სახელი" %}</label>
-                        <input type="text" name="first_name" id="id_first_name" class="form-control" required>
+                        <label for="id_first_name" class="form-label">{% trans "Name" %}</label>
+                        <input type="text" name="first_name" id="id_first_name" class="form-control" required value="{{ form.first_name.value|default:'' }}">
                         {% if form.first_name.errors %}
-                        <div class="text-danger">
-                            {{ form.first_name.errors|join:", " }}
-                        </div>
+                            <div class="invalid-feedback d-block">
+                                {{ form.first_name.errors|join:", " }}
+                            </div>
                         {% endif %}
                     </div>
-                    
                     <div class="mb-3">
-                        <label for="id_last_name" class="form-label">{% trans "გვარი" %}</label>
-                        <input type="text" name="last_name" id="id_last_name" class="form-control" required>
-                        {% if form.last_name.errors %}
-                        <div class="text-danger">
-                            {{ form.last_name.errors|join:", " }}
-                        </div>
+                        <label for="id_email" class="form-label">{% trans "Email" %}</label>
+                        <input type="email" name="email" id="id_email" class="form-control" required value="{{ form.email.value|default:'' }}">
+                        {% if form.email.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.email.errors|join:", " }}
+                            </div>
                         {% endif %}
                     </div>
-                    
                     <div class="mb-3">
-                        <label for="id_password1" class="form-label">{% trans "პაროლი" %}</label>
+                        <label for="id_password1" class="form-label">{% trans "Password" %}</label>
                         <input type="password" name="password1" id="id_password1" class="form-control" required>
                         {% if form.password1.errors %}
-                        <div class="text-danger">
-                            {{ form.password1.errors|join:", " }}
-                        </div>
-                        {% endif %}
-                        {% if form.password1.help_text %}
-                        <div class="form-text small text-muted">
-                            {{ form.password1.help_text }}
-                        </div>
+                            <div class="invalid-feedback d-block">
+                                {{ form.password1.errors|join:", " }}
+                            </div>
                         {% endif %}
                     </div>
-                    
-                    <div class="mb-3">
-                        <label for="id_password2" class="form-label">{% trans "გაიმეორეთ პაროლი" %}</label>
-                        <input type="password" name="password2" id="id_password2" class="form-control" required>
-                        {% if form.password2.errors %}
-                        <div class="text-danger">
-                            {{ form.password2.errors|join:", " }}
-                        </div>
-                        {% endif %}
-                    </div>
-                    
                     <div class="d-grid mb-3">
                         <button type="submit" class="btn btn-linkedin">
-                            <i class="fas fa-user-plus me-1"></i>{% trans "რეგისტრაცია" %}
+                            <i class="fas fa-user-plus me-1"></i>{% trans "Register" %}
                         </button>
                     </div>
                 </form>
 
                 <div class="text-center mb-3">
-                    <p class="text-muted">{% trans "ან" %}</p>
+                    <p class="text-muted">{% trans "or" %}</p>
                 </div>
 
                 <div class="d-grid">
                     <a href="{% url 'social:begin' 'google-oauth2' %}" class="btn btn-outline-primary">
-                        <i class="fab fa-google me-2"></i>{% trans "Google-ით შესვლა" %}
+                        <i class="fab fa-google me-2"></i>{% trans "Continue with Google" %}
                     </a>
                 </div>
 
                 <div class="text-center mt-4">
-                    <p class="mb-0">{% trans "უკვე გაქვთ ანგარიში?" %} <a href="{% url 'login' %}" class="text-linkedin">{% trans "შესვლა" %}</a></p>
+                    <p class="mb-0">{% trans "Already have an account?" %} <a href="{% url 'login' %}" class="text-linkedin">{% trans "Login" %}</a></p>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+
+.btn-linkedin {
+    background-color: #0073b1;
+    border-color: #0073b1;
+    color: white;
+    font-weight: 600;
+    padding: 12px;
+    border-radius: 8px;
+}
+</style>
 {% endblock %}
 
 {% block extra_js %}

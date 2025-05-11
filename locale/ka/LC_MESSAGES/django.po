@@ -259,3 +259,87 @@ msgstr "გვარი"
 #: templates/core/register.html
 msgid "უკვე გაქვთ ანგარიში?"
 msgstr "უკვე გაქვთ ანგარიში?"
+
+# Profile section translations
+
+#: templates/core/profile.html
+msgid "Linked AI - Your Profile"
+msgstr "Linked AI - თქვენი პროფილი"
+
+msgid "Profile"
+msgstr "პროფილი"
+
+msgid "Your Profile"
+msgstr "თქვენი პროფილი"
+
+msgid "Employer Dashboard"
+msgstr "დამსაქმებლის დაფა"
+
+msgid "View Jobs"
+msgstr "ვაკანსიების ნახვა"
+
+msgid "Profile Picture"
+msgstr "პროფილის ფოტო"
+
+msgid "Change Photo"
+msgstr "ფოტოს შეცვლა"
+
+msgid "Employer"
+msgstr "დამსაქმებელი"
+
+msgid "Admin"
+msgstr "ადმინი"
+
+msgid "Job Seeker"
+msgstr "სამუშაოს მაძიებელი"
+
+msgid "Company Information"
+msgstr "კომპანიის ინფორმაცია"
+
+msgid "Company Name"
+msgstr "კომპანიის სახელი"
+
+msgid "Company Website"
+msgstr "კომპანიის ვებგვერდი"
+
+msgid "Company Description"
+msgstr "კომპანიის აღწერა"
+
+msgid "Company Logo"
+msgstr "კომპანიის ლოგო"
+
+msgid "Company Size"
+msgstr "კომპანიის ზომა"
+
+msgid "Industry"
+msgstr "ინდუსტრია"
+
+msgid "Location"
+msgstr "მდებარეობა"
+
+msgid "Save Profile"
+msgstr "პროფილის შენახვა"
+
+msgid "Your CV"
+msgstr "თქვენი CV"
+
+msgid "View Current CV"
+msgstr "CV-ის ნახვა"
+
+msgid "Remove CV"
+msgstr "CV-ის წაშლა"
+
+msgid "Upload CV"
+msgstr "CV-ის ატვირთვა"
+
+msgid "Save"
+msgstr "შენახვა"
+
+msgid "Add/Upload CV"
+msgstr "CV-ის დამატება/ატვირთვა"
+
+msgid "Are you sure you want to remove your CV?"
+msgstr "ნამდვილად გსურთ სივის წაშლა?"
+
+msgid "Cancel"
+msgstr "გაუქმება"

@@ -74,13 +74,17 @@ def register(request):
         if form.is_valid():
             user = form.save()
             
-            # Create a UserProfile for the new user
-            UserProfile.objects.create(
+            # Create a UserProfile for the new user if it doesn't exist
+            profile, created = UserProfile.objects.get_or_create(
                 user=user,
-                role='candidate'
+                defaults={'role': 'candidate'}
             )
+            if not created and profile.role != 'candidate':
+                profile.role = 'candidate'
+                profile.save()
             
-            # Log the user in after registration
+            # Set backend for login (required if multiple backends)
+            user.backend = 'django.contrib.auth.backends.ModelBackend'
             login(request, user)
             messages.success(request, "Registration successful. Welcome to Jobsy!")
             return redirect('job_list')
