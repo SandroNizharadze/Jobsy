@@ -10,6 +10,14 @@
             <div class="card text-center shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title">{% trans "Active Jobs" %}</h5>
+                    <p class="display-5 fw-bold">{{ active_jobs }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">{% trans "Total Jobs" %}</h5>
                     <p class="display-5 fw-bold">{{ total_jobs }}</p>
                 </div>
             </div>
@@ -27,14 +35,6 @@
                 <div class="card-body">
                     <h5 class="card-title">{% trans "Avg. Applicants/Job" %}</h5>
                     <p class="display-5 fw-bold">{{ avg_applicants }}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">{% trans "Jobs Expiring Soon" %}</h5>
-                    <p class="display-5 fw-bold">{{ jobs_expiring_soon|length }}</p>
                 </div>
             </div>
         </div>

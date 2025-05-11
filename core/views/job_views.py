@@ -169,19 +169,30 @@ def apply_job(request, job_id):
             
             # Process form data
             cover_letter = request.POST.get('cover_letter', '')
-            resume_file = request.FILES.get('resume')
             
-            if not cover_letter or not resume_file:
-                messages.error(request, "Both cover letter and resume are required.")
-                return redirect('job_detail', job_id=job.id)
-            
-            # Create application
-            application = JobApplication.objects.create(
-                job=job,
-                user=request.user,
-                cover_letter=cover_letter,
-                resume=resume_file
-            )
+            # For authenticated users with CV, resume is not required
+            if request.user.userprofile.cv:
+                # Create application with profile CV
+                application = JobApplication.objects.create(
+                    job=job,
+                    user=request.user,
+                    cover_letter=cover_letter,
+                    resume=request.user.userprofile.cv
+                )
+            else:
+                # For authenticated users without CV, resume is required
+                resume_file = request.FILES.get('resume')
+                if not resume_file:
+                    messages.error(request, "Resume is required.")
+                    return redirect('job_detail', job_id=job.id)
+                
+                # Create application with uploaded resume
+                application = JobApplication.objects.create(
+                    job=job,
+                    user=request.user,
+                    cover_letter=cover_letter,
+                    resume=resume_file
+                )
             
             messages.success(request, "Your application has been submitted successfully!")
             return redirect('job_detail', job_id=job.id)
@@ -192,8 +203,8 @@ def apply_job(request, job_id):
             cover_letter = request.POST.get('cover_letter', '')
             resume_file = request.FILES.get('resume')
             
-            if not all([guest_name, guest_email, cover_letter, resume_file]):
-                messages.error(request, "All fields are required for guest application.")
+            if not all([guest_name, guest_email, resume_file]):
+                messages.error(request, "Name, email and resume are required for guest application.")
                 return redirect('job_detail', job_id=job.id)
             
             # Create guest application

@@ -6,6 +6,8 @@ from django.db.models import Count, Prefetch
 from ..models import JobListing, EmployerProfile, JobApplication, UserProfile
 from ..forms import JobListingForm, EmployerProfileForm
 import logging
+from django.utils import timezone
+from datetime import timedelta
 
 logger = logging.getLogger(__name__)
 
@@ -25,33 +27,34 @@ def is_employer(user):
 @user_passes_test(is_employer)
 def employer_home(request):
     """
-    Display the employer dashboard home page
+    Display the employer metrics/summary page (not job management)
     """
-    # Get the employer profile with prefetched related data
     employer_profile = request.user.userprofile.employer_profile
-    
-    # Get jobs with optimized query - fetch all at once
     jobs = JobListing.objects.filter(employer=employer_profile)
-    
-    # Get statistics for employer's jobs
-    job_stats = {
-        'total': jobs.count(),
-        'active': jobs.filter(status='approved').count(),
-        'pending': jobs.filter(status='pending_review').count(),
-        'applications': JobApplication.objects.filter(job__employer=employer_profile).count(),
-    }
-    
-    # Recent applications with related jobs - use select_related
-    recent_applications = JobApplication.objects.filter(
+
+    # Metrics
+    total_jobs = jobs.count()
+    active_jobs = jobs.filter(status='approved').count()
+    total_applicants = JobApplication.objects.filter(job__employer=employer_profile).count()
+    avg_applicants = round(total_applicants / total_jobs, 2) if total_jobs > 0 else 0
+    # Jobs expiring soon (example: jobs expiring in next 7 days)
+    soon = timezone.now() + timedelta(days=7)
+    jobs_expiring_soon = jobs.filter(expiry_date__lte=soon, expiry_date__gte=timezone.now()) if hasattr(jobs.first(), 'expiry_date') else []
+
+    # Recent applicants (last 5)
+    recent_applicants = JobApplication.objects.filter(
         job__employer=employer_profile
     ).select_related('job', 'user').order_by('-applied_at')[:5]
-    
+
     context = {
         'employer_profile': employer_profile,
-        'job_stats': job_stats,
-        'recent_applications': recent_applications,
+        'total_jobs': total_jobs,
+        'active_jobs': active_jobs,
+        'total_applicants': total_applicants,
+        'avg_applicants': avg_applicants,
+        'jobs_expiring_soon': jobs_expiring_soon,
+        'recent_applicants': recent_applicants,
     }
-    
     return render(request, 'core/employer_home.html', context)
 
 @login_required
@@ -60,46 +63,36 @@ def employer_dashboard(request):
     """
     Display the employer dashboard with detailed analytics
     """
-    # Get the employer profile
     employer_profile = request.user.userprofile.employer_profile
-    
-    # Get all jobs by this employer with prefetched applications
-    jobs = JobListing.objects.filter(employer=employer_profile).prefetch_related(
-        Prefetch('applications', queryset=JobApplication.objects.select_related('user'))
+
+    # All jobs for this employer
+    jobs = JobListing.objects.filter(employer=employer_profile)
+
+    # Metrics
+    active_jobs = jobs.filter(status='approved').count()
+    total_applicants = JobApplication.objects.filter(job__employer=employer_profile).count()
+    avg_applicants = (
+        total_applicants / active_jobs if active_jobs > 0 else 0
     )
-    
-    # Count applications per job using annotation for efficiency
-    job_applications = JobListing.objects.filter(
-        employer=employer_profile
-    ).annotate(application_count=Count('applications'))
-    
+    # Jobs expiring soon (example: jobs expiring in next 7 days)
+    soon = timezone.now() + timedelta(days=7)
+    jobs_expiring_soon = jobs.filter(expiry_date__lte=soon, expiry_date__gte=timezone.now()).count() if hasattr(jobs.first(), 'expiry_date') else 0
+
+    # Recent applicants (last 5)
+    recent_applicants = JobApplication.objects.filter(
+        job__employer=employer_profile
+    ).select_related('user', 'job').order_by('-applied_at')[:5]
+
     context = {
         'employer_profile': employer_profile,
         'jobs': jobs,
-        'job_applications': job_applications,
+        'active_jobs': active_jobs,
+        'total_applicants': total_applicants,
+        'avg_applicants': avg_applicants,
+        'jobs_expiring_soon': jobs_expiring_soon,
+        'recent_applicants': recent_applicants,
     }
-    
     return render(request, 'core/employer_dashboard.html', context)
-
-@login_required
-@user_passes_test(is_employer)
-def employer_jobs(request):
-    """
-    Display all jobs posted by the employer
-    """
-    # Get the employer profile
-    employer_profile = request.user.userprofile.employer_profile
-    
-    # Get all jobs by this employer with application counts
-    jobs = JobListing.objects.filter(employer=employer_profile).annotate(
-        application_count=Count('applications')
-    ).order_by('-posted_at')
-    
-    context = {
-        'jobs': jobs,
-    }
-    
-    return render(request, 'core/employer_jobs.html', context)
 
 @login_required
 @user_passes_test(is_employer)
@@ -122,7 +115,7 @@ def post_job(request):
             job.save()
             
             messages.success(request, "Job posting submitted for review!")
-            return redirect('employer_jobs')
+            return redirect('employer_dashboard')
     else:
         form = JobListingForm()
     
@@ -144,7 +137,7 @@ def edit_job(request, job_id):
     
     if job.employer != employer_profile:
         messages.error(request, "You don't have permission to edit this job.")
-        return redirect('employer_jobs')
+        return redirect('employer_dashboard')
     
     if request.method == 'POST':
         form = JobListingForm(request.POST, instance=job)
@@ -160,7 +153,7 @@ def edit_job(request, job_id):
             # Save changes
             updated_job.save()
             
-            return redirect('employer_jobs')
+            return redirect('employer_dashboard')
     else:
         form = JobListingForm(instance=job)
     
@@ -184,10 +177,10 @@ def delete_job(request, job_id):
     
     if job.employer != employer_profile:
         messages.error(request, "You don't have permission to delete this job.")
-        return redirect('employer_jobs')
+        return redirect('employer_dashboard')
     
     # Delete the job
     job.delete()
     
     messages.success(request, "Job listing has been deleted.")
-    return redirect('employer_jobs') 
+    return redirect('employer_dashboard') 
