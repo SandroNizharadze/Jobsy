@@ -82,7 +82,6 @@ coverage.xml
 .hypothesis/
 
 # Translations
-*.mo
 *.pot
 
 # Unit test / coverage reports
