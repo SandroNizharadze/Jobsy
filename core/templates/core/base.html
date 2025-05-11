@@ -271,14 +271,14 @@
                 <div class="language-switcher me-3">
                     <form action="{% url 'set_language' %}" method="post" style="display:inline;" class="lang-switch-form">
                         {% csrf_token %}
-                        <input name="next" type="hidden" value="{{ request.path }}">
+                        <input name="next" type="hidden" value="{% if not request.path|slice:':4' == '/en/' %}/en{{ request.path }}{% else %}{{ request.path }}{% endif %}">
                         <input name="language" type="hidden" value="en">
                         <button type="submit" class="btn btn-link p-0 {% if LANGUAGE_CODE == 'en' %}active{% endif %}" style="color: rgba(255,255,255,0.8); font-size: 0.9rem; text-decoration: none; background: none; border: none;">EN</button>
                     </form>
                     <span>|</span>
                     <form action="{% url 'set_language' %}" method="post" style="display:inline;" class="lang-switch-form">
                         {% csrf_token %}
-                        <input name="next" type="hidden" value="{{ request.path }}">
+                        <input name="next" type="hidden" value="{{ request.path|cut:'/en' }}">
                         <input name="language" type="hidden" value="ka">
                         <button type="submit" class="btn btn-link p-0 {% if LANGUAGE_CODE == 'ka' %}active{% endif %}" style="color: rgba(255,255,255,0.8); font-size: 0.9rem; text-decoration: none; background: none; border: none;">KA</button>
                     </form>
@@ -388,18 +388,6 @@
                 });
             });
         }
-
-        // Language switcher fix: strip /ka/ from next field when switching to EN
-        document.querySelectorAll('.lang-switch-form').forEach(function(form) {
-            form.addEventListener('submit', function(e) {
-                var langInput = form.querySelector('input[name="language"]');
-                var nextInput = form.querySelector('input[name="next"]');
-                if (langInput && nextInput && langInput.value === 'en') {
-                    // Remove /ka from the start of the path
-                    nextInput.value = nextInput.value.replace(/^\/ka\//, '/');
-                }
-            });
-        });
     });
     </script>
     {% block extra_js %}{% endblock %}
