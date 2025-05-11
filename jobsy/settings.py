@@ -113,7 +113,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Internationalization
-LANGUAGE_CODE = 'en'
+LANGUAGE_CODE = 'ka'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
