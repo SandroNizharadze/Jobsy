@@ -28,6 +28,12 @@ class JobListing(models.Model):
     ]
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending_review', db_index=True)
     admin_feedback = models.TextField(blank=True)
+    PREMIUM_LEVEL_CHOICES = [
+        ('standard', 'Standard'),
+        ('premium', 'Premium'),
+        ('premium_plus', 'Premium +'),
+    ]
+    premium_level = models.CharField(max_length=20, choices=PREMIUM_LEVEL_CHOICES, default='standard', db_index=True)
 
     def __str__(self):
         return f"{self.title} at {self.company}"

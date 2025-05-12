@@ -20,13 +20,24 @@ def job_list(request):
     """
     # Only show approved jobs to the public
     # Use select_related to fetch employer in the same query
-    jobs = JobListing.objects.filter(status='approved').select_related('employer').order_by('-posted_at')
+    # Order by premium level (premium_plus first, then premium, then standard)
+    jobs = JobListing.objects.filter(status='approved').select_related('employer').order_by(
+        # Custom ordering for premium levels
+        # This will put premium_plus first, then premium, then standard
+        # Since it's in reverse alphabetical order: standard < premium < premium_plus
+        '-premium_level', '-posted_at'
+    )
     
     # Initialize filtering context variables
     filtered = False
     active_filters = {}
     filter_remove_urls = {}
     show_filters = 'show_filters' in request.GET
+    
+    # Filter by premium level on main page (when filters are NOT being shown)
+    # Premium filtering logic - only show premium and premium_plus jobs on main page
+    if not show_filters:
+        jobs = jobs.filter(premium_level__in=['premium', 'premium_plus'])
     
     # Apply filters based on request parameters
     if 'search' in request.GET and request.GET['search']:
@@ -54,6 +65,18 @@ def job_list(request):
         active_filters['კატეგორია'] = category
         filter_remove_urls['კატეგორია'] = remove_from_query_string(request.GET, 'category')
     
+    if 'premium_level' in request.GET and request.GET['premium_level']:
+        premium_level = request.GET['premium_level']
+        jobs = jobs.filter(premium_level=premium_level)
+        filtered = True
+        premium_level_display = {
+            'standard': 'Standard',
+            'premium': 'Premium',
+            'premium_plus': 'Premium +'
+        }.get(premium_level, premium_level)
+        active_filters['Premium Level'] = premium_level_display
+        filter_remove_urls['Premium Level'] = remove_from_query_string(request.GET, 'premium_level')
+    
     if 'experience' in request.GET and request.GET['experience']:
         experience = request.GET['experience']
         jobs = jobs.filter(experience=experience)
@@ -78,6 +101,10 @@ def job_list(request):
         filtered = True
         active_filters['სამუშაოს ტიპი'] = ', '.join(preferences)
         filter_remove_urls['სამუშაოს ტიპი'] = remove_from_query_string(request.GET, 'job_preferences')
+    
+    # After all filters are applied, ensure premium ordering is preserved
+    # This guarantees premium jobs always appear at the top even after filtering
+    jobs = jobs.order_by('-premium_level', '-posted_at')
     
     # Get unique categories and locations for filter dropdowns - use distinct() with values_list for optimization
     all_categories = JobListing.objects.filter(status='approved').values_list('category', flat=True).distinct()
@@ -136,10 +163,11 @@ def job_detail(request, job_id):
     job = get_object_or_404(JobListing.objects.select_related('employer'), id=job_id, status='approved')
     
     # Get similar jobs based on category and experience, only show approved
+    # Also order by premium level
     similar_jobs = JobListing.objects.filter(
         status='approved',
         category=job.category
-    ).exclude(id=job_id).select_related('employer').order_by('-posted_at')[:5]
+    ).exclude(id=job_id).select_related('employer').order_by('-premium_level', '-posted_at')[:5]
     
     context = {
         'job': job,

@@ -129,7 +129,7 @@ class JobListingForm(forms.ModelForm):
         model = JobListing
         fields = (
             'title', 'description', 'location', 'salary_min', 'salary_max', 'salary_type',
-            'category', 'interests', 'fields', 'experience', 'job_preferences'
+            'category', 'interests', 'fields', 'experience', 'job_preferences', 'premium_level'
         )
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Job Title'}),
@@ -143,4 +143,5 @@ class JobListingForm(forms.ModelForm):
             'fields': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Relevant fields'}),
             'experience': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Entry, Mid, Senior'}),
             'job_preferences': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. remote, full-time, contract'}),
+            'premium_level': forms.Select(attrs={'class': 'form-control'}),
         }

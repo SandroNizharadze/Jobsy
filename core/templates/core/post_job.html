@@ -139,6 +139,22 @@
                                 </div>
                                 {% endif %}
                             </div>
+                            
+                            <!-- Premium Level -->
+                            <div class="col-12">
+                                <label for="{{ form.premium_level.id_for_label }}" class="form-label">Premium Level</label>
+                                {{ form.premium_level }}
+                                <small class="form-text text-muted">
+                                    Standard: Appears only in filtered searches<br>
+                                    Premium: Appears on main page with standard styling<br>
+                                    Premium+: Appears on main page with enhanced visibility
+                                </small>
+                                {% if form.premium_level.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.premium_level.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
                         </div>
 
                         <div class="mt-4">

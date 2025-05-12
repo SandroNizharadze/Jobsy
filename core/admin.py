@@ -66,8 +66,8 @@ class EmployerProfileAdmin(admin.ModelAdmin):
 
 @admin.register(JobListing)
 class JobListingAdmin(admin.ModelAdmin):
-    list_display = ('title', 'company', 'get_employer', 'salary_range', 'location', 'posted_at')
-    list_filter = ('employer__company_name', 'location')
+    list_display = ('title', 'company', 'get_employer', 'salary_range', 'location', 'premium_level', 'posted_at')
+    list_filter = ('employer__company_name', 'location', 'premium_level')
     search_fields = ('title', 'company', 'description', 'location')
     date_hierarchy = 'posted_at'
 
