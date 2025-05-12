@@ -2,7 +2,7 @@ from .settings import *
 import os
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-3!rk4uta2qj@xis7_^sv8u=34*pd$-%b3&!fd)inbbvd5$a*$z')
