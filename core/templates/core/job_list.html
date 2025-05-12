@@ -41,8 +41,10 @@
 {% endblock %}
 
 {% block content %}
+<!-- Content wrapper with increased width -->
+<div style="width: 130%; max-width: 1500px; margin: 0 auto; position: relative; left: 50%; transform: translateX(-50%);">
 <!-- Filtering Section -->
-<div id="filters" class="card mb-4 shadow-sm {% if not request.GET.show_filters %}d-none{% endif %}" style="border-radius:18px; background-color:var(--jobsy-yellow); border:none; scroll-margin-top: 100px;">
+<div id="filters" class="card mb-4 shadow-sm {% if not request.GET.show_filters %}d-none{% endif %}" style="width: 100%; border-radius:18px; background-color:var(--jobsy-yellow); border:none; scroll-margin-top: 100px;">
     <div class="card-body p-4">
         <form method="get" action="{% url 'job_list' %}" id="filter-form" onsubmit="return false;">
             <input type="hidden" name="show_filters" value="1">
@@ -127,7 +129,7 @@
     </div>
 </div>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex justify-content-between align-items-center mb-4" >
     <h2 style="font-weight:700; font-size:1.8rem;">{% trans "ვაკანსიები" %} 
         {% if filtered %}
             <small>({{ jobs|length }} {% trans "შედეგი" %})</small>
@@ -152,134 +154,168 @@
     {% endif %}
 </div>
 
-<div class="row g-4">
-    {% if jobs %}
-    <!-- First show Premium+ jobs -->
-    {% for job in jobs %}
-        {% if job.premium_level == 'premium_plus' %}
-        <div class="col-12 col-md-6 col-lg-{% if show_filters %}4{% else %}4{% endif %}">
-            <a href="{% url 'job_detail' job.id %}" class="text-decoration-none h-100">
-                <div class="card shadow-sm h-100 premium-plus-card" style="background:#f9e090; border-radius:18px; border:2px solid #a64dff; padding: 1.2rem 1.5rem; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.1)';" onmouseout="this.style.transform=''; this.style.boxShadow='';">
-                    <div class="card-body p-2 d-flex flex-column">
-                        <div class="d-flex justify-content-between">
-                            <div>
-                                <h5 class="mb-1" style="font-weight:600; color:#333; font-size:1.3rem;">{{ job.title }}</h5>
-                                <p class="mb-1" style="font-size:1.1rem;">{{ job.company }}</p>
-                            </div>
-                            <div class="d-flex align-items-start">
-                                <span class="badge rounded-pill" style="background-color:#a64dff; padding:0.4em 0.8em; margin-right:4px;">Premium+</span>
-                                <span class="badge rounded-pill text-dark" style="background-color:#f6f8fa; padding:0.4em 0.8em;"><i class="fas fa-map-marker-alt"></i> {{ job.location|default:"თბილისი" }}</span>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-3 mb-3">
-                            <p class="mb-1" style="color:#666; font-size:1.1rem;"><i class="fas fa-wallet me-1"></i> {{ job.salary_min|default:"1500" }} - {{ job.salary_max|default:"2600" }} ₾ {{ job.salary_type|default:"თვეში" }}</p>
-                        </div>
-                        
-                        <div class="d-flex justify-content-between mt-auto">
-                            <div>
-                                <span class="badge bg-light text-dark" style="font-size:0.9rem; color:#666; margin-right:5px;">{{ job.job_preferences|default:"სრული განაკვეთი" }}</span>
-                                <span class="badge bg-light text-dark" style="font-size:0.9rem; color:#666;">{{ job.experience|default:"პროფესიონალი" }}</span>
-                            </div>
-                            {% if job.employer and job.employer.company_logo %}
-                            <img src="{{ job.employer.company_logo.url }}" alt="{{ job.company }}" style="width:40px; height:40px; border-radius:50%;">
-                            {% else %}
-                            <img src="https://via.placeholder.com/40" alt="{{ job.company }}" style="width:40px; height:40px; border-radius:50%;">
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </a>
-        </div>
-        {% endif %}
-    {% endfor %}
-    
-    <!-- Then show Premium jobs -->
-    {% for job in jobs %}
-        {% if job.premium_level == 'premium' %}
-        <div class="col-12 col-md-6 col-lg-{% if show_filters %}4{% else %}4{% endif %}">
-            <a href="{% url 'job_detail' job.id %}" class="text-decoration-none h-100">
-                <div class="card shadow-sm h-100" style="background:var(--jobsy-card); border-radius:18px; border:1px solid #4d7bff; padding: 1.2rem 1.5rem; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.1)';" onmouseout="this.style.transform=''; this.style.boxShadow='';">
-                    <div class="card-body p-2 d-flex flex-column">
-                        <div class="d-flex justify-content-between">
-                            <div>
-                                <h5 class="mb-1" style="font-weight:600; color:#333; font-size:1.3rem;">{{ job.title }}</h5>
-                                <p class="mb-1" style="font-size:1.1rem;">{{ job.company }}</p>
-                            </div>
-                            <div class="d-flex align-items-start">
-                                <span class="badge rounded-pill" style="background-color:#4d7bff; padding:0.4em 0.8em; margin-right:4px;">Premium</span>
-                                <span class="badge rounded-pill text-dark" style="background-color:#f6f8fa; padding:0.4em 0.8em;"><i class="fas fa-map-marker-alt"></i> {{ job.location|default:"თბილისი" }}</span>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-3 mb-3">
-                            <p class="mb-1" style="color:#666; font-size:1.1rem;"><i class="fas fa-wallet me-1"></i> {{ job.salary_min|default:"1500" }} - {{ job.salary_max|default:"2600" }} ₾ {{ job.salary_type|default:"თვეში" }}</p>
-                        </div>
-                        
-                        <div class="d-flex justify-content-between mt-auto">
-                            <div>
-                                <span class="badge bg-light text-dark" style="font-size:0.9rem; color:#666; margin-right:5px;">{{ job.job_preferences|default:"სრული განაკვეთი" }}</span>
-                                <span class="badge bg-light text-dark" style="font-size:0.9rem; color:#666;">{{ job.experience|default:"პროფესიონალი" }}</span>
-                            </div>
-                            {% if job.employer and job.employer.company_logo %}
-                            <img src="{{ job.employer.company_logo.url }}" alt="{{ job.company }}" style="width:40px; height:40px; border-radius:50%;">
-                            {% else %}
-                            <img src="https://via.placeholder.com/40" alt="{{ job.company }}" style="width:40px; height:40px; border-radius:50%;">
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </a>
-        </div>
-        {% endif %}
-    {% endfor %}
-    
-    <!-- Finally show Standard jobs -->
-    {% for job in jobs %}
-        {% if job.premium_level == 'standard' %}
-        <div class="col-12 col-md-6 col-lg-{% if show_filters %}4{% else %}4{% endif %}">
-            <a href="{% url 'job_detail' job.id %}" class="text-decoration-none h-100">
-                <div class="card shadow-sm h-100" style="background:var(--jobsy-card); border-radius:18px; border:1px solid #ffe066; padding: 1.2rem 1.5rem; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.1)';" onmouseout="this.style.transform=''; this.style.boxShadow='';">
-                    <div class="card-body p-2 d-flex flex-column">
-                        <div class="d-flex justify-content-between">
-                            <div>
-                                <h5 class="mb-1" style="font-weight:600; color:#333; font-size:1.3rem;">{{ job.title }}</h5>
-                                <p class="mb-1" style="font-size:1.1rem;">{{ job.company }}</p>
-                            </div>
-                            <div class="d-flex align-items-start">
-                                <span class="badge rounded-pill text-dark" style="background-color:#f6f8fa; padding:0.4em 0.8em;"><i class="fas fa-map-marker-alt"></i> {{ job.location|default:"თბილისი" }}</span>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-3 mb-3">
-                            <p class="mb-1" style="color:#666; font-size:1.1rem;"><i class="fas fa-wallet me-1"></i> {{ job.salary_min|default:"1500" }} - {{ job.salary_max|default:"2600" }} ₾ {{ job.salary_type|default:"თვეში" }}</p>
-                        </div>
-                        
-                        <div class="d-flex justify-content-between mt-auto">
-                            <div>
-                                <span class="badge bg-light text-dark" style="font-size:0.9rem; color:#666; margin-right:5px;">{{ job.job_preferences|default:"სრული განაკვეთი" }}</span>
-                                <span class="badge bg-light text-dark" style="font-size:0.9rem; color:#666;">{{ job.experience|default:"პროფესიონალი" }}</span>
-                            </div>
-                            {% if job.employer and job.employer.company_logo %}
-                            <img src="{{ job.employer.company_logo.url }}" alt="{{ job.company }}" style="width:40px; height:40px; border-radius:50%;">
-                            {% else %}
-                            <img src="https://via.placeholder.com/40" alt="{{ job.company }}" style="width:40px; height:40px; border-radius:50%;">
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </a>
-        </div>
-        {% endif %}
-    {% endfor %}
-    {% else %}
-    <div class="col-12 text-center text-muted py-5">
-        <i class="fas fa-search fa-3x mb-3"></i>
-        <h4 class="mb-2">ვაკანსიები ვერ მოიძებნა</h4>
-        <p class="mb-3">შეცვალეთ ფილტრები უფრო მეტი შედეგის სანახავად</p>
-        <a href="{% url 'job_list' %}?show_filters=1#filters" class="btn btn-primary">ყველა ვაკანსია</a>
-    </div>
+<!-- Wider container for the job listings with 4 per row -->
+<div class="container-fluid px-6">
+    {% if not show_filters %}
+        <!-- Premium+ Section Header (main page only) -->
+        <h3 class="my-4 pt-2" style="color:#333; font-weight:600; border-bottom:1px solid rgba(0,0,0,0.05); padding-bottom:15px; margin-bottom:20px;">
+            <div style="display: flex; align-items: center;">
+                <span class="me-2" style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background-color: #a64dff; border-radius: 50%; color: white;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M9.669.864 8 0 6.331.864l-1.858.282-.842 1.68-1.337 1.32L2.6 6l-.306 1.854 1.337 1.32.842 1.68 1.858.282L8 12l1.669-.864 1.858-.282.842-1.68 1.337-1.32L13.4 6l.306-1.854-1.337-1.32-.842-1.68L9.669.864zm1.196 1.193.684 1.365 1.086 1.072L12.387 6l.248 1.506-1.086 1.072-.684 1.365-1.51.229L8 10.874l-1.355-.702-1.51-.229-.684-1.365-1.086-1.072L3.614 6l-.25-1.506 1.087-1.072.684-1.365 1.51-.229L8 1.126l1.356.702 1.509.229z"/>
+                        <path d="M4 11.794V16l4-1 4 1v-4.206l-2.018.306L8 13.126 6.018 12.1 4 11.794z"/>
+                    </svg>
+                </span>
+                პრემიუმ+ ვაკანსიები
+            </div>
+        </h3>
     {% endif %}
+    
+    <div class="row g-3">
+        {% if jobs %}
+        <!-- First show Premium+ jobs -->
+        {% for job in jobs %}
+            {% if job.premium_level == 'premium_plus' %}
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                <a href="{% url 'job_detail' job.id %}" class="text-decoration-none h-100">
+                    <div class="card shadow-sm h-100 premium-plus-card" style="background:#f9e090; border-radius:18px; border:2px solid #a64dff; padding: 1.5rem 1.5rem; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.1)';" onmouseout="this.style.transform=''; this.style.boxShadow='';">
+                        <div class="card-body p-1 d-flex flex-column">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h5 class="mb-1" style="font-weight:600; color:#333; font-size:1.2rem;">{{ job.title }}</h5>
+                                    <p class="mb-1" style="font-size:1rem;">{{ job.company }}</p>
+                                </div>
+                                <div class="d-flex align-items-start">
+                                    <span class="badge rounded-pill" style="background-color:#a64dff; padding:0.4em 0.8em; margin-right:4px;">Premium+</span>
+                                    <span class="badge rounded-pill text-dark" style="background-color:#f6f8fa; padding:0.4em 0.8em;"><i class="fas fa-map-marker-alt"></i> {{ job.location|default:"თბილისი" }}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-2 mb-2">
+                                <p class="mb-1" style="color:#666; font-size:1rem;"><i class="fas fa-wallet me-1"></i> {{ job.salary_min|default:"1500" }} - {{ job.salary_max|default:"2600" }} ₾ {{ job.salary_type|default:"თვეში" }}</p>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between mt-auto">
+                                <div>
+                                    <span class="badge bg-light text-dark" style="font-size:0.8rem; color:#666; margin-right:5px;">{{ job.job_preferences|default:"სრული განაკვეთი" }}</span>
+                                    <span class="badge bg-light text-dark" style="font-size:0.8rem; color:#666;">{{ job.experience|default:"პროფესიონალი" }}</span>
+                                </div>
+                                {% if job.employer and job.employer.company_logo %}
+                                <img src="{{ job.employer.company_logo.url }}" alt="{{ job.company }}" style="width:40px; height:40px; border-radius:50%;">
+                                {% else %}
+                                <img src="https://via.placeholder.com/40" alt="{{ job.company }}" style="width:40px; height:40px; border-radius:50%;">
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endif %}
+        {% endfor %}
+        
+        {% if not show_filters %}
+        <!-- Premium Section Header (main page only) -->
+        <div class="col-12">
+            <h3 class="my-4 pt-2" style="color:#333; font-weight:600; border-bottom:1px solid rgba(0,0,0,0.05); padding-bottom:15px; margin-bottom:20px;">
+                <div style="display: flex; align-items: center;">
+                    <span class="me-2" style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background-color: #4d7bff; border-radius: 50%; color: white;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                    </span>
+                    პრემიუმ განცხადებები
+                </div>
+            </h3>
+        </div>
+        {% endif %}
+        
+        <!-- Then show Premium jobs with similar adjustments -->
+        {% for job in jobs %}
+            {% if job.premium_level == 'premium' %}
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                <a href="{% url 'job_detail' job.id %}" class="text-decoration-none h-100">
+                    <div class="card shadow-sm h-100" style="background:var(--jobsy-card); border-radius:18px; border:1px solid #4d7bff; padding: 1.5rem 1.5rem; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.1)';" onmouseout="this.style.transform=''; this.style.boxShadow='';">
+                        <div class="card-body p-1 d-flex flex-column">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h5 class="mb-1" style="font-weight:600; color:#333; font-size:1.2rem;">{{ job.title }}</h5>
+                                    <p class="mb-1" style="font-size:1rem;">{{ job.company }}</p>
+                                </div>
+                                <div class="d-flex align-items-start">
+                                    <span class="badge rounded-pill" style="background-color:#4d7bff; padding:0.4em 0.8em; margin-right:4px;">Premium</span>
+                                    <span class="badge rounded-pill text-dark" style="background-color:#f6f8fa; padding:0.4em 0.8em;"><i class="fas fa-map-marker-alt"></i> {{ job.location|default:"თბილისი" }}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-2 mb-2">
+                                <p class="mb-1" style="color:#666; font-size:1rem;"><i class="fas fa-wallet me-1"></i> {{ job.salary_min|default:"1500" }} - {{ job.salary_max|default:"2600" }} ₾ {{ job.salary_type|default:"თვეში" }}</p>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between mt-auto">
+                                <div>
+                                    <span class="badge bg-light text-dark" style="font-size:0.8rem; color:#666; margin-right:5px;">{{ job.job_preferences|default:"სრული განაკვეთი" }}</span>
+                                    <span class="badge bg-light text-dark" style="font-size:0.8rem; color:#666;">{{ job.experience|default:"პროფესიონალი" }}</span>
+                                </div>
+                                {% if job.employer and job.employer.company_logo %}
+                                <img src="{{ job.employer.company_logo.url }}" alt="{{ job.company }}" style="width:40px; height:40px; border-radius:50%;">
+                                {% else %}
+                                <img src="https://via.placeholder.com/40" alt="{{ job.company }}" style="width:40px; height:40px; border-radius:50%;">
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endif %}
+        {% endfor %}
+        
+        <!-- Finally show Standard jobs with similar adjustments -->
+        {% for job in jobs %}
+            {% if job.premium_level == 'standard' %}
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                <a href="{% url 'job_detail' job.id %}" class="text-decoration-none h-100">
+                    <div class="card shadow-sm h-100" style="background:var(--jobsy-card); border-radius:18px; border:1px solid #ffe066; padding: 1.5rem 1.5rem; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.1)';" onmouseout="this.style.transform=''; this.style.boxShadow='';">
+                        <div class="card-body p-1 d-flex flex-column">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h5 class="mb-1" style="font-weight:600; color:#333; font-size:1.2rem;">{{ job.title }}</h5>
+                                    <p class="mb-1" style="font-size:1rem;">{{ job.company }}</p>
+                                </div>
+                                <div class="d-flex align-items-start">
+                                    <span class="badge rounded-pill text-dark" style="background-color:#f6f8fa; padding:0.4em 0.8em;"><i class="fas fa-map-marker-alt"></i> {{ job.location|default:"თბილისი" }}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-2 mb-2">
+                                <p class="mb-1" style="color:#666; font-size:1rem;"><i class="fas fa-wallet me-1"></i> {{ job.salary_min|default:"1500" }} - {{ job.salary_max|default:"2600" }} ₾ {{ job.salary_type|default:"თვეში" }}</p>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between mt-auto">
+                                <div>
+                                    <span class="badge bg-light text-dark" style="font-size:0.8rem; color:#666; margin-right:5px;">{{ job.job_preferences|default:"სრული განაკვეთი" }}</span>
+                                    <span class="badge bg-light text-dark" style="font-size:0.8rem; color:#666;">{{ job.experience|default:"პროფესიონალი" }}</span>
+                                </div>
+                                {% if job.employer and job.employer.company_logo %}
+                                <img src="{{ job.employer.company_logo.url }}" alt="{{ job.company }}" style="width:40px; height:40px; border-radius:50%;">
+                                {% else %}
+                                <img src="https://via.placeholder.com/40" alt="{{ job.company }}" style="width:40px; height:40px; border-radius:50%;">
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endif %}
+        {% endfor %}
+        {% else %}
+        <div class="col-12 text-center text-muted py-5">
+            <i class="fas fa-search fa-3x mb-3"></i>
+            <h4 class="mb-2">ვაკანსიები ვერ მოიძებნა</h4>
+            <p class="mb-3">შეცვალეთ ფილტრები უფრო მეტი შედეგის სანახავად</p>
+            <a href="{% url 'job_list' %}?show_filters=1#filters" class="btn btn-primary">ყველა ვაკანსია</a>
+        </div>
+        {% endif %}
+    </div>
 </div>
 
 <!-- Pagination (only shown on main page) -->
