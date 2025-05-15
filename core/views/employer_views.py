@@ -2,12 +2,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.views.decorators.http import require_POST
-from django.db.models import Count, Prefetch
+from django.db.models import Count, Prefetch, Q, Case, When, Value, IntegerField
 from ..models import JobListing, EmployerProfile, JobApplication, UserProfile
 from ..forms import JobListingForm, EmployerProfileForm
 import logging
 from django.utils import timezone
 from datetime import timedelta
+from django.http import HttpResponseForbidden
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +41,21 @@ def employer_home(request):
     # Jobs expiring soon (example: jobs expiring in next 7 days)
     soon = timezone.now() + timedelta(days=7)
     jobs_expiring_soon = jobs.filter(expiry_date__lte=soon, expiry_date__gte=timezone.now()) if hasattr(jobs.first(), 'expiry_date') else []
-
+    
+    # All jobs for this employer ordered by most recent first
+    all_jobs = jobs.order_by('-posted_at')
+    
+    # Sort jobs by status (approved first, then pending review, then rejected)
+    all_jobs = jobs.annotate(
+        status_order=Case(
+            When(status='approved', then=Value(1)),
+            When(status='pending_review', then=Value(2)),
+            When(status='rejected', then=Value(3)),
+            default=Value(4),
+            output_field=IntegerField(),
+        )
+    ).order_by('status_order', '-posted_at')
+    
     # Recent applicants (last 5)
     recent_applicants = JobApplication.objects.filter(
         job__employer=employer_profile
@@ -53,6 +68,7 @@ def employer_home(request):
         'total_applicants': total_applicants,
         'avg_applicants': avg_applicants,
         'jobs_expiring_soon': jobs_expiring_soon,
+        'all_jobs': all_jobs,
         'recent_applicants': recent_applicants,
     }
     return render(request, 'core/employer_home.html', context)
@@ -183,4 +199,81 @@ def delete_job(request, job_id):
     job.delete()
     
     messages.success(request, "Job listing has been deleted.")
-    return redirect('employer_dashboard') 
+    return redirect('employer_dashboard')
+
+@login_required
+@user_passes_test(is_employer)
+def job_applications(request, job_id):
+    """
+    Display all applications for a specific job
+    """
+    # Get the job and verify ownership
+    job = get_object_or_404(JobListing, id=job_id)
+    employer_profile = request.user.userprofile.employer_profile
+    
+    if job.employer != employer_profile:
+        messages.error(request, "You don't have permission to view applications for this job.")
+        return redirect('employer_dashboard')
+    
+    # Get applications for this job
+    applications = JobApplication.objects.filter(job=job).select_related('user', 'job')
+    
+    # Apply filters if provided
+    if 'status' in request.GET and request.GET['status']:
+        applications = applications.filter(status=request.GET['status'])
+    
+    if 'search' in request.GET and request.GET['search']:
+        search_query = request.GET['search']
+        applications = applications.filter(
+            Q(user__username__icontains=search_query) |
+            Q(user__first_name__icontains=search_query) |
+            Q(user__last_name__icontains=search_query) |
+            Q(user__email__icontains=search_query) |
+            Q(guest_name__icontains=search_query) |
+            Q(guest_email__icontains=search_query)
+        )
+    
+    # Sort applications by status with custom order
+    applications = applications.annotate(
+        status_order=Case(
+            When(status='გასაუბრება', then=Value(1)),     # Interview - first priority
+            When(status='განხილვის_პროცესში', then=Value(2)),  # In review - third priority
+            When(status='რეზერვი', then=Value(3)),        # Reserve - second priority
+            default=Value(4),
+            output_field=IntegerField(),
+        )
+    ).order_by('status_order', '-applied_at')
+    
+    context = {
+        'job': job,
+        'applications': applications,
+    }
+    
+    return render(request, 'core/employer_applications.html', context)
+
+@login_required
+@user_passes_test(is_employer)
+@require_POST
+def update_application_status(request, application_id):
+    """
+    Update the status of a job application
+    """
+    # Get the application and verify permission
+    application = get_object_or_404(JobApplication, id=application_id)
+    employer_profile = request.user.userprofile.employer_profile
+    
+    # Check if the application belongs to a job owned by this employer
+    if application.job.employer != employer_profile:
+        return HttpResponseForbidden("You don't have permission to update this application.")
+    
+    # Update the status
+    new_status = request.POST.get('status')
+    if new_status in dict(JobApplication.STATUS_CHOICES):
+        application.status = new_status
+        application.save()
+        messages.success(request, "Application status updated successfully.")
+    else:
+        messages.error(request, "Invalid status value provided.")
+    
+    # Redirect back to the applications page
+    return redirect('job_applications', job_id=application.job.id) 

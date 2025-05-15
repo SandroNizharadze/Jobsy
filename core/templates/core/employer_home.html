@@ -77,15 +77,26 @@
         </div>
         <div class="col-md-6 mb-4">
             <div class="card h-100">
-                <div class="card-header bg-warning text-dark">{% trans "Jobs Expiring Soon" %}</div>
+                <div class="card-header bg-warning text-dark">{% trans "All Jobs" %}</div>
                 <ul class="list-group list-group-flush">
-                    {% for job in jobs_expiring_soon %}
+                    {% for job in all_jobs %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span>{{ job.title }}</span>
+                        <a href="{% url 'job_applications' job.id %}" class="text-decoration-none text-dark d-flex align-items-center" style="flex: 1;">
+                            <span>{{ job.title }}</span>
+                            {% if job.status == 'approved' %}
+                                <span class="badge bg-success ms-2">{% trans "Approved" %}</span>
+                            {% elif job.status == 'rejected' %}
+                                <span class="badge bg-danger ms-2">{% trans "Rejected" %}</span>
+                            {% elif job.status == 'pending_review' %}
+                                <span class="badge bg-warning text-dark ms-2">{% trans "In Review" %}</span>
+                            {% else %}
+                                <span class="badge bg-secondary ms-2">{{ job.status }}</span>
+                            {% endif %}
+                        </a>
                         <span class="badge bg-light text-dark">{{ job.posted_at|date:"M d" }}</span>
                     </li>
                     {% empty %}
-                    <li class="list-group-item">{% trans "No jobs expiring soon." %}</li>
+                    <li class="list-group-item">{% trans "No jobs available." %}</li>
                     {% endfor %}
                 </ul>
             </div>

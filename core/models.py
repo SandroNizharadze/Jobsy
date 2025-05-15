@@ -115,6 +115,9 @@ class JobListing(models.Model):
 
 class JobApplication(models.Model):
     STATUS_CHOICES = [
+        ('განხილვის_პროცესში', _('განხილვის პროცესში')),
+        ('გასაუბრება', _('გასაუბრება')),
+        ('რეზერვი', _('რეზერვი')),
         ('pending', _('Pending')),
         ('reviewed', _('Reviewed')),
         ('interviewed', _('Interviewed')),
@@ -130,7 +133,7 @@ class JobApplication(models.Model):
     guest_email = models.EmailField(blank=True, null=True, verbose_name=_("სტუმრის ელ-ფოსტა"))
     cover_letter = models.TextField(verbose_name=_("მოტივაციის წერილი"))
     resume = models.FileField(upload_to='resumes/', verbose_name=_("რეზიუმე"))
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending', db_index=True, verbose_name=_("სტატუსი"))
+    status = models.CharField(max_length=30, choices=STATUS_CHOICES, default='განხილვის_პროცესში', db_index=True, verbose_name=_("სტატუსი"))
     applied_at = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name=_("აპლიკაციის თარიღი"))
     updated_at = models.DateTimeField(auto_now=True, verbose_name=_("განახლების თარიღი"))
     

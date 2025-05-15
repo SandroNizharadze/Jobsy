@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from django.db.models import Prefetch
-from ..models import UserProfile, EmployerProfile
+from ..models import UserProfile, EmployerProfile, JobApplication
 from ..forms import UserProfileForm, EmployerProfileForm
 import logging
 
@@ -72,9 +72,15 @@ def profile(request):
                 # Create a fresh user profile form
                 user_form = UserProfileForm(instance=user_profile)
     
+    # Get user's job applications if they are a candidate
+    applications = None
+    if user_profile.role == 'candidate':
+        applications = JobApplication.objects.filter(user=request.user).select_related('job').order_by('-applied_at')
+    
     context = {
         'user_form': user_form,
         'employer_form': employer_form,
+        'applications': applications,
     }
     
     return render(request, 'core/profile.html', context)

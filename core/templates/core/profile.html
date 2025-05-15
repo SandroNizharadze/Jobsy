@@ -147,8 +147,8 @@
                 <i class="fas fa-file-alt me-1"></i>{% trans "View Current CV" %}
             </a>
             <button type="button" class="btn-cv-remove" id="remove-cv-btn" aria-label="{% trans 'Remove CV' %}">
-                <i class="fas fa-times"></i>
-            </button>
+                    <i class="fas fa-times"></i>
+                </button>
         {% endif %}
     </div>
 
@@ -181,6 +181,95 @@
         </button>
     {% endif %}
     </div>
+
+    <!-- Recent Applications Section -->
+    <div class="applications-section mt-4">
+        <h3 class="h4 mb-3">{% trans "Your Job Applications" %}</h3>
+        {% if applications %}
+        <div class="card">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>{% trans "Position" %}</th>
+                                <th>{% trans "Company" %}</th>
+                                <th>{% trans "Applied On" %}</th>
+                                <th>{% trans "Status" %}</th>
+                                <th class="text-center">{% trans "Action" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for application in applications %}
+                            <tr>
+                                <td>{{ application.job.title }}</td>
+                                <td>{{ application.job.company }}</td>
+                                <td>{{ application.applied_at|date:"d M Y" }}</td>
+                                <td>
+                                    {% if application.status == 'განხილვის_პროცესში' %}
+                                    <span class="badge bg-secondary">{% trans "განხილვის პროცესში" %}</span>
+                                    {% elif application.status == 'გასაუბრება' %}
+                                    <span class="badge bg-success">{% trans "გასაუბრება" %}</span>
+                                    {% elif application.status == 'რეზერვი' %}
+                                    <span class="badge bg-warning text-dark">{% trans "რეზერვი" %}</span>
+                                    {% elif application.status == 'pending' %}
+                                    <span class="badge bg-secondary">{% trans "Pending" %}</span>
+                                    {% elif application.status == 'reviewed' %}
+                                    <span class="badge bg-info">{% trans "Reviewed" %}</span>
+                                    {% elif application.status == 'interviewed' %}
+                                    <span class="badge bg-primary">{% trans "Interviewed" %}</span>
+                                    {% elif application.status == 'offered' %}
+                                    <span class="badge bg-success">{% trans "Offer Extended" %}</span>
+                                    {% elif application.status == 'accepted' %}
+                                    <span class="badge bg-success">{% trans "Accepted" %}</span>
+                                    {% elif application.status == 'rejected' %}
+                                    <span class="badge bg-danger">{% trans "Rejected" %}</span>
+                                    {% elif application.status == 'withdrawn' %}
+                                    <span class="badge bg-secondary">{% trans "Withdrawn" %}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <a href="{% url 'job_detail' application.job.id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye me-1"></i>{% trans "View Job" %}
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="mt-3 small">
+            <h5>{% trans "სტატუსების ახსნა:" %}</h5>
+            <ul class="list-unstyled status-explanations">
+                <li>
+                    <span class="badge bg-success me-2">{% trans "გასაუბრება" %}</span>
+                    {% trans "ნიშნავს რომ კომპანიამ განიხილა თქვენი კანდიდატურა, თვლის რომ შეესაბამებით პოზიციას და დაგიკავშირდებიან გასაუბრებაზე დასაბარებლად" %}
+                </li>
+                <li>
+                    <span class="badge bg-warning text-dark me-2">{% trans "რეზერვი" %}</span>
+                    {% trans "ნიშნავს, რომ კომპანიამ განიხილა თქვენი კანდიდატურა, თვლის რომ არ შეესაბამებით პოზიციას და ამ ეტაპზე ვერ აგიყვანენ, თუმცა თქვენი სივი შეინახება ბაზაში მომავალში დაინტერესების შემთვევაში დასაკონტაქტებლად" %}
+                </li>
+                <li>
+                    <span class="badge bg-secondary me-2">{% trans "განხილვის პროცესში" %}</span>
+                    {% trans "ნიშნავს რომ თქვენი კანდიდატურა ჯერ არ განუხილავთ" %}
+                </li>
+            </ul>
+        </div>
+        {% else %}
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-file-import fa-3x text-muted mb-3"></i>
+                <h5>{% trans "No Applications Yet" %}</h5>
+                <p class="text-muted mb-0">{% trans "You haven't applied to any jobs yet." %}</p>
+                <a href="{% url 'job_list' %}" class="btn btn-outline-primary mt-3">
+                    <i class="fas fa-search me-1"></i>{% trans "Browse Job Listings" %}
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
 {% endif %}
 </div>
 
@@ -390,9 +479,9 @@
                 cvUploadForm.style.display = 'none';
                 if (showCvFormBtn) {
                     showCvFormBtn.style.display = 'block';
-                }
-            });
-        }
+            }
+        });
+    }
 
         // Handle CV upload form submission
         if (cvUploadFormElement) {

@@ -1,0 +1,248 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Jobsy - აპლიკაციების მენეჯმენტი" %}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">{% trans "აპლიკაციები:" %} {{ job.title }}</h2>
+                <a href="{% url 'employer_dashboard' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>{% trans "უკან დაბრუნება" %}
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Status Explanation Box -->
+    <div class="card mb-4 bg-light">
+        <div class="card-body">
+            <h5 class="card-title mb-3">{% trans "სტატუსების ახსნა:" %}</h5>
+            <div class="row small">
+                <div class="col-md-4 mb-2">
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-success me-2">{% trans "გასაუბრება" %}</span>
+                        <span>{% trans "ნიშნავს რომ განიხილეთ კანდიდატურა, თვლით რომ შეესაბამება პოზიციას და დაუკავშირდებით გასაუბრებაზე დასაბარებლად" %}</span>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-warning text-dark me-2">{% trans "რეზერვი" %}</span>
+                        <span>{% trans "ნიშნავს, რომ განიხილეთ კანდიდატურა, თვლით რომ არ შეესაბამება პოზიციას და ამ ეტაპზე ვერ აიყვანთ, თუმცა მისი სივი შეინახება ბაზაში მომავალში დაინტერესების შემთვევაში დასაკონტაქტებლად" %}</span>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-secondary me-2">{% trans "განხილვის პროცესში" %}</span>
+                        <span>{% trans "ნიშნავს რომ კანდიდატურა ჯერ არ განგიხილავთ" %}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert alert-info mt-3 mb-0">
+                <i class="fas fa-info-circle me-2"></i>
+                {% trans "არ გამოგრჩეთ კანდიდატების სტატუსების მინიჭება, ეს გეხმარებათ მარტივად გამოარჩიოთ და დაახარისხოთ მეტად სასურველი კანდიდატები<3" %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="mb-3">{% trans "გაფილტვრა" %}</h5>
+            <form method="get" id="filter-form" class="row">
+                <div class="col-md-4">
+                    <select name="status" class="form-select" onchange="this.form.submit()">
+                        <option value="">{% trans "ყველა სტატუსი" %}</option>
+                        <option value="განხილვის_პროცესში" {% if request.GET.status == 'განხილვის_პროცესში' %}selected{% endif %}>
+                            {% trans "განხილვის პროცესში" %}
+                        </option>
+                        <option value="გასაუბრება" {% if request.GET.status == 'გასაუბრება' %}selected{% endif %}>
+                            {% trans "გასაუბრება" %}
+                        </option>
+                        <option value="რეზერვი" {% if request.GET.status == 'რეზერვი' %}selected{% endif %}>
+                            {% trans "რეზერვი" %}
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <input type="text" name="search" class="form-control" placeholder="{% trans 'მოძებნა სახელით...' %}" value="{{ request.GET.search|default:'' }}">
+                        <button class="btn btn-outline-secondary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-4 d-flex justify-content-end">
+                    {% if request.GET.status or request.GET.search %}
+                    <a href="{% url 'job_applications' job.id %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times me-1"></i>{% trans "ფილტრების გასუფთავება" %}
+                    </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Applications List -->
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">{% trans "აპლიკანტი" %}</th>
+                            <th scope="col">{% trans "თარიღი" %}</th>
+                            <th scope="col">{% trans "CV" %}</th>
+                            <th scope="col">{% trans "მოტივაციის წერილი" %}</th>
+                            <th scope="col">{% trans "სტატუსი" %}</th>
+                            <th scope="col" class="text-center">{% trans "მოქმედება" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for application in applications %}
+                        <tr{% if application.status == 'გასაუბრება' %} class="table-success"{% elif application.status == 'რეზერვი' %} class="table-warning"{% endif %}>
+                            <td>
+                                {% if application.user %}
+                                    <div class="d-flex align-items-center">
+                                        {% if application.user.userprofile.profile_picture %}
+                                            <img src="{{ application.user.userprofile.profile_picture.url }}" alt="Profile" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                                        {% else %}
+                                            <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                        {% endif %}
+                                        <div>
+                                            <p class="mb-0 fw-medium">{{ application.user.get_full_name|default:application.user.username }}</p>
+                                            <p class="mb-0 small text-muted">{{ application.user.email }}</p>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        <div>
+                                            <p class="mb-0 fw-medium">{{ application.guest_name }}</p>
+                                            <p class="mb-0 small text-muted">{{ application.guest_email }}</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div>{{ application.applied_at|date:"d M Y" }}</div>
+                                <small class="text-muted">{{ application.applied_at|time:"H:i" }}</small>
+                            </td>
+                            <td>
+                                <a href="{{ application.resume.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                    <i class="fas fa-file-pdf me-1"></i>{% trans "ნახვა" %}
+                                </a>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#coverLetterModal{{ application.id }}">
+                                    <i class="fas fa-envelope-open-text me-1"></i>{% trans "ნახვა" %}
+                                </button>
+                                
+                                <!-- Cover Letter Modal -->
+                                <div class="modal fade" id="coverLetterModal{{ application.id }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">{% trans "მოტივაციის წერილი" %}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>{{ application.cover_letter|linebreaks }}</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "დახურვა" %}</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <form id="statusForm{{ application.id }}" method="post" action="{% url 'update_application_status' application.id %}">
+                                    {% csrf_token %}
+                                    <select name="status" class="form-select form-select-sm update-status {% if application.status == 'გასაუბრება' %}bg-success text-white{% elif application.status == 'რეზერვი' %}bg-warning{% elif application.status == 'განხილვის_პროცესში' %}bg-secondary text-white{% endif %}" data-form-id="statusForm{{ application.id }}">
+                                        <option value="განხილვის_პროცესში" {% if application.status == 'განხილვის_პროცესში' %}selected{% endif %}>
+                                            {% trans "განხილვის პროცესში" %}
+                                        </option>
+                                        <option value="გასაუბრება" {% if application.status == 'გასაუბრება' %}selected{% endif %}>
+                                            {% trans "გასაუბრება" %}
+                                        </option>
+                                        <option value="რეზერვი" {% if application.status == 'რეზერვი' %}selected{% endif %}>
+                                            {% trans "რეზერვი" %}
+                                        </option>
+                                    </select>
+                                </form>
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group">
+                                    <a href="{{ application.resume.url }}" class="btn btn-sm btn-outline-primary" download>
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                    {% if application.user and application.user.email %}
+                                    <a href="mailto:{{ application.user.email }}" class="btn btn-sm btn-outline-info">
+                                        <i class="fas fa-envelope"></i>
+                                    </a>
+                                    {% elif application.guest_email %}
+                                    <a href="mailto:{{ application.guest_email }}" class="btn btn-sm btn-outline-info">
+                                        <i class="fas fa-envelope"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <div class="my-4">
+                                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                    <p class="mb-1">{% trans "ამ ვაკანსიაზე აპლიკაციები ჯერ არ გაქვთ" %}</p>
+                                    <p class="text-muted mb-0">{% trans "როგორც კი ვინმე შემოიტანს აპლიკაციას, აქ გამოჩნდება" %}</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-submit status form on change
+    const statusSelects = document.querySelectorAll('.update-status');
+    statusSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            const formId = this.dataset.formId;
+            
+            // Update select appearance immediately based on new status
+            const selectedValue = this.value;
+            this.className = 'form-select form-select-sm update-status';
+            
+            if (selectedValue === 'გასაუბრება') {
+                this.classList.add('bg-success', 'text-white');
+                this.closest('tr').className = 'table-success';
+            } else if (selectedValue === 'რეზერვი') {
+                this.classList.add('bg-warning');
+                this.closest('tr').className = 'table-warning';
+            } else if (selectedValue === 'განხილვის_პროცესში') {
+                this.classList.add('bg-secondary', 'text-white');
+                this.closest('tr').className = '';
+            }
+            
+            document.getElementById(formId).submit();
+        });
+    });
+});
+</script>
+{% endblock %} 

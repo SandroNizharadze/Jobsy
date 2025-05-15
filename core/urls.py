@@ -17,6 +17,8 @@ urlpatterns = [
     path('employer/jobs/<int:job_id>/edit/', main.edit_job, name='edit_job'),
     path('employer/jobs/<int:job_id>/delete/', main.delete_job, name='delete_job'),
     path('employer/home/', main.employer_home, name='employer_home'),
+    path('employer/jobs/<int:job_id>/applications/', main.job_applications, name='job_applications'),
+    path('employer/applications/<int:application_id>/update-status/', main.update_application_status, name='update_application_status'),
     
     # Job routes
     path('jobs/<int:job_id>/', main.job_detail, name='job_detail'),
