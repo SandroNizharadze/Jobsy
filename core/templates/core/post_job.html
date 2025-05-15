@@ -1,4 +1,5 @@
 {% extends 'core/base.html' %}
+{% load i18n %}
 
 {% block title %}Post New Job{% endblock %}
 
@@ -8,7 +9,7 @@
         <div class="col-lg-8">
             <div class="card shadow-sm">
                 <div class="card-header bg-white">
-                    <h2 class="h4 mb-0">Post New Job</h2>
+                    <h2 class="h4 mb-0">{% trans "ვაკანსიის გამოქვეყნება" %}</h2>
                 </div>
                 <div class="card-body">
                     <form method="post" class="needs-validation" novalidate>
@@ -23,7 +24,7 @@
                         <div class="row g-3">
                             <!-- Title -->
                             <div class="col-12">
-                                <label for="{{ form.title.id_for_label }}" class="form-label">ვაკანსიის დასახელება</label>
+                                <label for="{{ form.title.id_for_label }}" class="form-label">{% trans "ვაკანსიის დასახელება" %}</label>
                                 {{ form.title }}
                                 {% if form.title.errors %}
                                 <div class="invalid-feedback d-block">
@@ -34,7 +35,7 @@
 
                             <!-- Description -->
                             <div class="col-12">
-                                <label for="{{ form.description.id_for_label }}" class="form-label">ვაკანსიის აღწერა</label>
+                                <label for="{{ form.description.id_for_label }}" class="form-label"> {% trans "ვაკანსიის აღწერა" %}</label>
                                 {{ form.description }}
                                 {% if form.description.errors %}
                                 <div class="invalid-feedback d-block">
@@ -45,7 +46,7 @@
 
                             <!-- Location -->
                             <div class="col-md-6">
-                                <label for="{{ form.location.id_for_label }}" class="form-label">ლოკაცია</label>
+                                <label for="{{ form.location.id_for_label }}" class="form-label">{% trans "ლოკაცია" %}</label>
                                 {{ form.location }}
                                 {% if form.location.errors %}
                                 <div class="invalid-feedback d-block">
@@ -56,7 +57,7 @@
 
                             <!-- Category -->
                             <div class="col-md-6">
-                                <label for="{{ form.category.id_for_label }}" class="form-label">კატეგორია</label>
+                                <label for="{{ form.category.id_for_label }}" class="form-label">{% trans "კატეგორია" %}</label>
                                 {{ form.category }}
                                 {% if form.category.errors %}
                                 <div class="invalid-feedback d-block">
@@ -67,7 +68,7 @@
 
                             <!-- Salary Range -->
                             <div class="col-md-4">
-                                <label for="{{ form.salary_min.id_for_label }}" class="form-label">მინიმალური ხელფასი</label>
+                                <label for="{{ form.salary_min.id_for_label }}" class="form-label">{% trans "მინიმალური ხელფასი" %}</label>
                                 {{ form.salary_min }}
                                 {% if form.salary_min.errors %}
                                 <div class="invalid-feedback d-block">
@@ -77,7 +78,7 @@
                             </div>
 
                             <div class="col-md-4">
-                                <label for="{{ form.salary_max.id_for_label }}" class="form-label">მაქსიმალური ხელფასი</label>
+                                <label for="{{ form.salary_max.id_for_label }}" class="form-label">{% trans "მაქსიმალური ხელფასი" %}</label>
                                 {{ form.salary_max }}
                                 {% if form.salary_max.errors %}
                                 <div class="invalid-feedback d-block">
@@ -87,7 +88,7 @@
                             </div>
 
                             <div class="col-md-4">
-                                <label for="{{ form.salary_type.id_for_label }}" class="form-label">ხელფასის ტიპი</label>
+                                <label for="{{ form.salary_type.id_for_label }}" class="form-label">{% trans "ხელფასის ტიპი" %}</label>
                                 {{ form.salary_type }}
                                 {% if form.salary_type.errors %}
                                 <div class="invalid-feedback d-block">
@@ -98,7 +99,7 @@
 
                             <!-- Experience -->
                             <div class="col-md-6">
-                                <label for="{{ form.experience.id_for_label }}" class="form-label">გამოცდილების სტატუსი</label>
+                                <label for="{{ form.experience.id_for_label }}" class="form-label">{% trans "გამოცდილების სტატუსი" %}</label>
                                 {{ form.experience }}
                                 {% if form.experience.errors %}
                                 <div class="invalid-feedback d-block">
@@ -109,7 +110,7 @@
 
                             <!-- Job Preferences -->
                             <div class="col-md-6">
-                                <label for="{{ form.job_preferences.id_for_label }}" class="form-label">სამუშაო გრაფიკი</label>
+                                <label for="{{ form.job_preferences.id_for_label }}" class="form-label">{% trans "სამუშაო გრაფიკი" %}</label>
                                 {{ form.job_preferences }}
                                 {% if form.job_preferences.errors %}
                                 <div class="invalid-feedback d-block">
@@ -120,7 +121,7 @@
 
                             <!-- Considers Students -->
                             <div class="col-md-6">
-                                <label class="form-label">განიხილავთ სტუდენტის აყვანას?</label>
+                                <label class="form-label">{% trans "განიხილავთ სტუდენტის აყვანას?" %}</label>
                                 <div class="mt-2">
                                     {% for radio in form.considers_students %}
                                     <div class="form-check form-check-inline">
@@ -140,12 +141,12 @@
 
                             <!-- Premium Level -->
                             <div class="col-md-6">
-                                <label for="{{ form.premium_level.id_for_label }}" class="form-label">პრემიუმ ტიპი</label>
+                                <label for="{{ form.premium_level.id_for_label }}" class="form-label">{% trans "პრემიუმ ტიპი" %}</label>
                                 {{ form.premium_level }}
                                 <small class="form-text text-muted">
-                                    Standard: გამოჩნდება მხოლოდ ფილტრირებულ ძებნებში<br>
-                                    Premium: გამოჩნდება მხოლოდ მთავარ გვერდზე სტანდარტული სტილით<br>
-                                    Premium+: გამოჩნდება მთავარ გვერდზე გამომწვევი სტილით
+                                    {% trans "სტანდარტული: გამოჩნდება მხოლოდ ფილტრირებულ ძებნებში" %}<br>
+                                    {% trans "პრემიუმ: გამოჩნდება მთავარ გვერდზე სტანდარტული სტილით" %}<br>
+                                    {% trans "პრემიუმ+: გამოჩნდება მთავარ გვერდზე გამომწვევი სტილით" %}
                                 </small>
                                 {% if form.premium_level.errors %}
                                 <div class="invalid-feedback d-block">
@@ -156,8 +157,8 @@
                         </div>
 
                         <div class="mt-4">
-                            <button type="submit" class="btn btn-primary">ვაკანსიის გამოქვეყნება</button>
-                            <a href="{% url 'employer_dashboard' %}" class="btn btn-outline-secondary ms-2">გაუქმება</a>
+                            <button type="submit" class="btn btn-primary">{% trans "ვაკანსიის გამოქვეყნება" %}</button>
+                            <a href="{% url 'employer_dashboard' %}" class="btn btn-outline-secondary ms-2">{% trans "გაუქმება" %}</a>
                         </div>
                     </form>
                 </div>

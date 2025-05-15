@@ -47,26 +47,26 @@
                 <div class="d-flex align-items-center mb-2">
                     <span style="font-size:1.2rem; font-weight:600; opacity:0.9;">{{ job.company }}</span>
                     <span class="mx-2 text-white">•</span>
-                    <span style="opacity:0.9;">{{ job.location|default:_("თბილისი") }}</span>
+                    <span style="opacity:0.9;">{% trans job.location|default:_("თბილისი") %}</span>
                 </div>
                 <div class="d-flex gap-2 mb-1">
                     {% if job.premium_level == 'premium_plus' %}
                     <span class="badge rounded-pill" style="background-color:#a64dff; color:white; font-weight:500; padding:0.5em 1em;">
-                        Premium+
+                        {% trans "Premium+" %}
                     </span>
                     {% elif job.premium_level == 'premium' %}
                     <span class="badge rounded-pill" style="background-color:#4d7bff; color:white; font-weight:500; padding:0.5em 1em;">
-                        Premium
+                        {% trans "Premium" %}
                     </span>
                     {% endif %}
                     <span class="badge rounded-pill" style="background-color:var(--jobsy-yellow); color:var(--jobsy-blue); font-weight:500; padding:0.5em 1em;">
-                        {{ job.category|default:_("IT / კომპიუტერები") }}
-                    </span>
+                        {% trans job.category|default:_("IT / კომპიუტერები") %}
+                                </span>
                     <span class="badge rounded-pill" style="background-color:white; color:var(--jobsy-blue); font-weight:500; padding:0.5em 1em;">
-                        {{ job.get_experience_display|default:_("სრული განაკვეთი") }}
-                    </span>
-                </div>
-            </div>
+                        {% trans job.get_experience_display|default:_("სრული განაკვეთი") %}
+                                </span>
+                            </div>
+                        </div>
             <div class="col-md-4 text-center text-md-end">
                 {% if job.employer and job.employer.company_logo %}
                 <div class="company-badge ms-auto me-0">
@@ -97,11 +97,11 @@
                         <i class="fas fa-wallet me-2" style="color:var(--jobsy-blue);"></i>
                         <span style="font-weight:600; font-size:1.2rem;">
                             {% if job.salary_min and job.salary_max %}
-                            {{ job.salary_min }} - {{ job.salary_max }} ₾ {{ job.salary_type }}
+                            {{ job.salary_min }} - {{ job.salary_max }} ₾ {% trans job.salary_type %}
                             {% elif job.salary_min %}
-                            {{ job.salary_min }} ₾ {{ job.salary_type }}
+                            {{ job.salary_min }} ₾ {% trans job.salary_type %}
                             {% elif job.salary_max %}
-                            {{ job.salary_max }} ₾ {{ job.salary_type }}
+                            {{ job.salary_max }} ₾ {% trans job.salary_type %}
                             {% else %}
                             {% trans "ანაზღაურება შეთანხმებით" %}
                             {% endif %}
@@ -212,7 +212,7 @@
                                     </span>
                                     {% endif %}
                                     <span class="badge rounded-pill" style="background-color:var(--jobsy-card); color:#333; padding:0.4em 0.8em; font-size:0.8rem;">
-                                        {{ similar_job.job_preferences|default:_("სრული განაკვეთი")|truncatechars:12 }}
+                                    {{ similar_job.job_preferences|default:_("სრული განაკვეთი")|truncatechars:12 }}
                                     </span>
                                 </div>
                             </div>
@@ -295,11 +295,11 @@
                     {% csrf_token %}
                     <div class="modal-body p-4">
                         <div class="mb-4">
-                            <label for="id_applicant_name" class="form-label" style="font-weight:600;">{% trans "Name" %}</label>
+                            <label for="id_applicant_name" class="form-label" style="font-weight:600;">{% trans "სახელი" %}</label>
                             <input type="text" class="form-control" id="id_applicant_name" name="applicant_name" style="border-radius:12px;" required>
                         </div>
                         <div class="mb-4">
-                            <label for="id_applicant_email" class="form-label" style="font-weight:600;">{% trans "Email" %}</label>
+                            <label for="id_applicant_email" class="form-label" style="font-weight:600;">{% trans "ელ-ფოსტა" %}</label>
                             <input type="email" class="form-control" id="id_applicant_email" name="applicant_email" style="border-radius:12px;" required>
                         </div>
                         <div class="mb-4">
