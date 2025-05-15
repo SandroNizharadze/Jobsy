@@ -1,6 +1,6 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Post New Job - Linked AI{% endblock %}
+{% block title %}Post New Job{% endblock %}
 
 {% block content %}
 <div class="container py-4">
@@ -23,7 +23,7 @@
                         <div class="row g-3">
                             <!-- Title -->
                             <div class="col-12">
-                                <label for="{{ form.title.id_for_label }}" class="form-label">Job Title</label>
+                                <label for="{{ form.title.id_for_label }}" class="form-label">ვაკანსიის დასახელება</label>
                                 {{ form.title }}
                                 {% if form.title.errors %}
                                 <div class="invalid-feedback d-block">
@@ -34,7 +34,7 @@
 
                             <!-- Description -->
                             <div class="col-12">
-                                <label for="{{ form.description.id_for_label }}" class="form-label">Job Description</label>
+                                <label for="{{ form.description.id_for_label }}" class="form-label">ვაკანსიის აღწერა</label>
                                 {{ form.description }}
                                 {% if form.description.errors %}
                                 <div class="invalid-feedback d-block">
@@ -45,7 +45,7 @@
 
                             <!-- Location -->
                             <div class="col-md-6">
-                                <label for="{{ form.location.id_for_label }}" class="form-label">Location</label>
+                                <label for="{{ form.location.id_for_label }}" class="form-label">ლოკაცია</label>
                                 {{ form.location }}
                                 {% if form.location.errors %}
                                 <div class="invalid-feedback d-block">
@@ -56,7 +56,7 @@
 
                             <!-- Category -->
                             <div class="col-md-6">
-                                <label for="{{ form.category.id_for_label }}" class="form-label">Category</label>
+                                <label for="{{ form.category.id_for_label }}" class="form-label">კატეგორია</label>
                                 {{ form.category }}
                                 {% if form.category.errors %}
                                 <div class="invalid-feedback d-block">
@@ -67,7 +67,7 @@
 
                             <!-- Salary Range -->
                             <div class="col-md-4">
-                                <label for="{{ form.salary_min.id_for_label }}" class="form-label">Minimum Salary</label>
+                                <label for="{{ form.salary_min.id_for_label }}" class="form-label">მინიმალური ხელფასი</label>
                                 {{ form.salary_min }}
                                 {% if form.salary_min.errors %}
                                 <div class="invalid-feedback d-block">
@@ -77,7 +77,7 @@
                             </div>
 
                             <div class="col-md-4">
-                                <label for="{{ form.salary_max.id_for_label }}" class="form-label">Maximum Salary</label>
+                                <label for="{{ form.salary_max.id_for_label }}" class="form-label">მაქსიმალური ხელფასი</label>
                                 {{ form.salary_max }}
                                 {% if form.salary_max.errors %}
                                 <div class="invalid-feedback d-block">
@@ -87,7 +87,7 @@
                             </div>
 
                             <div class="col-md-4">
-                                <label for="{{ form.salary_type.id_for_label }}" class="form-label">Salary Type</label>
+                                <label for="{{ form.salary_type.id_for_label }}" class="form-label">ხელფასის ტიპი</label>
                                 {{ form.salary_type }}
                                 {% if form.salary_type.errors %}
                                 <div class="invalid-feedback d-block">
@@ -98,7 +98,7 @@
 
                             <!-- Experience -->
                             <div class="col-md-6">
-                                <label for="{{ form.experience.id_for_label }}" class="form-label">Experience Level</label>
+                                <label for="{{ form.experience.id_for_label }}" class="form-label">გამოცდილების სტატუსი</label>
                                 {{ form.experience }}
                                 {% if form.experience.errors %}
                                 <div class="invalid-feedback d-block">
@@ -109,7 +109,7 @@
 
                             <!-- Job Preferences -->
                             <div class="col-md-6">
-                                <label for="{{ form.job_preferences.id_for_label }}" class="form-label">Job Preferences</label>
+                                <label for="{{ form.job_preferences.id_for_label }}" class="form-label">სამუშაო გრაფიკი</label>
                                 {{ form.job_preferences }}
                                 {% if form.job_preferences.errors %}
                                 <div class="invalid-feedback d-block">
@@ -118,36 +118,34 @@
                                 {% endif %}
                             </div>
 
-                            <!-- Fields -->
+                            <!-- Considers Students -->
                             <div class="col-md-6">
-                                <label for="{{ form.fields.id_for_label }}" class="form-label">Fields</label>
-                                {{ form.fields }}
-                                {% if form.fields.errors %}
+                                <label class="form-label">განიხილავთ სტუდენტის აყვანას?</label>
+                                <div class="mt-2">
+                                    {% for radio in form.considers_students %}
+                                    <div class="form-check form-check-inline">
+                                        {{ radio.tag }}
+                                        <label class="btn btn-outline-primary" for="{{ radio.id_for_label }}">
+                                            {{ radio.choice_label }}
+                                        </label>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% if form.considers_students.errors %}
                                 <div class="invalid-feedback d-block">
-                                    {{ form.fields.errors }}
+                                    {{ form.considers_students.errors }}
                                 </div>
                                 {% endif %}
                             </div>
 
-                            <!-- Interests -->
-                            <div class="col-md-6">
-                                <label for="{{ form.interests.id_for_label }}" class="form-label">Interests/Skills</label>
-                                {{ form.interests }}
-                                {% if form.interests.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.interests.errors }}
-                                </div>
-                                {% endif %}
-                            </div>
-                            
                             <!-- Premium Level -->
-                            <div class="col-12">
-                                <label for="{{ form.premium_level.id_for_label }}" class="form-label">Premium Level</label>
+                            <div class="col-md-6">
+                                <label for="{{ form.premium_level.id_for_label }}" class="form-label">პრემიუმ ტიპი</label>
                                 {{ form.premium_level }}
                                 <small class="form-text text-muted">
-                                    Standard: Appears only in filtered searches<br>
-                                    Premium: Appears on main page with standard styling<br>
-                                    Premium+: Appears on main page with enhanced visibility
+                                    Standard: გამოჩნდება მხოლოდ ფილტრირებულ ძებნებში<br>
+                                    Premium: გამოჩნდება მხოლოდ მთავარ გვერდზე სტანდარტული სტილით<br>
+                                    Premium+: გამოჩნდება მთავარ გვერდზე გამომწვევი სტილით
                                 </small>
                                 {% if form.premium_level.errors %}
                                 <div class="invalid-feedback d-block">
@@ -158,8 +156,8 @@
                         </div>
 
                         <div class="mt-4">
-                            <button type="submit" class="btn btn-primary">Post Job</button>
-                            <a href="{% url 'employer_dashboard' %}" class="btn btn-outline-secondary ms-2">Cancel</a>
+                            <button type="submit" class="btn btn-primary">ვაკანსიის გამოქვეყნება</button>
+                            <a href="{% url 'employer_dashboard' %}" class="btn btn-outline-secondary ms-2">გაუქმება</a>
                         </div>
                     </form>
                 </div>

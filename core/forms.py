@@ -129,19 +129,18 @@ class JobListingForm(forms.ModelForm):
         model = JobListing
         fields = (
             'title', 'description', 'location', 'salary_min', 'salary_max', 'salary_type',
-            'category', 'interests', 'fields', 'experience', 'job_preferences', 'premium_level'
+            'category', 'experience', 'job_preferences', 'considers_students', 'premium_level'
         )
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Job Title'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Describe the job...'}),
-            'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Location'}),
+            'location': forms.Select(attrs={'class': 'form-control'}),
             'salary_min': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Minimum Salary'}),
             'salary_max': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Maximum Salary'}),
-            'salary_type': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. per month'}),
-            'category': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Category'}),
-            'interests': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Python, Django, React'}),
-            'fields': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Relevant fields'}),
-            'experience': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Entry, Mid, Senior'}),
-            'job_preferences': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. remote, full-time, contract'}),
+            'salary_type': forms.Select(attrs={'class': 'form-control'}),
+            'category': forms.Select(attrs={'class': 'form-control'}),
+            'experience': forms.Select(attrs={'class': 'form-control'}),
+            'job_preferences': forms.Select(attrs={'class': 'form-control'}),
+            'considers_students': forms.RadioSelect(attrs={'class': 'btn-check'}),
             'premium_level': forms.Select(attrs={'class': 'form-control'}),
         }

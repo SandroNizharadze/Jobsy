@@ -135,7 +135,7 @@
                             {{ form.title }}
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="id_category" class="form-label">Category</label>
+                            <label for="id_category" class="form-label">კატეგორია</label>
                             {{ form.category }}
                         </div>
                     </div>
@@ -145,7 +145,7 @@
                     </div>
                     <div class="row g-3">
                         <div class="col-md-6 mb-3">
-                            <label for="id_location" class="form-label">Location</label>
+                            <label for="id_location" class="form-label">ლოკაცია</label>
                             {{ form.location }}
                         </div>
                         <div class="col-md-3 mb-3">
@@ -158,38 +158,36 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="id_salary_type" class="form-label">Salary Type</label>
+                        <label for="id_salary_type" class="form-label">ხელფასის ტიპი</label>
                         {{ form.salary_type }}
-                        <div class="form-text">e.g. per month, per hour</div>
                     </div>
                     <div class="row g-3">
                         <div class="col-md-6 mb-3">
-                            <label for="id_interests" class="form-label">Required Skills/Interests</label>
-                            {{ form.interests }}
-                            <div class="form-text">
-                                <i class="fas fa-lightbulb me-1"></i>Skills that candidates should have (comma-separated)
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="id_fields" class="form-label">Relevant Fields</label>
-                            {{ form.fields }}
-                            <div class="form-text">
-                                <i class="fas fa-graduation-cap me-1"></i>Relevant fields for this position
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row g-3">
-                        <div class="col-md-6 mb-3">
-                            <label for="id_experience" class="form-label">Required Experience</label>
+                            <label for="id_experience" class="form-label">გამოცდილების სტატუსი</label>
                             {{ form.experience }}
-                            <div class="form-text">e.g. Entry, Mid, Senior</div>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="id_job_preferences" class="form-label">Job Type</label>
+                            <label for="id_job_preferences" class="form-label">სამუშაო გრაფიკი</label>
                             {{ form.job_preferences }}
-                            <div class="form-text">
-                                <i class="fas fa-sliders-h me-1"></i>E.g., remote, full-time, contract
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">განიხილავთ სტუდენტის აყვანას?</label>
+                            <div class="mt-2">
+                                {% for radio in form.considers_students %}
+                                <div class="form-check form-check-inline">
+                                    {{ radio.tag }}
+                                    <label class="btn btn-outline-primary" for="{{ radio.id_for_label }}">
+                                        {{ radio.choice_label }}
+                                    </label>
+                                </div>
+                                {% endfor %}
                             </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_premium_level" class="form-label">Premium Level</label>
+                            {{ form.premium_level }}
                         </div>
                     </div>
                 </div>

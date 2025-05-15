@@ -6,21 +6,85 @@ from django.urls import reverse
 from django.conf import settings
 
 class JobListing(models.Model):
+    CATEGORY_CHOICES = [
+        ('მენეჯმენტი/ადმინისტრირება', 'მენეჯმენტი/ ადმინისტრირება'),
+        ('მარკეტინგი', 'მარკეტინგი'),
+        ('ფინანსები', 'ფინანსები'),
+        ('გაყიდვები/მომხმარებელთან ურთიერთობა', 'გაყიდვები/მომხმარებელთან ურთიერთობა'),
+        ('IT/პროგრამირება', 'IT/პროგრამირება'),
+        ('დიზაინი', 'დიზაინი'),
+        ('ჰორეკა/კვება', 'ჰორეკა/კვება'),
+        ('დაცვა', 'დაცვა'),
+        ('სილამაზე/მოდა', 'სილამაზე/მოდა'),
+        ('მშენებლობა', 'მშენებლობა'),
+        ('მედიცინა', 'მედიცინა'),
+        ('განათლება', 'განათლება'),
+        ('სამართალი', 'სამართალი'),
+        ('ტურიზმი', 'ტურიზმი'),
+        ('ლოჯისტიკა/დისტრიბუცია', 'ლოჯისტიკა/დისტრიბუცია'),
+        ('საბანკო საქმე', 'საბანკო საქმე'),
+        ('აზარტული', 'აზარტული'),
+    ]
+    
+    LOCATION_CHOICES = [
+        ('დისტანციური', 'დისტანციური'),
+        ('თბილისი', 'თბილისი'),
+        ('აჭარის ა/რ', 'აჭარის ა/რ'),
+        ('აფხაზეთის ა/რ', 'აფხაზეთის ა/რ'),
+        ('სვანეთი', 'სვანეთი'),
+        ('სამეგრელო', 'სამეგრელო'),
+        ('კახეთი', 'კახეთი'),
+        ('ლეჩხუმი', 'ლეჩხუმი'),
+        ('რაჭა', 'რაჭა'),
+        ('გურია', 'გურია'),
+        ('ქვემო ქართლი', 'ქვემო ქართლი'),
+        ('სამცხე-ჯავახეთი', 'სამცხე-ჯავახეთი'),
+        ('შიდა ქართლი', 'შიდა ქართლი'),
+        ('მცხეთა-მთიანეთი', 'მცხეთა-მთიანეთი'),
+        ('იმერეთი', 'იმერეთი'),
+    ]
+    
+    EXPERIENCE_CHOICES = [
+        ('გამოცდილების გარეშე', 'გამოცდილების გარეშე'),
+        ('დამწყები', 'დამწყები'),
+        ('საშუალო დონე', 'საშუალო დონე'),
+        ('პროფესიონალი', 'პროფესიონალი'),
+    ]
+    
+    JOB_PREFERENCE_CHOICES = [
+        ('სრული განაკვეთი', 'სრული განაკვეთი'),
+        ('ნახევარი განაკვეთი', 'ნახევარი განაკვეთი'),
+        ('ცვლები', 'ცვლები'),
+    ]
+    
+    CONSIDERS_STUDENTS_CHOICES = [
+        (True, 'კი'),
+        (False, 'არა'),
+    ]
+    
+    SALARY_TYPE_CHOICES = [
+        ('თვეში', 'თვეში'),
+        ('კვირაში', 'კვირაში'),
+        ('დღეში', 'დღეში'),
+        ('საათში', 'საათში'),
+    ]
+
     title = models.CharField(max_length=100, db_index=True)
     company = models.CharField(max_length=100, db_index=True)
     description = models.TextField()
     salary_min = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, db_index=True)
     salary_max = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    salary_type = models.CharField(max_length=50, blank=True)
-    category = models.CharField(max_length=100, blank=True, db_index=True)
-    location = models.CharField(max_length=100, blank=True, db_index=True)
+    salary_type = models.CharField(max_length=50, choices=SALARY_TYPE_CHOICES, default='თვეში')
+    category = models.CharField(max_length=100, choices=CATEGORY_CHOICES, db_index=True)
+    location = models.CharField(max_length=100, choices=LOCATION_CHOICES, db_index=True)
     employer = models.ForeignKey('EmployerProfile', on_delete=models.CASCADE, related_name='job_listings')
     posted_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
     interests = models.CharField(max_length=255, blank=True)
     fields = models.CharField(max_length=255, blank=True)
-    experience = models.CharField(max_length=100, blank=True, db_index=True)
-    job_preferences = models.CharField(max_length=255, blank=True)
+    experience = models.CharField(max_length=100, choices=EXPERIENCE_CHOICES, db_index=True)
+    job_preferences = models.CharField(max_length=255, choices=JOB_PREFERENCE_CHOICES)
+    considers_students = models.BooleanField(default=False, choices=CONSIDERS_STUDENTS_CHOICES)
     STATUS_CHOICES = [
         ('pending_review', 'Pending Review'),
         ('approved', 'Approved'),
