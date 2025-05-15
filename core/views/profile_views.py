@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from django.db.models import Prefetch
-from ..models import UserProfile, EmployerProfile, JobApplication
+from ..models import UserProfile, EmployerProfile, JobApplication, SavedJob
 from ..forms import UserProfileForm, EmployerProfileForm
 import logging
 
@@ -74,13 +74,16 @@ def profile(request):
     
     # Get user's job applications if they are a candidate
     applications = None
+    saved_jobs = None
     if user_profile.role == 'candidate':
         applications = JobApplication.objects.filter(user=request.user).select_related('job').order_by('-applied_at')
+        saved_jobs = SavedJob.objects.filter(user=request.user).select_related('job').order_by('-saved_at')
     
     context = {
         'user_form': user_form,
         'employer_form': employer_form,
         'applications': applications,
+        'saved_jobs': saved_jobs,
     }
     
     return render(request, 'core/profile.html', context)

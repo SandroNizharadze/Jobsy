@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import main
+from .views.job_views import save_job, unsave_job
 
 urlpatterns = [
     path('', main.home_redirect, name='home_redirect'),
@@ -23,6 +24,8 @@ urlpatterns = [
     # Job routes
     path('jobs/<int:job_id>/', main.job_detail, name='job_detail'),
     path('jobs/<int:job_id>/apply/', main.apply_job, name='apply_job'),
+    path('jobs/<int:job_id>/save/', save_job, name='save_job'),
+    path('jobs/<int:job_id>/unsave/', unsave_job, name='unsave_job'),
     
     # Admin routes
     path('admin/assign-employer/<int:user_id>/', main.assign_employer, name='assign_employer'),

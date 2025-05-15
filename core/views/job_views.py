@@ -2,8 +2,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.db.models import Q
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from ..models import JobListing, JobApplication
+from ..models import JobListing, JobApplication, SavedJob
 from ..forms import JobListingForm
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 import logging
 
 logger = logging.getLogger(__name__)
@@ -169,9 +171,15 @@ def job_detail(request, job_id):
         category=job.category
     ).exclude(id=job_id).select_related('employer').order_by('-premium_level', '-posted_at')[:5]
     
+    # Check if job is saved by user
+    is_saved = False
+    if request.user.is_authenticated:
+        is_saved = SavedJob.objects.filter(user=request.user, job=job).exists()
+    
     context = {
         'job': job,
         'similar_jobs': similar_jobs,
+        'is_saved': is_saved,
     }
     return render(request, 'core/job_detail.html', context)
 
@@ -248,4 +256,47 @@ def apply_job(request, job_id):
             return redirect('job_detail', job_id=job.id)
     
     # If not POST, redirect to job detail page
-    return redirect('job_detail', job_id=job.id) 
+    return redirect('job_detail', job_id=job.id)
+
+@login_required
+def save_job(request, job_id):
+    """
+    Save a job for a user
+    """
+    if request.method == 'POST':
+        job = get_object_or_404(JobListing, id=job_id, status='approved')
+        saved_job, created = SavedJob.objects.get_or_create(user=request.user, job=job)
+        
+        if created:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': True, 'message': 'Job saved successfully'})
+            messages.success(request, 'Job saved successfully')
+        else:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'message': 'Job already saved'})
+            messages.info(request, 'Job already saved')
+            
+        return redirect('job_detail', job_id=job_id)
+    return redirect('job_list')
+
+@login_required
+def unsave_job(request, job_id):
+    """
+    Remove a saved job for a user
+    """
+    if request.method == 'POST':
+        job = get_object_or_404(JobListing, id=job_id)
+        saved_job = SavedJob.objects.filter(user=request.user, job=job)
+        
+        if saved_job.exists():
+            saved_job.delete()
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': True, 'message': 'Job removed from saved jobs'})
+            messages.success(request, 'Job removed from saved jobs')
+        else:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'message': 'Job was not saved'})
+            messages.info(request, 'Job was not saved')
+            
+        return redirect('job_detail', job_id=job_id)
+    return redirect('job_list') 

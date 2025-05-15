@@ -219,3 +219,17 @@ class EmployerProfile(models.Model):
     class Meta:
         verbose_name = _("დამსაქმებლის პროფილი")
         verbose_name_plural = _("დამსაქმებლების პროფილები")
+
+class SavedJob(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='saved_jobs', verbose_name=_("მომხმარებელი"))
+    job = models.ForeignKey('JobListing', on_delete=models.CASCADE, related_name='saved_by', verbose_name=_("ვაკანსია"))
+    saved_at = models.DateTimeField(auto_now_add=True, verbose_name=_("შენახვის თარიღი"))
+
+    class Meta:
+        unique_together = ('user', 'job')
+        verbose_name = _("შენახული ვაკანსია")
+        verbose_name_plural = _("შენახული ვაკანსიები")
+        ordering = ['-saved_at']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.job.title}"

@@ -116,9 +116,36 @@
                     </div>
 
                     <div class="apply-section mt-4 pt-3 border-top">
+                        <div class="row">
+                            <div class="col-md-9 mb-2 mb-md-0">
                                 <button class="btn btn-lg w-100" data-bs-toggle="modal" data-bs-target="#applyModal" style="background-color:var(--jobsy-blue); color:white; border-radius:12px; font-weight:600; padding:0.8rem;">
                                     <i class="fas fa-paper-plane me-2"></i> {% trans "განაცხადის გაგზავნა" %}
-                        </button>
+                                </button>
+                            </div>
+                            <div class="col-md-3">
+                                {% if user.is_authenticated %}
+                                    {% if is_saved %}
+                                    <form action="{% url 'unsave_job' job.id %}" method="post" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-lg w-100" style="background-color:var(--jobsy-light); color:var(--jobsy-blue); border-radius:12px; font-weight:600; padding:0.8rem;">
+                                            <i class="fas fa-bookmark"></i>
+                                        </button>
+                                    </form>
+                                    {% else %}
+                                    <form action="{% url 'save_job' job.id %}" method="post" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-lg w-100" style="background-color:var(--jobsy-light); color:var(--jobsy-blue); border-radius:12px; font-weight:600; padding:0.8rem;">
+                                            <i class="far fa-bookmark"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                {% else %}
+                                <a href="{% url 'login' %}" class="btn btn-lg w-100" style="background-color:var(--jobsy-light); color:var(--jobsy-blue); border-radius:12px; font-weight:600; padding:0.8rem;">
+                                    <i class="far fa-bookmark"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
