@@ -3,14 +3,22 @@ from django.contrib.auth.models import User
 from .models import UserProfile, EmployerProfile, JobListing
 from django.contrib.auth.forms import UserCreationForm
 from django.core.files.uploadedfile import UploadedFile
+from django.utils.translation import gettext_lazy as _
 
 class RegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True)
     first_name = forms.CharField(required=True)
+    # Define user_type as a separate field - not a model field
+    user_type = forms.ChoiceField(
+        choices=[('candidate', _('Job Seeker')), ('employer', _('Employer'))],
+        widget=forms.RadioSelect,
+        initial='candidate',
+        required=True
+    )
     
     class Meta:
         model = User
-        fields = ['username', 'email', 'first_name', 'password1']
+        fields = ['username', 'email', 'first_name', 'password1']  # Don't include user_type here
         widgets = {
             'username': forms.HiddenInput(),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}),
@@ -29,6 +37,8 @@ class RegistrationForm(UserCreationForm):
         self.fields['password1'].error_messages = {
             'required': 'Please enter your password.',
         }
+        # Make user_type field more prominent
+        self.fields['user_type'].widget.attrs.update({'class': 'form-check-input'})
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -50,7 +60,39 @@ class RegistrationForm(UserCreationForm):
         if email:
             # Set username to be the same as email
             cleaned_data['username'] = email
+        
+        # Explicitly capture user_type for later use in the view
+        user_type = cleaned_data.get('user_type')
+        if user_type not in ['candidate', 'employer']:
+            # Default to candidate if invalid value
+            cleaned_data['user_type'] = 'candidate'
+        
         return cleaned_data
+
+class EmployerRegistrationForm(forms.ModelForm):
+    """Form for employer-specific registration information"""
+    company_name = forms.CharField(
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': _('Company Name')})
+    )
+    company_id = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': _('Identification Code')})
+    )
+    phone_number = forms.CharField(
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': _('Mobile Number')})
+    )
+    
+    class Meta:
+        model = EmployerProfile
+        fields = ['company_name', 'company_id', 'phone_number']
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Add company_id and phone_number to EmployerProfile temporarily for registration
+        self.fields['company_id'] = forms.CharField(required=False)
+        self.fields['phone_number'] = forms.CharField(required=True)
 
 class UserProfileForm(forms.ModelForm):
     class Meta:

@@ -5,6 +5,10 @@ from django.dispatch import receiver
 from django.urls import reverse
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+import logging
+from django.db import transaction
+
+logger = logging.getLogger(__name__)
 
 class JobListing(models.Model):
     CATEGORY_CHOICES = [
@@ -175,18 +179,31 @@ class UserProfile(models.Model):
 
     def save(self, *args, **kwargs):
         """Override save method to create employer profile if role changes to employer."""
+        logger.info(f"Saving UserProfile for {self.user.username} with role {self.role}")
+        
         is_new = self.pk is None
         old_role = None
         
         if not is_new:
-            old_instance = UserProfile.objects.get(pk=self.pk)
-            old_role = old_instance.role
+            try:
+                old_instance = UserProfile.objects.get(pk=self.pk)
+                old_role = old_instance.role
+                logger.info(f"Previous role was: {old_role}")
+            except Exception as e:
+                logger.error(f"Error getting old role: {e}")
         
+        # Ensure the save completes 
         super().save(*args, **kwargs)
         
-        # Create employer profile if user is assigned employer role
-        if (is_new and self.role == 'employer') or (old_role != 'employer' and self.role == 'employer'):
-            EmployerProfile.objects.get_or_create(user_profile=self)
+        # Always create/check employer profile if the role is 'employer'
+        if self.role == 'employer':
+            logger.info(f"Creating employer profile for {self.user.username}")
+            try:
+                employer_profile, created = EmployerProfile.objects.get_or_create(user_profile=self)
+                action = "Created new" if created else "Using existing"
+                logger.info(f"{action} employer profile (id: {employer_profile.pk})")
+            except Exception as e:
+                logger.error(f"Error creating/getting employer profile: {e}")
 
     class Meta:
         verbose_name = _("მომხმარებლის პროფილი")
@@ -204,6 +221,8 @@ class EmployerProfile(models.Model):
     
     user_profile = models.OneToOneField(UserProfile, on_delete=models.CASCADE, related_name='employer_profile', verbose_name=_("მომხმარებლის პროფილი"))
     company_name = models.CharField(max_length=100, blank=True, db_index=True, verbose_name=_("კომპანიის დასახელება"))
+    company_id = models.CharField(max_length=50, blank=True, null=True, verbose_name=_("საიდენტიფიკაციო კოდი"))
+    phone_number = models.CharField(max_length=50, blank=True, null=True, verbose_name=_("მობილურის ნომერი"))
     company_website = models.URLField(blank=True, verbose_name=_("კომპანიის ვებსაიტი"))
     company_description = models.TextField(blank=True, verbose_name=_("კომპანიის აღწერა"))
     company_logo = models.ImageField(upload_to='company_logos/', blank=True, null=True, verbose_name=_("კომპანიის ლოგო"))
@@ -220,6 +239,50 @@ class EmployerProfile(models.Model):
         verbose_name = _("დამსაქმებლის პროფილი")
         verbose_name_plural = _("დამსაქმებლების პროფილები")
 
+    @classmethod
+    def create_for_user(cls, user, company_name="", company_id=None, phone_number=None):
+        """
+        Create an EmployerProfile for a user, ensuring the UserProfile has the right role.
+        This is a convenience method for the registration process.
+        """
+        with transaction.atomic():
+            # First ensure user profile exists with employer role
+            try:
+                profile = UserProfile.objects.get(user=user)
+                # Update role if needed
+                if profile.role != 'employer':
+                    profile.role = 'employer'
+                    profile.save()
+                    logger.info(f"Updated existing UserProfile for {user.username} to role 'employer'")
+            except UserProfile.DoesNotExist:
+                # Create new profile with employer role
+                profile = UserProfile.objects.create(user=user, role='employer')
+                logger.info(f"Created new UserProfile for {user.username} with role 'employer'")
+            
+            # Now create/update employer profile
+            try:
+                employer_profile = cls.objects.get(user_profile=profile)
+                # Update fields if provided
+                if company_name:
+                    employer_profile.company_name = company_name
+                if company_id:
+                    employer_profile.company_id = company_id
+                if phone_number:
+                    employer_profile.phone_number = phone_number
+                employer_profile.save()
+                logger.info(f"Updated existing EmployerProfile for {user.username}")
+                return employer_profile
+            except cls.DoesNotExist:
+                # Create new employer profile
+                employer_profile = cls.objects.create(
+                    user_profile=profile,
+                    company_name=company_name,
+                    company_id=company_id,
+                    phone_number=phone_number
+                )
+                logger.info(f"Created new EmployerProfile for {user.username}")
+                return employer_profile
+
 class SavedJob(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='saved_jobs', verbose_name=_("მომხმარებელი"))
     job = models.ForeignKey('JobListing', on_delete=models.CASCADE, related_name='saved_by', verbose_name=_("ვაკანსია"))
@@ -233,3 +296,23 @@ class SavedJob(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.job.title}"
+
+# Add signals to ensure user profile and employer profile are properly created
+@receiver(post_save, sender=UserProfile)
+def ensure_employer_profile(sender, instance, created, **kwargs):
+    """
+    Ensure that when a UserProfile is saved with the 'employer' role,
+    an EmployerProfile is created.
+    """
+    logger.info(f"Signal: UserProfile saved for {instance.user.username} with role {instance.role}")
+    
+    if instance.role == 'employer':
+        try:
+            if hasattr(instance, 'employer_profile'):
+                logger.info(f"EmployerProfile already exists for {instance.user.username}")
+            else:
+                logger.info(f"Creating new EmployerProfile for {instance.user.username}")
+                employer_profile = EmployerProfile.objects.create(user_profile=instance)
+                logger.info(f"Created EmployerProfile with ID {employer_profile.id}")
+        except Exception as e:
+            logger.error(f"Error in ensure_employer_profile: {str(e)}")

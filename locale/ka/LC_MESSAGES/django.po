@@ -1,623 +1,562 @@
-# Georgian translations for Jobsy.
-# Copyright (C) 2023
-# This file is distributed under the same license as the Jobsy package.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Jobsy 1.0\n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-15 17:43+0000\n"
-"PO-Revision-Date: 2023-05-20 12:00+0000\n"
-"Last-Translator: \n"
-"Language-Team: Georgian\n"
-"Language: ka\n"
+"POT-Creation-Date: 2025-05-15 19:29+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+#: core/forms.py:13 core/templates/core/profile.html:57
+#: core/templates/core/register.html:31
+msgid "Job Seeker"
+msgstr "სამუშაოს მაძიებელი"
 
-#: core/models.py:11
-#, fuzzy
-#| msgid "მინიმალური ანაზღაურება"
+#: core/forms.py:13 core/models.py:159 core/templates/core/base.html:298
+#: core/templates/core/profile.html:53 core/templates/core/register.html:37
+msgid "Employer"
+msgstr "დამსაქმებელი"
+
+#: core/forms.py:76 core/templates/core/profile.html:67
+#: core/templates/core/register.html:84
+msgid "Company Name"
+msgstr "კომპანიის სახელი"
+
+#: core/forms.py:80 core/templates/core/register.html:94
+msgid "Identification Code"
+msgstr "საიდენტიფიკაციო კოდი"
+
+#: core/forms.py:84 core/templates/core/register.html:104
+msgid "Mobile Number"
+msgstr "მობილურის ნომერი"
+
+#: core/models.py:15
 msgid "მენეჯმენტი/ ადმინისტრირება"
-msgstr "მინიმალური ანაზღაურება"
+msgstr ""
 
-#: core/models.py:12
+#: core/models.py:16
 msgid "მარკეტინგი"
 msgstr ""
 
-#: core/models.py:13
+#: core/models.py:17
 msgid "ფინანსები"
 msgstr ""
 
-#: core/models.py:14
-#, fuzzy
-#| msgid "ჩვენი ვაკანსიები დაგეხმარება!"
-msgid "გაყიდვები/მომხმარებელთან ურთიერთობა"
-msgstr "ჩვენი ვაკანსიები დაგეხმარება!"
-
-#: core/models.py:15
-#, fuzzy
-#| msgid "სტაჟირება"
-msgid "IT/პროგრამირება"
-msgstr "სტაჟირება"
-
-#: core/models.py:16
-msgid "დიზაინი"
-msgstr ""
-
-#: core/models.py:17
-#, fuzzy
-#| msgid "გასუფთავება"
-msgid "ჰორეკა/კვება"
-msgstr "გასუფთავება"
-
 #: core/models.py:18
-msgid "დაცვა"
+msgid "გაყიდვები/მომხმარებელთან ურთიერთობა"
 msgstr ""
 
 #: core/models.py:19
-msgid "სილამაზე/მოდა"
+msgid "IT/პროგრამირება"
 msgstr ""
 
 #: core/models.py:20
-msgid "მშენებლობა"
+msgid "დიზაინი"
 msgstr ""
 
 #: core/models.py:21
-msgid "მედიცინა"
+msgid "ჰორეკა/კვება"
 msgstr ""
 
 #: core/models.py:22
-#, fuzzy
-#| msgid "განაცხადი"
-msgid "განათლება"
-msgstr "განაცხადი"
+msgid "დაცვა"
+msgstr ""
 
 #: core/models.py:23
-msgid "სამართალი"
+msgid "სილამაზე/მოდა"
 msgstr ""
 
 #: core/models.py:24
-msgid "ტურიზმი"
+msgid "მშენებლობა"
 msgstr ""
 
 #: core/models.py:25
-#, fuzzy
-#| msgid "რეგისტრაცია"
-msgid "ლოჯისტიკა/დისტრიბუცია"
-msgstr "რეგისტრაცია"
+msgid "მედიცინა"
+msgstr ""
 
 #: core/models.py:26
-msgid "საბანკო საქმე"
+msgid "განათლება"
 msgstr ""
 
 #: core/models.py:27
+msgid "სამართალი"
+msgstr ""
+
+#: core/models.py:28
+msgid "ტურიზმი"
+msgstr ""
+
+#: core/models.py:29
+msgid "ლოჯისტიკა/დისტრიბუცია"
+msgstr ""
+
+#: core/models.py:30
+msgid "საბანკო საქმე"
+msgstr ""
+
+#: core/models.py:31
 msgid "აზარტული"
 msgstr ""
 
-#: core/models.py:31 core/templates/core/job_list.html:114
+#: core/models.py:35 core/templates/core/job_list.html:114
 msgid "დისტანციური"
-msgstr "დისტანციური"
+msgstr ""
 
-#: core/models.py:32 core/templates/core/job_detail.html:50
+#: core/models.py:36 core/templates/core/job_detail.html:50
 msgid "თბილისი"
 msgstr ""
 
-#: core/models.py:33
+#: core/models.py:37
 msgid "აჭარა"
 msgstr ""
 
-#: core/models.py:34
+#: core/models.py:38
 msgid "აფხაზეთი"
 msgstr ""
 
-#: core/models.py:35
+#: core/models.py:39
 msgid "სვანეთი"
 msgstr ""
 
-#: core/models.py:36
+#: core/models.py:40
 msgid "სამეგრელო"
 msgstr ""
 
-#: core/models.py:37
+#: core/models.py:41
 msgid "კახეთი"
 msgstr ""
 
-#: core/models.py:38
+#: core/models.py:42
 msgid "ლეჩხუმი"
 msgstr ""
 
-#: core/models.py:39
+#: core/models.py:43
 msgid "რაჭა"
 msgstr ""
 
-#: core/models.py:40
+#: core/models.py:44
 msgid "გურია"
 msgstr ""
 
-#: core/models.py:41
+#: core/models.py:45
 msgid "ქვემო ქართლი"
 msgstr ""
 
-#: core/models.py:42
+#: core/models.py:46
 msgid "სამცხე-ჯავახეთი"
 msgstr ""
 
-#: core/models.py:43
+#: core/models.py:47
 msgid "შიდა ქართლი"
 msgstr ""
 
-#: core/models.py:44
+#: core/models.py:48
 msgid "მცხეთა-მთიანეთი"
 msgstr ""
 
-#: core/models.py:45
+#: core/models.py:49
 msgid "იმერეთი"
 msgstr ""
 
-#: core/models.py:49
-#, fuzzy
-#| msgid "გამოცდილება"
+#: core/models.py:53
 msgid "გამოცდილების გარეშე"
-msgstr "გამოცდილება"
+msgstr ""
 
-#: core/models.py:50 core/templates/core/job_list.html:77
+#: core/models.py:54 core/templates/core/job_list.html:77
 msgid "დამწყები"
-msgstr "დამწყები"
+msgstr ""
 
-#: core/models.py:51
-#, fuzzy
-#| msgid "საშუალო"
+#: core/models.py:55
 msgid "საშუალო დონე"
-msgstr "საშუალო"
+msgstr ""
 
-#: core/models.py:52 core/templates/core/job_list.html:79
+#: core/models.py:56 core/templates/core/job_list.html:79
 msgid "პროფესიონალი"
-msgstr "პროფესიონალი"
+msgstr ""
 
-#: core/models.py:56 core/templates/core/job_detail.html:66
+#: core/models.py:60 core/templates/core/job_detail.html:66
 #: core/templates/core/job_detail.html:242
 #: core/templates/core/job_list.html:106
 msgid "სრული განაკვეთი"
-msgstr "სრული განაკვეთი"
+msgstr ""
 
-#: core/models.py:57 core/templates/core/job_list.html:110
+#: core/models.py:61 core/templates/core/job_list.html:110
 msgid "ნახევარი განაკვეთი"
-msgstr "ნახევარი განაკვეთი"
-
-#: core/models.py:58
-msgid "ცვლები"
 msgstr ""
 
 #: core/models.py:62
-#, fuzzy
-#| msgid "ან"
-msgid "კი"
-msgstr "ან"
+msgid "ცვლები"
+msgstr ""
 
-#: core/models.py:63
-#, fuzzy
-#| msgid "ან"
-msgid "არა"
-msgstr "ან"
+#: core/models.py:66
+msgid "კი"
+msgstr ""
 
 #: core/models.py:67
+msgid "არა"
+msgstr ""
+
+#: core/models.py:71
 msgid "თვეში"
 msgstr ""
 
-#: core/models.py:68
+#: core/models.py:72
 msgid "კვირაში"
 msgstr ""
 
-#: core/models.py:69
+#: core/models.py:73
 msgid "დღეში"
 msgstr ""
 
-#: core/models.py:70
+#: core/models.py:74
 msgid "საათში"
 msgstr ""
 
-#: core/models.py:73 core/templates/core/post_job.html:27
-#, fuzzy
-#| msgid "კომპანიის შესახებ"
+#: core/models.py:77 core/templates/core/post_job.html:27
 msgid "ვაკანსიის დასახელება"
-msgstr "კომპანიის შესახებ"
+msgstr ""
 
-#: core/models.py:74 core/templates/core/profile.html:301
-#, fuzzy
-#| msgid "მოძებნა / კომპანია"
+#: core/models.py:78 core/templates/core/profile.html:301
 msgid "კომპანია"
-msgstr "მოძებნა / კომპანია"
+msgstr ""
 
-#: core/models.py:75 core/templates/core/post_job.html:38
-#, fuzzy
-#| msgid "ვაკანსიები"
+#: core/models.py:79 core/templates/core/post_job.html:38
 msgid "ვაკანსიის აღწერა"
-msgstr "ვაკანსიები"
+msgstr ""
 
-#: core/models.py:76 core/templates/core/post_job.html:71
-#, fuzzy
-#| msgid "მინიმალური ანაზღაურება"
+#: core/models.py:80 core/templates/core/post_job.html:71
 msgid "მინიმალური ხელფასი"
-msgstr "მინიმალური ანაზღაურება"
+msgstr ""
 
-#: core/models.py:77 core/templates/core/post_job.html:81
-#, fuzzy
-#| msgid "მინიმალური ანაზღაურება"
+#: core/models.py:81 core/templates/core/post_job.html:81
 msgid "მაქსიმალური ხელფასი"
-msgstr "მინიმალური ანაზღაურება"
+msgstr ""
 
-#: core/models.py:78 core/templates/core/post_job.html:91
+#: core/models.py:82 core/templates/core/post_job.html:91
 msgid "ხელფასის ტიპი"
 msgstr ""
 
-#: core/models.py:79 core/templates/core/job_list.html:58
+#: core/models.py:83 core/templates/core/job_list.html:58
 #: core/templates/core/post_job.html:60
 msgid "კატეგორია"
-msgstr "კატეგორია"
+msgstr ""
 
-#: core/models.py:80 core/templates/core/job_list.html:67
+#: core/models.py:84 core/templates/core/job_list.html:67
 #: core/templates/core/post_job.html:49
 msgid "ლოკაცია"
-msgstr "ლოკაცია"
-
-#: core/models.py:81
-#, fuzzy
-#| msgid "გაუქმება"
-msgid "დამსაქმებელი"
-msgstr "გაუქმება"
-
-#: core/models.py:82
-#, fuzzy
-#| msgid "გამოქვეყნებულია"
-msgid "გამოქვეყნების თარიღი"
-msgstr "გამოქვეყნებულია"
-
-#: core/models.py:83 core/models.py:138 core/models.py:214
-#, fuzzy
-#| msgid "განაცხადის გაგზავნა"
-msgid "განახლების თარიღი"
-msgstr "განაცხადის გაგზავნა"
-
-#: core/models.py:84
-msgid "ინტერესები"
 msgstr ""
 
 #: core/models.py:85
-msgid "სფეროები"
+msgid "დამსაქმებელი"
 msgstr ""
 
-#: core/models.py:86 core/templates/core/job_list.html:76
-msgid "გამოცდილება"
-msgstr "გამოცდილება"
+#: core/models.py:86
+msgid "გამოქვეყნების თარიღი"
+msgstr ""
 
-#: core/models.py:87 core/templates/core/post_job.html:113
-msgid "სამუშაო გრაფიკი"
+#: core/models.py:87 core/models.py:142 core/models.py:233
+msgid "განახლების თარიღი"
 msgstr ""
 
 #: core/models.py:88
+msgid "ინტერესები"
+msgstr ""
+
+#: core/models.py:89
+msgid "სფეროები"
+msgstr ""
+
+#: core/models.py:90 core/templates/core/job_list.html:76
+msgid "გამოცდილება"
+msgstr ""
+
+#: core/models.py:91 core/templates/core/post_job.html:113
+msgid "სამუშაო გრაფიკი"
+msgstr ""
+
+#: core/models.py:92
 msgid "განიხილავს სტუდენტებს"
 msgstr ""
 
-#: core/models.py:90
+#: core/models.py:94
 msgid "Pending Review"
 msgstr ""
 
-#: core/models.py:91 core/templates/core/employer_home.html:87
+#: core/models.py:95 core/templates/core/employer_home.html:87
 msgid "Approved"
 msgstr ""
 
-#: core/models.py:92 core/models.py:126
+#: core/models.py:96 core/models.py:130
 #: core/templates/core/employer_home.html:89
 #: core/templates/core/profile.html:242
 msgid "Rejected"
 msgstr ""
 
-#: core/models.py:94 core/models.py:136
+#: core/models.py:98 core/models.py:140
 #: core/templates/core/employer_applications.html:101
 msgid "სტატუსი"
 msgstr ""
 
-#: core/models.py:95
-#, fuzzy
-#| msgid "მინიმალური ანაზღაურება"
-msgid "ადმინის უკუკავშირი"
-msgstr "მინიმალური ანაზღაურება"
-
-#: core/models.py:97
-msgid "Standard"
-msgstr ""
-
-#: core/models.py:98 core/templates/core/job_detail.html:59
-msgid "Premium"
-msgstr ""
-
 #: core/models.py:99
-msgid "Premium +"
+msgid "ადმინის უკუკავშირი"
 msgstr ""
 
 #: core/models.py:101
+msgid "Standard"
+msgstr ""
+
+#: core/models.py:102 core/templates/core/job_detail.html:59
+msgid "Premium"
+msgstr ""
+
+#: core/models.py:103
+msgid "Premium +"
+msgstr ""
+
+#: core/models.py:105
 msgid "პრემიუმ დონე"
 msgstr ""
 
-#: core/models.py:113 core/models.py:130 core/models.py:225
+#: core/models.py:117 core/models.py:134 core/models.py:288
 #: core/templates/core/profile.html:300
-#, fuzzy
-#| msgid "ვაკანსიები"
 msgid "ვაკანსია"
-msgstr "ვაკანსიები"
+msgstr ""
 
-#: core/models.py:114 core/templates/core/base.html:259
+#: core/models.py:118 core/templates/core/base.html:259
 #: core/templates/core/job_list.html:133 core/templates/core/job_list.html:399
 msgid "ვაკანსიები"
-msgstr "ვაკანსიები"
+msgstr ""
 
-#: core/models.py:118 core/templates/core/employer_applications.html:39
+#: core/models.py:122 core/templates/core/employer_applications.html:39
 #: core/templates/core/employer_applications.html:61
 #: core/templates/core/employer_applications.html:172
 #: core/templates/core/profile.html:226 core/templates/core/profile.html:271
-#, fuzzy
-#| msgid "კომპანიის პროფილი"
 msgid "განხილვის პროცესში"
-msgstr "კომპანიის პროფილი"
+msgstr ""
 
-#: core/models.py:119 core/templates/core/employer_applications.html:27
+#: core/models.py:123 core/templates/core/employer_applications.html:27
 #: core/templates/core/employer_applications.html:64
 #: core/templates/core/employer_applications.html:175
 #: core/templates/core/profile.html:228 core/templates/core/profile.html:263
-#, fuzzy
-#| msgid "სტაჟირება"
 msgid "გასაუბრება"
-msgstr "სტაჟირება"
+msgstr ""
 
-#: core/models.py:120 core/templates/core/employer_applications.html:33
+#: core/models.py:124 core/templates/core/employer_applications.html:33
 #: core/templates/core/employer_applications.html:67
 #: core/templates/core/employer_applications.html:178
 #: core/templates/core/profile.html:230 core/templates/core/profile.html:267
 msgid "რეზერვი"
 msgstr ""
 
-#: core/models.py:121 core/templates/core/profile.html:232
+#: core/models.py:125 core/templates/core/profile.html:232
 msgid "Pending"
 msgstr ""
 
-#: core/models.py:122 core/templates/core/profile.html:234
+#: core/models.py:126 core/templates/core/profile.html:234
 msgid "Reviewed"
 msgstr ""
 
-#: core/models.py:123 core/templates/core/profile.html:236
+#: core/models.py:127 core/templates/core/profile.html:236
 msgid "Interviewed"
 msgstr ""
 
-#: core/models.py:124 core/templates/core/profile.html:238
+#: core/models.py:128 core/templates/core/profile.html:238
 msgid "Offer Extended"
 msgstr ""
 
-#: core/models.py:125
+#: core/models.py:129
 msgid "Offer Accepted"
 msgstr ""
 
-#: core/models.py:127 core/templates/core/profile.html:244
+#: core/models.py:131 core/templates/core/profile.html:244
 msgid "Withdrawn"
 msgstr ""
 
-#: core/models.py:131 core/models.py:159 core/models.py:224
+#: core/models.py:135 core/models.py:163 core/models.py:287
 msgid "მომხმარებელი"
 msgstr ""
 
-#: core/models.py:132
-#, fuzzy
-#| msgid "კომპანიის შესახებ"
+#: core/models.py:136
 msgid "სტუმრის სახელი"
-msgstr "კომპანიის შესახებ"
+msgstr ""
 
-#: core/models.py:133
-#, fuzzy
-#| msgid "ელ-ფოსტა"
+#: core/models.py:137
 msgid "სტუმრის ელ-ფოსტა"
-msgstr "ელ-ფოსტა"
+msgstr ""
 
-#: core/models.py:134 core/templates/core/employer_applications.html:100
+#: core/models.py:138 core/templates/core/employer_applications.html:100
 #: core/templates/core/employer_applications.html:154
 #: core/templates/core/job_detail.html:282
 #: core/templates/core/job_detail.html:305
 #: core/templates/core/job_detail.html:333
 msgid "მოტივაციის წერილი"
-msgstr "მოტივაციის წერილი"
+msgstr ""
 
-#: core/models.py:135
-#, fuzzy
-#| msgid "CV / რეზიუმე"
+#: core/models.py:139
 msgid "რეზიუმე"
-msgstr "CV / რეზიუმე"
+msgstr ""
 
-#: core/models.py:137
-#, fuzzy
-#| msgid "მოტივაციის წერილი"
+#: core/models.py:141
 msgid "აპლიკაციის თარიღი"
-msgstr "მოტივაციის წერილი"
+msgstr ""
 
-#: core/models.py:146
-#, fuzzy
-#| msgid "ლოკაცია"
+#: core/models.py:150
 msgid "აპლიკაცია"
-msgstr "ლოკაცია"
+msgstr ""
 
-#: core/models.py:147
-#, fuzzy
-#| msgid "ვაკანსიები"
+#: core/models.py:151
 msgid "აპლიკაციები"
-msgstr "ვაკანსიები"
+msgstr ""
 
-#: core/models.py:154
+#: core/models.py:158
 msgid "Candidate"
 msgstr ""
 
-#: core/models.py:155 core/templates/core/base.html:298
-#: core/templates/core/profile.html:53
-msgid "Employer"
-msgstr "დამსაქმებელი"
-
-#: core/models.py:156 core/templates/core/profile.html:55
+#: core/models.py:160 core/templates/core/profile.html:55
 msgid "Admin"
-msgstr "ადმინი"
+msgstr ""
 
-#: core/models.py:160
-#, fuzzy
-#| msgid "პაროლი"
+#: core/models.py:164
 msgid "როლი"
-msgstr "პაროლი"
-
-#: core/models.py:161
-#, fuzzy
-#| msgid "პროფესიონალი"
-msgid "პროფილის სურათი"
-msgstr "პროფესიონალი"
-
-#: core/models.py:162 core/models.py:213
-#, fuzzy
-#| msgid "შექმენით ანგარიში"
-msgid "შექმნის თარიღი"
-msgstr "შექმენით ანგარიში"
-
-#: core/models.py:164 core/templates/core/employer_applications.html:99
-msgid "CV"
 msgstr ""
 
 #: core/models.py:165
-#, fuzzy
-#| msgid "ანაზღაურება შეთანხმებით"
+msgid "პროფილის სურათი"
+msgstr ""
+
+#: core/models.py:166 core/models.py:232
+msgid "შექმნის თარიღი"
+msgstr ""
+
+#: core/models.py:168 core/templates/core/employer_applications.html:99
+msgid "CV"
+msgstr ""
+
+#: core/models.py:169
 msgid "CV-ის გაზიარების თანხმობა"
-msgstr "ანაზღაურება შეთანხმებით"
+msgstr ""
 
-#: core/models.py:166
-#, fuzzy
-#| msgid "ანაზღაურება შეთანხმებით"
+#: core/models.py:170
 msgid "CV-ის გაზიარება დამსაქმებლებთან"
-msgstr "ანაზღაურება შეთანხმებით"
+msgstr ""
 
-#: core/models.py:167
+#: core/models.py:171
 msgid "CV-ის ხილვადობა"
 msgstr ""
 
-#: core/models.py:192 core/models.py:205
-#, fuzzy
-#| msgid "კომპანიის პროფილი"
+#: core/models.py:209 core/models.py:222
 msgid "მომხმარებლის პროფილი"
-msgstr "კომპანიის პროფილი"
+msgstr ""
 
-#: core/models.py:193
-#, fuzzy
-#| msgid "კომპანიის პროფილი"
+#: core/models.py:210
 msgid "მომხმარებლების პროფილები"
-msgstr "კომპანიის პროფილი"
+msgstr ""
 
-#: core/models.py:197
+#: core/models.py:214
 msgid "1-10 employees"
 msgstr ""
 
-#: core/models.py:198
+#: core/models.py:215
 msgid "11-50 employees"
 msgstr ""
 
-#: core/models.py:199
+#: core/models.py:216
 msgid "51-200 employees"
 msgstr ""
 
-#: core/models.py:200
+#: core/models.py:217
 msgid "201-500 employees"
 msgstr ""
 
-#: core/models.py:201
+#: core/models.py:218
 msgid "501-1000 employees"
 msgstr ""
 
-#: core/models.py:202
+#: core/models.py:219
 msgid "1001+ employees"
 msgstr ""
 
-#: core/models.py:206
-#, fuzzy
-#| msgid "კომპანიის შესახებ"
+#: core/models.py:223
 msgid "კომპანიის დასახელება"
-msgstr "კომპანიის შესახებ"
+msgstr ""
 
-#: core/models.py:207
-#, fuzzy
-#| msgid "კომპანიის შესახებ"
+#: core/models.py:224
+msgid "საიდენტიფიკაციო კოდი"
+msgstr ""
+
+#: core/models.py:225
+msgid "მობილურის ნომერი"
+msgstr ""
+
+#: core/models.py:226
 msgid "კომპანიის ვებსაიტი"
-msgstr "კომპანიის შესახებ"
+msgstr ""
 
-#: core/models.py:208
-#, fuzzy
-#| msgid "კომპანიის შესახებ"
+#: core/models.py:227
 msgid "კომპანიის აღწერა"
-msgstr "კომპანიის შესახებ"
+msgstr ""
 
-#: core/models.py:209
-#, fuzzy
-#| msgid "კომპანიის პროფილი"
+#: core/models.py:228
 msgid "კომპანიის ლოგო"
-msgstr "კომპანიის პროფილი"
+msgstr ""
 
-#: core/models.py:210
-#, fuzzy
-#| msgid "კომპანიის შესახებ"
+#: core/models.py:229
 msgid "კომპანიის ზომა"
-msgstr "კომპანიის შესახებ"
-
-#: core/models.py:211
-msgid "ინდუსტრია"
-msgstr ""
-
-#: core/models.py:212
-msgid "მდებარეობა"
-msgstr ""
-
-#: core/models.py:220
-#, fuzzy
-#| msgid "კომპანიის პროფილი"
-msgid "დამსაქმებლის პროფილი"
-msgstr "კომპანიის პროფილი"
-
-#: core/models.py:221
-#, fuzzy
-#| msgid "კომპანიის პროფილი"
-msgid "დამსაქმებლების პროფილები"
-msgstr "კომპანიის პროფილი"
-
-#: core/models.py:226 core/templates/core/profile.html:302
-msgid "შენახვის თარიღი"
 msgstr ""
 
 #: core/models.py:230
-#, fuzzy
-#| msgid "განათავსეთ ვაკანსია"
-msgid "შენახული ვაკანსია"
-msgstr "განათავსეთ ვაკანსია"
+msgid "ინდუსტრია"
+msgstr ""
 
-#: core/models.py:231 core/templates/core/profile.html:293
-#, fuzzy
-#| msgid "მსგავსი ვაკანსიები"
+#: core/models.py:231
+msgid "მდებარეობა"
+msgstr ""
+
+#: core/models.py:239
+msgid "დამსაქმებლის პროფილი"
+msgstr ""
+
+#: core/models.py:240
+msgid "დამსაქმებლების პროფილები"
+msgstr ""
+
+#: core/models.py:289 core/templates/core/profile.html:302
+msgid "შენახვის თარიღი"
+msgstr ""
+
+#: core/models.py:293
+msgid "შენახული ვაკანსია"
+msgstr ""
+
+#: core/models.py:294 core/templates/core/profile.html:293
 msgid "შენახული ვაკანსიები"
-msgstr "მსგავსი ვაკანსიები"
+msgstr ""
 
 #: core/templates/core/base.html:258 core/templates/core/job_list.html:398
 msgid "მთავარი"
-msgstr "მთავარი"
+msgstr ""
 
 #: core/templates/core/base.html:263
 msgid "გამოქვეყნება"
-msgstr "გამოქვეყნება"
+msgstr ""
 
 #: core/templates/core/base.html:265
 msgid "დამატება CV"
-msgstr "დამატება CV"
+msgstr ""
 
 #: core/templates/core/base.html:302
 msgid "Profile"
-msgstr "პროფილი"
+msgstr ""
 
 #: core/templates/core/base.html:304
 msgid "Metrics"
@@ -630,29 +569,23 @@ msgstr ""
 #: core/templates/core/base.html:311 core/templates/core/login.html:4
 #: core/templates/core/login.html:11 core/templates/core/login.html:40
 msgid "შესვლა"
-msgstr "შესვლა"
+msgstr ""
 
 #: core/templates/core/base.html:312 core/templates/core/login.html:56
 msgid "რეგისტრაცია"
-msgstr "რეგისტრაცია"
+msgstr ""
 
 #: core/templates/core/employer_applications.html:5
-#, fuzzy
-#| msgid "ჩვენი ვაკანსიები დაგეხმარება!"
 msgid "Jobsy - აპლიკაციების მენეჯმენტი"
-msgstr "ჩვენი ვაკანსიები დაგეხმარება!"
+msgstr ""
 
 #: core/templates/core/employer_applications.html:12
-#, fuzzy
-#| msgid "ვაკანსიები"
 msgid "აპლიკაციები:"
-msgstr "ვაკანსიები"
+msgstr ""
 
 #: core/templates/core/employer_applications.html:14
-#, fuzzy
-#| msgid "გამოქვეყნება"
 msgid "უკან დაბრუნება"
-msgstr "გამოქვეყნება"
+msgstr ""
 
 #: core/templates/core/employer_applications.html:23
 #: core/templates/core/profile.html:260
@@ -660,16 +593,10 @@ msgid "სტატუსების ახსნა:"
 msgstr ""
 
 #: core/templates/core/employer_applications.html:28
-#, fuzzy
-#| msgid ""
-#| "გამოაქვეყნეთ ვაკანსია ჯობსიზე და იპოვეთ საუკეთესო კანდიდატები თქვენი "
-#| "კომპანიისთვის."
 msgid ""
 "ნიშნავს რომ განიხილეთ კანდიდატურა, თვლით რომ შეესაბამება პოზიციას და "
 "დაუკავშირდებით გასაუბრებაზე დასაბარებლად"
 msgstr ""
-"გამოაქვეყნეთ ვაკანსია ჯობსიზე და იპოვეთ საუკეთესო კანდიდატები თქვენი "
-"კომპანიისთვის."
 
 #: core/templates/core/employer_applications.html:34
 msgid ""
@@ -679,46 +606,30 @@ msgid ""
 msgstr ""
 
 #: core/templates/core/employer_applications.html:40
-#, fuzzy
-#| msgid "კომპანიის აღწერა არ არის მითითებული."
 msgid "ნიშნავს რომ კანდიდატურა ჯერ არ განგიხილავთ"
-msgstr "კომპანიის აღწერა არ არის მითითებული."
+msgstr ""
 
 #: core/templates/core/employer_applications.html:47
-#, fuzzy
-#| msgid ""
-#| "გამოაქვეყნეთ ვაკანსია ჯობსიზე და იპოვეთ საუკეთესო კანდიდატები თქვენი "
-#| "კომპანიისთვის."
 msgid ""
 "არ გამოგრჩეთ კანდიდატების სტატუსების მინიჭება, ეს გეხმარებათ მარტივად "
 "გამოარჩიოთ და დაახარისხოთ მეტად სასურველი კანდიდატები<3"
 msgstr ""
-"გამოაქვეყნეთ ვაკანსია ჯობსიზე და იპოვეთ საუკეთესო კანდიდატები თქვენი "
-"კომპანიისთვის."
 
 #: core/templates/core/employer_applications.html:55
-#, fuzzy
-#| msgid "ფილტრები"
 msgid "გაფილტვრა"
-msgstr "ფილტრები"
+msgstr ""
 
 #: core/templates/core/employer_applications.html:59
-#, fuzzy
-#| msgid "ყველა ვაკანსია"
 msgid "ყველა სტატუსი"
-msgstr "ყველა ვაკანსია"
+msgstr ""
 
 #: core/templates/core/employer_applications.html:73
-#, fuzzy
-#| msgid "მოძებნა / კომპანია"
 msgid "მოძებნა სახელით..."
-msgstr "მოძებნა / კომპანია"
+msgstr ""
 
 #: core/templates/core/employer_applications.html:82
-#, fuzzy
-#| msgid "განაცხადის გაგზავნა"
 msgid "ფილტრების გასუფთავება"
-msgstr "განაცხადის გაგზავნა"
+msgstr ""
 
 #: core/templates/core/employer_applications.html:97
 msgid "აპლიკანტი"
@@ -743,26 +654,20 @@ msgid "დახურვა"
 msgstr ""
 
 #: core/templates/core/employer_applications.html:205
-#, fuzzy
-#| msgid "მსგავსი ვაკანსიები არ მოიძებნა."
 msgid "ამ ვაკანსიაზე აპლიკაციები ჯერ არ გაქვთ"
-msgstr "მსგავსი ვაკანსიები არ მოიძებნა."
+msgstr ""
 
 #: core/templates/core/employer_applications.html:206
 msgid "როგორც კი ვინმე შემოიტანს აპლიკაციას, აქ გამოჩნდება"
 msgstr ""
 
 #: core/templates/core/employer_dashboard.html:97
-#, fuzzy
-#| msgid "სრული განაკვეთი"
 msgid "მოსული სივები"
-msgstr "სრული განაკვეთი"
+msgstr ""
 
 #: core/templates/core/employer_home.html:3
-#, fuzzy
-#| msgid "Employer"
 msgid "Employer Home"
-msgstr "დამსაქმებელი"
+msgstr ""
 
 #: core/templates/core/employer_home.html:7
 #, python-format
@@ -772,10 +677,8 @@ msgid ""
 msgstr ""
 
 #: core/templates/core/employer_home.html:12
-#, fuzzy
-#| msgid "View Jobs"
 msgid "Active Jobs"
-msgstr "ვაკანსიების ნახვა"
+msgstr ""
 
 #: core/templates/core/employer_home.html:20
 msgid "Total Jobs"
@@ -806,10 +709,8 @@ msgid "No recent applicants."
 msgstr ""
 
 #: core/templates/core/employer_home.html:80
-#, fuzzy
-#| msgid "Jobsy"
 msgid "All Jobs"
-msgstr "Jobsy"
+msgstr ""
 
 #: core/templates/core/employer_home.html:91
 msgid "In Review"
@@ -820,16 +721,12 @@ msgid "No jobs available."
 msgstr ""
 
 #: core/templates/core/employer_home.html:107
-#, fuzzy
-#| msgid "View Jobs"
 msgid "Manage Jobs"
-msgstr "ვაკანსიების ნახვა"
+msgstr ""
 
 #: core/templates/core/employer_home.html:108
-#, fuzzy
-#| msgid "Company Size"
 msgid "Edit Company Profile"
-msgstr "კომპანიის ზომა"
+msgstr ""
 
 #: core/templates/core/employer_home.html:109
 msgid "Post New Job"
@@ -837,51 +734,38 @@ msgstr ""
 
 #: core/templates/core/job_detail.html:5
 msgid "Jobsy"
-msgstr "Jobsy"
+msgstr ""
 
 #: core/templates/core/job_detail.html:55
 msgid "Premium+"
 msgstr ""
 
 #: core/templates/core/job_detail.html:63
-#, fuzzy
-#| msgid "კომპანიის პროფილი"
 msgid "IT / კომპიუტერები"
-msgstr "კომპანიის პროფილი"
+msgstr ""
 
 #: core/templates/core/job_detail.html:82
 msgid "გამოქვეყნებულია"
-msgstr "გამოქვეყნებულია"
+msgstr ""
 
 #: core/templates/core/job_detail.html:106
 msgid "ანაზღაურება შეთანხმებით"
-msgstr "ანაზღაურება შეთანხმებით"
+msgstr ""
 
 #: core/templates/core/job_detail.html:112
 msgid "აღწერა"
-msgstr "აღწერა"
+msgstr ""
 
 #: core/templates/core/job_detail.html:122
 #: core/templates/core/job_detail.html:289
 #: core/templates/core/job_detail.html:317
 #: core/templates/core/job_detail.html:345
 msgid "განაცხადის გაგზავნა"
-msgstr "განაცხადის გაგზავნა"
-
-#: core/templates/core/job_detail.html:131
-#, fuzzy
-#| msgid "გამოქვეყნებულია"
-msgid "შენახულია"
-msgstr "გამოქვეყნებულია"
-
-#: core/templates/core/job_detail.html:138
-#: core/templates/core/job_detail.html:144
-msgid "შენახვა"
 msgstr ""
 
 #: core/templates/core/job_detail.html:159
 msgid "კომპანიის შესახებ"
-msgstr "კომპანიის შესახებ"
+msgstr ""
 
 #: core/templates/core/job_detail.html:171
 msgid "IT სფერო"
@@ -889,43 +773,39 @@ msgstr ""
 
 #: core/templates/core/job_detail.html:176
 msgid "კომპანიის აღწერა არ არის მითითებული."
-msgstr "კომპანიის აღწერა არ არის მითითებული."
+msgstr ""
 
 #: core/templates/core/job_detail.html:199
 msgid "კომპანიის პროფილი"
-msgstr "კომპანიის პროფილი"
+msgstr ""
 
 #: core/templates/core/job_detail.html:207
 msgid "მსგავსი ვაკანსიები"
-msgstr "მსგავსი ვაკანსიები"
+msgstr ""
 
 #: core/templates/core/job_detail.html:226
 msgid "შეთანხმებით"
-msgstr "შეთანხმებით"
+msgstr ""
 
 #: core/templates/core/job_detail.html:251
 msgid "მსგავსი ვაკანსიები არ მოიძებნა."
-msgstr "მსგავსი ვაკანსიები არ მოიძებნა."
+msgstr ""
 
 #: core/templates/core/job_detail.html:256 core/templates/core/job_list.html:32
 msgid "ყველა ვაკანსია"
-msgstr "ყველა ვაკანსია"
+msgstr ""
 
 #: core/templates/core/job_detail.html:269
 msgid "განაცხადი"
-msgstr "განაცხადი"
+msgstr ""
 
 #: core/templates/core/job_detail.html:278
-#, fuzzy
-#| msgid "ათასობით პროფესიონალი ეძებს ახალ შესაძლებლობებს ყოველდღე."
 msgid "თქვენი პროფილის CV გამოყენებით მოხდება განაცხადის გაგზავნა."
-msgstr "ათასობით პროფესიონალი ეძებს ახალ შესაძლებლობებს ყოველდღე."
+msgstr ""
 
 #: core/templates/core/job_detail.html:279
-#, fuzzy
-#| msgid "საუკეთესო სამსახურის მოძიებაში ჯობსის ვაკანსიები დაგეხმარება"
 msgid "თქვენი პროფილში ატვირთული CV ავტომატურად გადაეგზავნება დამსაქმებელს."
-msgstr "საუკეთესო სამსახურის მოძიებაში ჯობსის ვაკანსიები დაგეხმარება"
+msgstr ""
 
 #: core/templates/core/job_detail.html:284
 #: core/templates/core/job_detail.html:307
@@ -938,53 +818,53 @@ msgstr ""
 #: core/templates/core/job_detail.html:344
 #: core/templates/core/post_job.html:161
 msgid "გაუქმება"
-msgstr "გაუქმება"
+msgstr ""
 
-#: core/templates/core/job_detail.html:297 core/templates/core/register.html:25
+#: core/templates/core/job_detail.html:297
 msgid "Name"
 msgstr ""
 
-#: core/templates/core/job_detail.html:301 core/templates/core/register.html:34
+#: core/templates/core/job_detail.html:301 core/templates/core/register.html:60
 msgid "Email"
-msgstr ""
+msgstr "ელ-ფოსტა"
 
 #: core/templates/core/job_detail.html:310
 #: core/templates/core/job_detail.html:338
 msgid "CV / რეზიუმე"
-msgstr "CV / რეზიუმე"
+msgstr ""
 
 #: core/templates/core/job_detail.html:312
 #: core/templates/core/job_detail.html:340
 msgid "დასაშვები ფორმატი: PDF, DOC, DOCX"
-msgstr "დასაშვები ფორმატი: PDF, DOC, DOCX"
+msgstr ""
 
 #: core/templates/core/job_detail.html:325
 msgid "სახელი"
-msgstr "სახელი"
+msgstr ""
 
 #: core/templates/core/job_detail.html:329 core/templates/core/login.html:25
 msgid "ელ-ფოსტა"
-msgstr "ელ-ფოსტა"
+msgstr ""
 
 #: core/templates/core/job_list.html:5
 msgid "Jobsy - ვაკანსიები"
-msgstr "Jobsy - ვაკანსიები"
+msgstr ""
 
 #: core/templates/core/job_list.html:30
 msgid "ჩვენი ვაკანსიები დაგეხმარება!"
-msgstr "ჩვენი ვაკანსიები დაგეხმარება!"
+msgstr ""
 
 #: core/templates/core/job_list.html:31
 msgid "საუკეთესო სამსახურის მოძიებაში ჯობსის ვაკანსიები დაგეხმარება"
-msgstr "საუკეთესო სამსახურის მოძიებაში ჯობსის ვაკანსიები დაგეხმარება"
+msgstr ""
 
 #: core/templates/core/job_list.html:53
 msgid "მოძებნა / კომპანია"
-msgstr "მოძებნა / კომპანია"
+msgstr ""
 
 #: core/templates/core/job_list.html:78
 msgid "საშუალო"
-msgstr "საშუალო"
+msgstr ""
 
 #: core/templates/core/job_list.html:85
 msgid "Premium Level"
@@ -992,61 +872,57 @@ msgstr ""
 
 #: core/templates/core/job_list.html:94
 msgid "მინიმალური ანაზღაურება"
-msgstr "მინიმალური ანაზღაურება"
+msgstr ""
 
 #: core/templates/core/job_list.html:118
 msgid "სტაჟირება"
-msgstr "სტაჟირება"
+msgstr ""
 
 #: core/templates/core/job_list.html:125
 msgid "გასუფთავება"
-msgstr "გასუფთავება"
+msgstr ""
 
 #: core/templates/core/job_list.html:135 core/templates/core/job_list.html:137
 msgid "შედეგი"
-msgstr "შედეგი"
+msgstr ""
 
 #: core/templates/core/job_list.html:142
 msgid "ფილტრები"
-msgstr "ფილტრები"
+msgstr ""
 
 #: core/templates/core/job_list.html:372
 msgid "გჭირდებათ თანამშრომელი?"
-msgstr "გჭირდებათ თანამშრომელი?"
+msgstr ""
 
 #: core/templates/core/job_list.html:374
 msgid ""
 "გამოაქვეყნეთ ვაკანსია ჯობსიზე და იპოვეთ საუკეთესო კანდიდატები თქვენი "
 "კომპანიისთვის."
 msgstr ""
-"გამოაქვეყნეთ ვაკანსია ჯობსიზე და იპოვეთ საუკეთესო კანდიდატები თქვენი "
-"კომპანიისთვის."
 
 #: core/templates/core/job_list.html:375
 msgid "ათასობით პროფესიონალი ეძებს ახალ შესაძლებლობებს ყოველდღე."
-msgstr "ათასობით პროფესიონალი ეძებს ახალ შესაძლებლობებს ყოველდღე."
+msgstr ""
 
 #: core/templates/core/job_list.html:377
 msgid "განათავსეთ ვაკანსია"
-msgstr "განათავსეთ ვაკანსია"
+msgstr ""
 
 #: core/templates/core/job_list.html:389
 msgid "Stay in Touch"
-msgstr "Stay in Touch"
+msgstr ""
 
 #: core/templates/core/job_list.html:400
-#, fuzzy
-#| msgid "დამატება CV"
 msgid "დაამატეთ CV"
-msgstr "დამატება CV"
+msgstr ""
 
 #: core/templates/core/job_list.html:401
 msgid "გამოაქვეყნეთ"
-msgstr "გამოაქვეყნეთ"
+msgstr ""
 
 #: core/templates/core/login.html:28
 msgid "გთხოვთ შეიყვანოთ თქვენი ელ-ფოსტა."
-msgstr "გთხოვთ შეიყვანოთ თქვენი ელ-ფოსტა."
+msgstr ""
 
 #: core/templates/core/login.html:32
 msgid "პაროლი"
@@ -1054,180 +930,151 @@ msgstr "პაროლი"
 
 #: core/templates/core/login.html:35
 msgid "გთხოვთ შეიყვანოთ თქვენი პაროლი."
-msgstr "გთხოვთ შეიყვანოთ თქვენი პაროლი."
+msgstr ""
 
 #: core/templates/core/login.html:46
 msgid "ან"
-msgstr "ან"
+msgstr ""
 
 #: core/templates/core/login.html:51
 msgid "Google-ით შესვლა"
-msgstr "Google-ით შესვლა"
+msgstr ""
 
 #: core/templates/core/login.html:56
 msgid "არ გაქვთ ანგარიში?"
-msgstr "არ გაქვთ ანგარიში?"
+msgstr "უკვე გაქვთ ანგარიში?"
 
 #: core/templates/core/post_job.html:12 core/templates/core/post_job.html:160
-#, fuzzy
-#| msgid "განაცხადის გაგზავნა"
 msgid "ვაკანსიის გამოქვეყნება"
-msgstr "განაცხადის გაგზავნა"
+msgstr ""
 
 #: core/templates/core/post_job.html:102
-#, fuzzy
-#| msgid "გამოცდილება"
 msgid "გამოცდილების სტატუსი"
-msgstr "გამოცდილება"
+msgstr ""
 
 #: core/templates/core/post_job.html:124
-#, fuzzy
-#| msgid "გთხოვთ შეიყვანოთ თქვენი პაროლი."
 msgid "განიხილავთ სტუდენტის აყვანას?"
-msgstr "გთხოვთ შეიყვანოთ თქვენი პაროლი."
+msgstr ""
 
 #: core/templates/core/post_job.html:144
 msgid "პრემიუმ ტიპი"
 msgstr ""
 
 #: core/templates/core/post_job.html:147
-#, fuzzy
-#| msgid "კომპანიის აღწერა არ არის მითითებული."
 msgid "სტანდარტული: გამოჩნდება მხოლოდ ფილტრირებულ ძებნებში"
-msgstr "კომპანიის აღწერა არ არის მითითებული."
+msgstr ""
 
 #: core/templates/core/post_job.html:148
-#, fuzzy
-#| msgid ""
-#| "გამოაქვეყნეთ ვაკანსია ჯობსიზე და იპოვეთ საუკეთესო კანდიდატები თქვენი "
-#| "კომპანიისთვის."
 msgid "პრემიუმ: გამოჩნდება მთავარ გვერდზე სტანდარტული სტილით"
 msgstr ""
-"გამოაქვეყნეთ ვაკანსია ჯობსიზე და იპოვეთ საუკეთესო კანდიდატები თქვენი "
-"კომპანიისთვის."
 
 #: core/templates/core/post_job.html:149
 msgid "პრემიუმ+: გამოჩნდება მთავარ გვერდზე გამომწვევი სტილით"
 msgstr ""
 
-# Profile section translations
 #: core/templates/core/profile.html:4
 msgid "Linked AI - Your Profile"
-msgstr "Linked AI - თქვენი პროფილი"
+msgstr ""
 
 #: core/templates/core/profile.html:8
 msgid "Your Profile"
-msgstr "თქვენი პროფილი"
+msgstr ""
 
 #: core/templates/core/profile.html:12
 msgid "Employer Dashboard"
-msgstr "დამსაქმებლის დაფა"
+msgstr ""
 
 #: core/templates/core/profile.html:16
 msgid "View Jobs"
-msgstr "ვაკანსიების ნახვა"
+msgstr ""
 
 #: core/templates/core/profile.html:29
 msgid "Profile Picture"
-msgstr "პროფილის ფოტო"
+msgstr ""
 
 #: core/templates/core/profile.html:38 core/templates/core/profile.html:528
 msgid "Change Photo"
-msgstr "ფოტოს შეცვლა"
+msgstr ""
 
-#: core/templates/core/profile.html:57
-msgid "Job Seeker"
-msgstr "სამუშაოს მაძიებელი"
-
-#: core/templates/core/profile.html:64
+#: core/templates/core/profile.html:64 core/templates/core/register.html:81
 msgid "Company Information"
 msgstr "კომპანიის ინფორმაცია"
 
-#: core/templates/core/profile.html:67
-msgid "Company Name"
-msgstr "კომპანიის სახელი"
-
 #: core/templates/core/profile.html:76
 msgid "Company Website"
-msgstr "კომპანიის ვებგვერდი"
+msgstr ""
 
 #: core/templates/core/profile.html:86
 msgid "Company Description"
-msgstr "კომპანიის აღწერა"
+msgstr ""
 
 #: core/templates/core/profile.html:96
 msgid "Company Logo"
-msgstr "კომპანიის ლოგო"
+msgstr ""
 
 #: core/templates/core/profile.html:105
 msgid "Company Size"
-msgstr "კომპანიის ზომა"
+msgstr ""
 
 #: core/templates/core/profile.html:114
 msgid "Industry"
-msgstr "ინდუსტრია"
+msgstr ""
 
 #: core/templates/core/profile.html:124
 msgid "Location"
-msgstr "მდებარეობა"
+msgstr ""
 
 #: core/templates/core/profile.html:135
 msgid "Save Profile"
-msgstr "პროფილის შენახვა"
+msgstr ""
 
 #: core/templates/core/profile.html:143
 msgid "Your CV"
-msgstr "თქვენი CV"
+msgstr ""
 
 #: core/templates/core/profile.html:147
 msgid "View Current CV"
-msgstr "CV-ის ნახვა"
+msgstr ""
 
 #: core/templates/core/profile.html:149
 msgid "Remove CV"
-msgstr "CV-ის წაშლა"
+msgstr ""
 
 #: core/templates/core/profile.html:160
 msgid "Upload CV"
-msgstr "CV-ის ატვირთვა"
+msgstr ""
 
 #: core/templates/core/profile.html:170
 msgid "Save"
-msgstr "შენახვა"
+msgstr ""
 
 #: core/templates/core/profile.html:173
 msgid "Cancel"
-msgstr "გაუქმება"
+msgstr ""
 
 #: core/templates/core/profile.html:180
 msgid "Add/Upload CV"
-msgstr "CV-ის დამატება/ატვირთვა"
+msgstr ""
 
 #: core/templates/core/profile.html:187
 msgid "Your Job Activity"
 msgstr ""
 
 #: core/templates/core/profile.html:192
-#, fuzzy
-#| msgid "Location"
 msgid "Applications"
-msgstr "მდებარეობა"
+msgstr ""
 
 #: core/templates/core/profile.html:197
 msgid "შენახული"
 msgstr ""
 
 #: core/templates/core/profile.html:211
-#, fuzzy
-#| msgid "Location"
 msgid "Position"
-msgstr "მდებარეობა"
+msgstr ""
 
 #: core/templates/core/profile.html:212
-#, fuzzy
-#| msgid "Company Name"
 msgid "Company"
-msgstr "კომპანიის სახელი"
+msgstr ""
 
 #: core/templates/core/profile.html:213
 msgid "Applied On"
@@ -1238,20 +1085,16 @@ msgid "Status"
 msgstr ""
 
 #: core/templates/core/profile.html:215
-#, fuzzy
-#| msgid "Location"
 msgid "Action"
-msgstr "მდებარეობა"
+msgstr ""
 
 #: core/templates/core/profile.html:240
 msgid "Accepted"
 msgstr ""
 
 #: core/templates/core/profile.html:249
-#, fuzzy
-#| msgid "View Jobs"
 msgid "View Job"
-msgstr "ვაკანსიების ნახვა"
+msgstr ""
 
 #: core/templates/core/profile.html:264
 msgid ""
@@ -1267,10 +1110,8 @@ msgid ""
 msgstr ""
 
 #: core/templates/core/profile.html:272
-#, fuzzy
-#| msgid "მსგავსი ვაკანსიები არ მოიძებნა."
 msgid "ნიშნავს რომ თქვენი კანდიდატურა ჯერ არ განუხილავთ"
-msgstr "მსგავსი ვაკანსიები არ მოიძებნა."
+msgstr ""
 
 #: core/templates/core/profile.html:280
 msgid "No Applications Yet"
@@ -1293,26 +1134,20 @@ msgid "წაშლა"
 msgstr ""
 
 #: core/templates/core/profile.html:336
-#, fuzzy
-#| msgid "მსგავსი ვაკანსიები არ მოიძებნა."
 msgid "შენახული ვაკანსიები არ გაქვთ"
-msgstr "მსგავსი ვაკანსიები არ მოიძებნა."
+msgstr ""
 
 #: core/templates/core/profile.html:337
-#, fuzzy
-#| msgid "მსგავსი ვაკანსიები არ მოიძებნა."
 msgid "თქვენს მიერ შენახული ვაკანსიები აქ გამოჩნდება"
-msgstr "მსგავსი ვაკანსიები არ მოიძებნა."
+msgstr ""
 
 #: core/templates/core/profile.html:339
-#, fuzzy
-#| msgid "განაცხადის გაგზავნა"
 msgid "ვაკანსიების გადახედვა"
-msgstr "განაცხადის გაგზავნა"
+msgstr ""
 
 #: core/templates/core/profile.html:594
 msgid "Are you sure you want to remove your CV?"
-msgstr "ნამდვილად გსურთ სივის წაშლა?"
+msgstr ""
 
 #: core/templates/core/profile.html:607 core/templates/core/profile.html:611
 msgid "An error occurred while removing the CV."
@@ -1326,41 +1161,38 @@ msgstr ""
 msgid "Create Account"
 msgstr ""
 
-#: core/templates/core/register.html:43
+#: core/templates/core/register.html:26
+msgid "Choose registration type:"
+msgstr "გსურთ დარეგისტრირდეთ, როგორც:"
+
+#: core/templates/core/register.html:50
+msgid "Full Name"
+msgstr "სახელი და გვარი"
+
+#: core/templates/core/register.html:70
 msgid "Password"
-msgstr ""
+msgstr "პაროლი"
 
-#: core/templates/core/register.html:53
+#: core/templates/core/register.html:94
+msgid "optional"
+msgstr "optional"
+
+#: core/templates/core/register.html:116
 msgid "Register"
-msgstr ""
+msgstr "რეგისტრაცია"
 
-#: core/templates/core/register.html:59
+#: core/templates/core/register.html:122
 msgid "or"
 msgstr ""
 
-#: core/templates/core/register.html:64
+#: core/templates/core/register.html:127
 msgid "Continue with Google"
 msgstr ""
 
-#: core/templates/core/register.html:69
+#: core/templates/core/register.html:130
 msgid "Already have an account?"
-msgstr ""
+msgstr "უკვე გაქვთ ანგარიში?"
 
-#: core/templates/core/register.html:69
+#: core/templates/core/register.html:130
 msgid "Login"
-msgstr ""
-
-#~ msgid "გასვლა"
-#~ msgstr "გასვლა"
-
-#~ msgid "შესვლა განაცხადის გასაგზავნად"
-#~ msgstr "შესვლა განაცხადის გასაგზავნად"
-
-#~ msgid "გაიმეორეთ პაროლი"
-#~ msgstr "გაიმეორეთ პაროლი"
-
-#~ msgid "გვარი"
-#~ msgstr "გვარი"
-
-#~ msgid "უკვე გაქვთ ანგარიში?"
-#~ msgstr "უკვე გაქვთ ანგარიში?"
+msgstr "შესვლა"

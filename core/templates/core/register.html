@@ -21,8 +21,33 @@
 
                 <form method="post" class="needs-validation" novalidate>
                     {% csrf_token %}
+        
+                    <div class="mb-4">
+                        <p>{% trans "Choose registration type:" %}</p>
+                        <div class="d-flex gap-4 mt-2 mb-2">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="user_type" id="user_type_candidate" value="candidate" {% if form.user_type.value == 'candidate' or not form.user_type.value %}checked{% endif %}>
+                                <label class="form-check-label" for="user_type_candidate">
+                                    {% trans "Job Seeker" %}
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="user_type" id="user_type_employer" value="employer" {% if form.user_type.value == 'employer' %}checked{% endif %}>
+                                <label class="form-check-label" for="user_type_employer">
+                                    {% trans "Employer" %}
+                                </label>
+                            </div>
+                        </div>
+                        {% if form.user_type.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.user_type.errors|join:", " }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Common fields for both user types -->
                     <div class="mb-3">
-                        <label for="id_first_name" class="form-label">{% trans "Name" %}</label>
+                        <label for="id_first_name" class="form-label">{% trans "Full Name" %}</label>
                         <input type="text" name="first_name" id="id_first_name" class="form-control" required value="{{ form.first_name.value|default:'' }}">
                         {% if form.first_name.errors %}
                             <div class="invalid-feedback d-block">
@@ -30,6 +55,7 @@
                             </div>
                         {% endif %}
                     </div>
+                    
                     <div class="mb-3">
                         <label for="id_email" class="form-label">{% trans "Email" %}</label>
                         <input type="email" name="email" id="id_email" class="form-control" required value="{{ form.email.value|default:'' }}">
@@ -39,7 +65,8 @@
                             </div>
                         {% endif %}
                     </div>
-                    <div class="mb-3">
+                    
+                    <div class="mb-4">
                         <label for="id_password1" class="form-label">{% trans "Password" %}</label>
                         <input type="password" name="password1" id="id_password1" class="form-control" required>
                         {% if form.password1.errors %}
@@ -48,6 +75,42 @@
                             </div>
                         {% endif %}
                     </div>
+                    
+                    <!-- Employer-specific fields -->
+                    <div id="employer_fields" style="display: none;">
+                        <h4 class="fs-5 fw-bold mb-3">{% trans "Company Information" %}</h4>
+                        
+                        <div class="mb-3">
+                            <label for="id_company_name" class="form-label">{% trans "Company Name" %}</label>
+                            <input type="text" name="company_name" id="id_company_name" class="form-control" value="{{ employer_form.company_name.value|default:'' }}">
+                            {% if employer_form.company_name.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ employer_form.company_name.errors|join:", " }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_company_id" class="form-label">{% trans "Identification Code" %} <span class="text-muted">({% trans "optional" %})</span></label>
+                            <input type="text" name="company_id" id="id_company_id" class="form-control" value="{{ employer_form.company_id.value|default:'' }}">
+                            {% if employer_form.company_id.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ employer_form.company_id.errors|join:", " }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="id_phone_number" class="form-label">{% trans "Mobile Number" %}</label>
+                            <input type="text" name="phone_number" id="id_phone_number" class="form-control" value="{{ employer_form.phone_number.value|default:'' }}">
+                            {% if employer_form.phone_number.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ employer_form.phone_number.errors|join:", " }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
                     <div class="d-grid mb-3">
                         <button type="submit" class="btn btn-linkedin">
                             <i class="fas fa-user-plus me-1"></i>{% trans "Register" %}
@@ -74,7 +137,6 @@
 </div>
 
 <style>
-
 .btn-linkedin {
     background-color: #0073b1;
     border-color: #0073b1;
@@ -88,17 +150,78 @@
 
 {% block extra_js %}
 <script>
+    // Toggle employer fields visibility based on selected user type
+    document.addEventListener('DOMContentLoaded', function() {
+        const userTypeRadios = document.querySelectorAll('input[name="user_type"]');
+        const employerFields = document.getElementById('employer_fields');
+        
+        // Function to toggle employer fields
+        function toggleEmployerFields() {
+            const selectedValue = document.querySelector('input[name="user_type"]:checked').value;
+            console.log('Selected user type: ' + selectedValue);
+            
+            if (selectedValue === 'employer') {
+                employerFields.style.display = 'block';
+                document.querySelectorAll('#employer_fields input').forEach(input => {
+                    if (!input.name.includes('company_id')) {
+                        input.setAttribute('required', 'required');
+                    }
+                });
+            } else {
+                employerFields.style.display = 'none';
+                document.querySelectorAll('#employer_fields input').forEach(input => {
+                    input.removeAttribute('required');
+                });
+            }
+        }
+        
+        // Add event listeners to radio buttons
+        userTypeRadios.forEach(radio => {
+            radio.addEventListener('change', toggleEmployerFields);
+            
+            // For debugging: log when radio is clicked
+            radio.addEventListener('click', function() {
+                console.log('Radio clicked: ' + this.value);
+            });
+        });
+        
+        // Initialize state on page load
+        toggleEmployerFields();
+    });
+
     // Form validation
     (function () {
         'use strict'
         var forms = document.querySelectorAll('.needs-validation')
         Array.prototype.slice.call(forms).forEach(function (form) {
             form.addEventListener('submit', function (event) {
+                // Check if employer is selected but required fields are empty
+                const isEmployer = document.getElementById('user_type_employer').checked;
+                if (isEmployer) {
+                    const companyName = document.getElementById('id_company_name').value;
+                    const phoneNumber = document.getElementById('id_phone_number').value;
+                    
+                    if (!companyName || !phoneNumber) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        if (!companyName) {
+                            document.getElementById('id_company_name').classList.add('is-invalid');
+                        }
+                        if (!phoneNumber) {
+                            document.getElementById('id_phone_number').classList.add('is-invalid');
+                        }
+                    }
+                }
+                
                 if (!form.checkValidity()) {
                     event.preventDefault()
                     event.stopPropagation()
                 }
                 form.classList.add('was-validated')
+                
+                // Log form submission for debugging
+                console.log('Form submitting. User type selected: ' + 
+                    document.querySelector('input[name="user_type"]:checked').value);
             }, false)
         })
     })()
