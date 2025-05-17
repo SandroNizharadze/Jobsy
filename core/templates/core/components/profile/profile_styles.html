@@ -1,0 +1,279 @@
+<style>
+.profile-picture-container {
+    position: relative;
+    width: 152px;
+    height: 152px;
+    margin-right: 24px;
+}
+
+.profile-picture-wrapper {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    position: relative;
+    background-color: var(--linkedin-light-gray);
+}
+
+.profile-picture {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-picture-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: var(--linkedin-gray);
+}
+
+.profile-picture-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0,0,0,0.6);
+    padding: 8px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.profile-picture-container:hover .profile-picture-overlay {
+    opacity: 1;
+}
+
+.profile-picture-edit {
+    color: white;
+    text-align: center;
+    display: block;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.profile-picture-edit i {
+    display: block;
+    font-size: 1.2rem;
+    margin-bottom: 4px;
+}
+
+#id_profile_picture {
+    display: none;
+}
+
+.employer-section {
+    background-color: var(--linkedin-light-blue);
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 24px;
+}
+
+.cv-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    padding: 32px 24px;
+    max-width: 420px;
+    margin: 32px auto;
+    text-align: center;
+}
+.cv-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 24px;
+}
+.cv-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+.btn-cv-view {
+    background: #f5faff;
+    color: #0073b1;
+    border: 1px solid #0073b1;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+}
+.btn-cv-view:hover {
+    background: #0073b1;
+    color: #fff;
+}
+.btn-cv-remove {
+    background: none;
+    border: none;
+    color: #dc3545;
+    font-size: 1.7rem;
+    cursor: pointer;
+    transition: color 0.2s;
+    margin-left: 8px;
+}
+.btn-cv-remove:hover {
+    color: #a71d2a;
+    transform: scale(1.15);
+}
+.btn-cv-upload {
+    background: #0073b1;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 28px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    transition: background 0.2s;
+}
+.btn-cv-upload:hover {
+    background: #005983;
+}
+.cv-upload-form {
+    margin-top: 24px;
+    text-align: left;
+    background: #f8fafd;
+    border-radius: 12px;
+    padding: 24px 18px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.03);
+    animation: fadeIn 0.3s;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(16px);}
+    to { opacity: 1; transform: none;}
+}
+
+/* Status Card Styles */
+.status-card {
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    height: 100%;
+}
+
+.status-interview {
+    border-left: 5px solid #28a745;
+}
+
+.status-reserve {
+    border-left: 5px solid #ffc107;
+}
+
+.status-review {
+    border-left: 5px solid #6c757d;
+}
+
+/* Status Pills */
+.status-pills {
+    margin-bottom: 1.5rem;
+}
+
+.status-pills .nav-link {
+    border-radius: 50px;
+    margin-right: 10px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+}
+
+.status-pills .nav-link.active {
+    background-color: #0073b1;
+}
+
+/* Main Profile Navigation Pills */
+.profile-nav-pills {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 1rem;
+}
+
+.profile-nav-pills .nav-link {
+    font-size: 1.1rem;
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+}
+
+.profile-nav-pills .nav-link.active {
+    background-color: #0073b1;
+}
+
+/* Status Badge Styles */
+.status-interview-badge {
+    background-color: #28a745;
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 50px;
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.status-reserve-badge {
+    background-color: #ffc107;
+    color: #212529;
+    padding: 0.4rem 0.8rem;
+    border-radius: 50px;
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.status-review-badge {
+    background-color: #6c757d;
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 50px;
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+/* Filter Section Styles */
+.filter-section {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Job Title & Company Styles */
+.job-title-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.company-info {
+    display: flex;
+    align-items: center;
+}
+
+/* Table Styles */
+.table td, .table th {
+    padding: 0.75rem 1rem;
+    vertical-align: middle;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 115, 177, 0.03);
+}
+
+.fw-medium {
+    font-weight: 500;
+}
+
+/* Button Group Styles */
+.btn-group .btn {
+    padding: 0.375rem 0.75rem;
+}
+
+.btn-sm {
+    border-radius: 6px;
+}
+
+.btn-linkedin {
+    background-color: #0073b1;
+    border-color: #0073b1;
+    color: white;
+    font-weight: 600;
+    padding: 12px;
+    border-radius: 8px;
+}
+</style> 

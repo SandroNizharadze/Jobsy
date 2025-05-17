@@ -9,7 +9,7 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
-                <h2 class="mb-0">{% trans "აპლიკაციები:" %} {{ job.title }}</h2>
+                <h2 class="mb-0">{% trans "შემოსული სიცვები:" %} {{ job.title }}</h2>
                 <a href="{% url 'employer_dashboard' %}" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left me-2"></i>{% trans "უკან დაბრუნება" %}
                 </a>
@@ -18,72 +18,82 @@
     </div>
     
     <!-- Status Explanation Box -->
-    <div class="card mb-4 bg-light">
-        <div class="card-body">
-            <h5 class="card-title mb-3">{% trans "სტატუსების ახსნა:" %}</h5>
-            <div class="row small">
-                <div class="col-md-4 mb-2">
-                    <div class="d-flex align-items-center">
-                        <span class="badge bg-success me-2">{% trans "გასაუბრება" %}</span>
-                        <span>{% trans "ნიშნავს რომ განიხილეთ კანდიდატურა, თვლით რომ შეესაბამება პოზიციას და დაუკავშირდებით გასაუბრებაზე დასაბარებლად" %}</span>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-2">
-                    <div class="d-flex align-items-center">
-                        <span class="badge bg-warning text-dark me-2">{% trans "რეზერვი" %}</span>
-                        <span>{% trans "ნიშნავს, რომ განიხილეთ კანდიდატურა, თვლით რომ არ შეესაბამება პოზიციას და ამ ეტაპზე ვერ აიყვანთ, თუმცა მისი სივი შეინახება ბაზაში მომავალში დაინტერესების შემთვევაში დასაკონტაქტებლად" %}</span>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-2">
-                    <div class="d-flex align-items-center">
-                        <span class="badge bg-secondary me-2">{% trans "განხილვის პროცესში" %}</span>
-                        <span>{% trans "ნიშნავს რომ კანდიდატურა ჯერ არ განგიხილავთ" %}</span>
-                    </div>
+    <div class="alert alert-info mb-4">
+        <p class="mb-0"><i class="fas fa-info-circle me-2"></i>{% trans "არ გამოგრჩეთ კანდიდატების სტატუსების მინიჭება, ეს გეხმარებათ მარტივად გამოარჩიოთ და დაახარისხოთ მეტად სასურველი კანდიდატები" %}</p>
+    </div>
+    
+    <!-- Status Tabs -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <ul class="nav nav-pills status-pills">
+                <li class="nav-item">
+                    <a class="nav-link {% if not request.GET.status %}active{% endif %}" href="{% url 'job_applications' job.id %}">
+                        {% trans "ყველა" %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.GET.status == 'გასაუბრება' %}active{% endif %}" href="{% url 'job_applications' job.id %}?status=გასაუბრება">
+                        {% trans "გასაუბრება" %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.GET.status == 'რეზერვი' %}active{% endif %}" href="{% url 'job_applications' job.id %}?status=რეზერვი">
+                        {% trans "რეზერვი" %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.GET.status == 'განხილვის_პროცესში' %}active{% endif %}" href="{% url 'job_applications' job.id %}?status=განხილვის_პროცესში">
+                        {% trans "განხილვის პროცესში" %}
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Status Explanations -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card status-card status-interview">
+                <div class="card-body">
+                    <h5 class="card-title">{% trans "გასაუბრება" %}</h5>
+                    <p class="card-text">{% trans "ნიშნავს რომ განიხილეთ კანდიდატურა, თვლით რომ შეესაბამება პოზიციას და დაუკავშირდებით გასაუბრებაზე დასაბარებლად" %}</p>
                 </div>
             </div>
-            
-            <div class="alert alert-info mt-3 mb-0">
-                <i class="fas fa-info-circle me-2"></i>
-                {% trans "არ გამოგრჩეთ კანდიდატების სტატუსების მინიჭება, ეს გეხმარებათ მარტივად გამოარჩიოთ და დაახარისხოთ მეტად სასურველი კანდიდატები<3" %}
+        </div>
+        <div class="col-md-4">
+            <div class="card status-card status-reserve">
+                <div class="card-body">
+                    <h5 class="card-title">{% trans "რეზერვი" %}</h5>
+                    <p class="card-text">{% trans "ნიშნავს, რომ განიხილეთ კანდიდატურა, თვლით რომ არ შეესაბამება პოზიციას და ამ ეტაპზე ვერ აიყვანთ, თუმცა მისი სივი შეინახება ბაზაში მომავალში დაინტერესების შემთვევაში დასაკონტაქტებლად" %}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card status-card status-review">
+                <div class="card-body">
+                    <h5 class="card-title">{% trans "განხილვის პროცესში" %}</h5>
+                    <p class="card-text">{% trans "ნიშნავს რომ კანდიდატურა ჯერ არ განგიხილავთ" %}</p>
+                </div>
             </div>
         </div>
     </div>
     
-    <!-- Filters -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="mb-3">{% trans "გაფილტვრა" %}</h5>
-            <form method="get" id="filter-form" class="row">
-                <div class="col-md-4">
-                    <select name="status" class="form-select" onchange="this.form.submit()">
-                        <option value="">{% trans "ყველა სტატუსი" %}</option>
-                        <option value="განხილვის_პროცესში" {% if request.GET.status == 'განხილვის_პროცესში' %}selected{% endif %}>
-                            {% trans "განხილვის პროცესში" %}
-                        </option>
-                        <option value="გასაუბრება" {% if request.GET.status == 'გასაუბრება' %}selected{% endif %}>
-                            {% trans "გასაუბრება" %}
-                        </option>
-                        <option value="რეზერვი" {% if request.GET.status == 'რეზერვი' %}selected{% endif %}>
-                            {% trans "რეზერვი" %}
-                        </option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <input type="text" name="search" class="form-control" placeholder="{% trans 'მოძებნა სახელით...' %}" value="{{ request.GET.search|default:'' }}">
-                        <button class="btn btn-outline-secondary" type="submit">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="col-md-4 d-flex justify-content-end">
-                    {% if request.GET.status or request.GET.search %}
-                    <a href="{% url 'job_applications' job.id %}" class="btn btn-outline-secondary">
-                        <i class="fas fa-times me-1"></i>{% trans "ფილტრების გასუფთავება" %}
-                    </a>
-                    {% endif %}
-                </div>
-            </form>
+    <!-- Search Filter -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="input-group">
+                <input type="text" name="search" class="form-control" placeholder="{% trans 'მოძებნა სახელით...' %}" value="{{ request.GET.search|default:'' }}">
+                <button class="btn btn-outline-secondary" type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+        <div class="col-md-6 text-end">
+            {% if request.GET.search %}
+            <a href="{% url 'job_applications' job.id %}{% if request.GET.status %}?status={{ request.GET.status }}{% endif %}" class="btn btn-outline-secondary">
+                <i class="fas fa-times me-1"></i>{% trans "ძიების გასუფთავება" %}
+            </a>
+            {% endif %}
         </div>
     </div>
     
@@ -140,6 +150,9 @@
                                 <a href="{{ application.resume.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
                                     <i class="fas fa-file-pdf me-1"></i>{% trans "ნახვა" %}
                                 </a>
+                                <a href="{{ application.resume.url }}" class="btn btn-sm btn-outline-primary" download>
+                                    <i class="fas fa-download"></i>
+                                </a>
                             </td>
                             <td>
                                 <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#coverLetterModal{{ application.id }}">
@@ -167,7 +180,7 @@
                             <td>
                                 <form id="statusForm{{ application.id }}" method="post" action="{% url 'update_application_status' application.id %}">
                                     {% csrf_token %}
-                                    <select name="status" class="form-select form-select-sm update-status {% if application.status == 'გასაუბრება' %}bg-success text-white{% elif application.status == 'რეზერვი' %}bg-warning{% elif application.status == 'განხილვის_პროცესში' %}bg-secondary text-white{% endif %}" data-form-id="statusForm{{ application.id }}">
+                                    <select name="status" class="form-select form-select-sm status-select {% if application.status == 'გასაუბრება' %}status-interview-select{% elif application.status == 'რეზერვი' %}status-reserve-select{% elif application.status == 'განხილვის_პროცესში' %}status-review-select{% endif %}" data-form-id="statusForm{{ application.id }}">
                                         <option value="განხილვის_პროცესში" {% if application.status == 'განხილვის_პროცესში' %}selected{% endif %}>
                                             {% trans "განხილვის პროცესში" %}
                                         </option>
@@ -182,9 +195,6 @@
                             </td>
                             <td class="text-center">
                                 <div class="btn-group">
-                                    <a href="{{ application.resume.url }}" class="btn btn-sm btn-outline-primary" download>
-                                        <i class="fas fa-download"></i>
-                                    </a>
                                     {% if application.user and application.user.email %}
                                     <a href="mailto:{{ application.user.email }}" class="btn btn-sm btn-outline-info">
                                         <i class="fas fa-envelope"></i>
@@ -214,35 +224,122 @@
         </div>
     </div>
 </div>
+
+<style>
+    /* Status Card Styles */
+    .status-card {
+        margin-bottom: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        height: 100%;
+    }
+    
+    .status-interview {
+        border-left: 5px solid #28a745;
+    }
+    
+    .status-reserve {
+        border-left: 5px solid #ffc107;
+    }
+    
+    .status-review {
+        border-left: 5px solid #6c757d;
+    }
+    
+    /* Status Select Styles */
+    .status-select {
+        border-radius: 50px;
+        font-weight: 500;
+        padding: 0.25rem 1rem;
+    }
+    
+    .status-interview-select {
+        background-color: #28a745;
+        color: white;
+        border-color: #28a745;
+    }
+    
+    .status-reserve-select {
+        background-color: #ffc107;
+        border-color: #ffc107;
+    }
+    
+    .status-review-select {
+        background-color: #6c757d;
+        color: white;
+        border-color: #6c757d;
+    }
+    
+    /* Status Pills */
+    .status-pills {
+        margin-bottom: 1.5rem;
+    }
+    
+    .status-pills .nav-link {
+        border-radius: 50px;
+        margin-right: 10px;
+        padding: 0.5rem 1.5rem;
+        font-weight: 500;
+    }
+    
+    .status-pills .nav-link.active {
+        background-color: #0073b1;
+    }
+</style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Auto-submit status form on change
-    const statusSelects = document.querySelectorAll('.update-status');
+    const statusSelects = document.querySelectorAll('.status-select');
     statusSelects.forEach(select => {
         select.addEventListener('change', function() {
             const formId = this.dataset.formId;
             
             // Update select appearance immediately based on new status
             const selectedValue = this.value;
-            this.className = 'form-select form-select-sm update-status';
+            this.className = 'form-select form-select-sm status-select';
             
             if (selectedValue === 'გასაუბრება') {
-                this.classList.add('bg-success', 'text-white');
+                this.classList.add('status-interview-select');
                 this.closest('tr').className = 'table-success';
             } else if (selectedValue === 'რეზერვი') {
-                this.classList.add('bg-warning');
+                this.classList.add('status-reserve-select');
                 this.closest('tr').className = 'table-warning';
             } else if (selectedValue === 'განხილვის_პროცესში') {
-                this.classList.add('bg-secondary', 'text-white');
+                this.classList.add('status-review-select');
                 this.closest('tr').className = '';
             }
             
             document.getElementById(formId).submit();
         });
     });
+    
+    // Handle search form submission
+    const searchInput = document.querySelector('input[name="search"]');
+    const searchButton = searchInput.nextElementSibling;
+    
+    searchButton.addEventListener('click', function() {
+        const currentUrl = new URL(window.location.href);
+        const searchValue = searchInput.value.trim();
+        
+        if (searchValue) {
+            currentUrl.searchParams.set('search', searchValue);
+        } else {
+            currentUrl.searchParams.delete('search');
+        }
+        
+        window.location.href = currentUrl.toString();
+    });
+    
+    // Also submit on Enter key
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            searchButton.click();
+        }
+    });
 });
 </script>
-{% endblock %} 
+{% endblock %}

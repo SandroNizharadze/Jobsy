@@ -1,0 +1,50 @@
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-dismiss alerts after 4 seconds
+    const alerts = document.querySelectorAll('.auto-dismiss');
+    if (alerts.length > 0) {
+        setTimeout(function() {
+            // Fade out gradually
+            alerts.forEach(function(alert) {
+                alert.style.transition = 'opacity 1s';
+                alert.style.opacity = '0';
+            });
+            
+            // Keep the height but hide content
+            setTimeout(function() {
+                alerts.forEach(function(alert) {
+                    alert.style.visibility = 'hidden';
+                });
+            }, 1000);
+        }, 4000); // 4 seconds before fade out begins
+    } else {
+        // If no alerts, remove the height of the container
+        document.getElementById('alert-container').style.minHeight = '0';
+        document.getElementById('alert-container').style.marginBottom = '0';
+    }
+
+    // Ensure Bootstrap's navbar toggler works properly
+    var navbarToggler = document.querySelector('.navbar-toggler');
+    var navbarCollapse = document.querySelector('#navbarNav');
+    
+    if (navbarToggler && navbarCollapse) {
+        navbarToggler.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            navbarCollapse.classList.toggle('show');
+        });
+        
+        // Fix for mobile nav links
+        var navLinks = navbarCollapse.querySelectorAll('.nav-link');
+        navLinks.forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                // If we're on mobile and the menu is open, close it after clicking
+                if (window.innerWidth < 992 && navbarCollapse.classList.contains('show')) {
+                    navbarCollapse.classList.remove('show');
+                }
+            });
+        });
+    }
+});
+</script> 

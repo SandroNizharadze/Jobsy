@@ -1,0 +1,16 @@
+{% load i18n %}
+
+<div id="alert-container" class="alert-fixed-height">
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert 
+            {% if message.tags == 'success' %}alert-success
+            {% elif message.tags == 'error' or message.tags == 'danger' %}alert-danger
+            {% elif message.tags == 'warning' %}alert-warning
+            {% else %}alert-info{% endif %}
+            fade show auto-dismiss" role="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+</div> 

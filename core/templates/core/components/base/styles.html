@@ -1,0 +1,235 @@
+<style>
+    :root {
+        --jobsy-blue: #0a2342;
+        --jobsy-yellow: #ffd600;
+        --jobsy-light: #f6f8fa;
+        --jobsy-card: #fffbe6;
+        --jobsy-purple: #7c4dff;
+    }
+    body {
+        font-family: 'Fira Sans', 'Segoe UI', Arial, sans-serif;
+        background: var(--jobsy-light);
+    }
+    .jobsy-navbar {
+        background: var(--jobsy-blue);
+        color: #fff;
+        padding: 0.75rem 0;
+        position: relative;
+        z-index: 10;
+    }
+    .jobsy-navbar .navbar-brand {
+        font-weight: bold;
+        font-size: 2rem;
+        color: #fff !important;
+    }
+    .jobsy-navbar .nav-link {
+        color: #fff !important;
+        font-weight: 500;
+        margin-right: 1.5rem;
+        padding: 0.5rem 0.75rem;
+        display: block;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .jobsy-navbar .nav-link.active, .jobsy-navbar .nav-link:hover {
+        color: var(--jobsy-yellow) !important;
+        text-decoration: none;
+        transform: translateY(-2px);
+    }
+    .jobsy-navbar .btn {
+        border-radius: 20px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    .navbar-toggler {
+        color: white;
+        border-color: rgba(255,255,255,0.5);
+    }
+    .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.7%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
+    .hero-section {
+        background: var(--jobsy-blue);
+        color: #fff;
+        padding: 3rem 0 2rem 0;
+        position: relative;
+        overflow: hidden;
+        margin-top: 0;
+    }
+    .hero-content {
+        max-width: 600px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 100%;
+    }
+    .hero-cta {
+        background: var(--jobsy-yellow);
+        color: #0a2342;
+        border-radius: 28px;
+        padding: 2.2rem 2.5rem;
+        font-size: 2.1rem;
+        font-weight: bold;
+        margin-bottom: 1.5rem;
+        display: inline-block;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+    .hero-btn {
+        background: var(--jobsy-blue);
+        color: #fff;
+        border: none;
+        font-weight: 600;
+        border-radius: 20px;
+        padding: 0.75rem 2.5rem;
+        font-size: 1.1rem;
+        margin-top: 1rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        transition: all 0.3s ease;
+    }
+    .hero-btn:hover {
+        background: #021024;
+        color: #ffd600;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+    }
+    .hero-img {
+        position: absolute;
+        right: 5%;
+        top: 55%;
+        transform: translateY(-50%);
+        max-width: 300px;
+        width: 28vw;
+        z-index: 1;
+    }
+    @media (max-width: 991px) {
+        .hero-img { display: none; }
+        .jobsy-navbar .nav-link {
+            padding: 0.5rem 1rem;
+            margin-right: 0;
+            border-radius: 4px;
+        }
+        .jobsy-navbar .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .navbar-nav {
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+    }
+    .main-bg {
+        background: #f3f6fd;
+        min-height: 100vh;
+        padding-top: 0;
+    }
+    .main-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem 1rem 1rem;
+    }
+    .facebook-icon {
+        color: #1877f3;
+        font-size: 1.7rem;
+        margin-left: 0.5rem;
+    }
+    /* Custom button styles and hover effects */
+    .btn {
+        transition: all 0.3s ease;
+        overflow: hidden;
+        position: relative;
+    }
+    .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .btn-primary, .btn-dark {
+        position: relative;
+        z-index: 1;
+    }
+    .btn-primary:before, .btn-dark:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: rgba(255,255,255,0.2);
+        transition: all 0.4s ease;
+        z-index: -1;
+    }
+    .btn-primary:hover:before, .btn-dark:hover:before {
+        left: 0;
+    }
+    .btn-yellow {
+        background-color: var(--jobsy-yellow);
+        color: var(--jobsy-blue);
+        font-weight: 600;
+        border: none;
+    }
+    .btn-yellow:hover {
+        background-color: #ffe033;
+        color: #021024;
+    }
+    .auth-buttons .btn {
+        margin-left: 10px;
+        font-weight: 600;
+        padding: 8px 18px;
+    }
+    .auth-buttons .btn-yellow {
+        border: 2px solid var(--jobsy-yellow);
+    }
+    .auth-buttons .btn-outline-light {
+        border: 2px solid rgba(255,255,255,0.6);
+    }
+    .auth-buttons .btn-outline-light:hover {
+        background-color: rgba(255,255,255,0.1);
+        color: var(--jobsy-yellow);
+        border-color: var(--jobsy-yellow);
+    }
+    .language-switcher {
+        margin-left: 15px;
+        display: flex;
+        align-items: center;
+    }
+    .language-switcher a {
+        color: rgba(255,255,255,0.8);
+        font-size: 0.9rem;
+        text-decoration: none;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+    }
+    .language-switcher a:hover,
+    .language-switcher a.active {
+        color: var(--jobsy-yellow);
+        background-color: rgba(255,255,255,0.1);
+    }
+    .language-switcher span {
+        color: rgba(255,255,255,0.4);
+        margin: 0 0.2rem;
+    }
+    
+    /* Alert styling */
+    .alert-fixed-height {
+        min-height: 60px; /* Fixed height for alerts */
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
+    }
+    /* Remove always-red .alert background and color */
+    /* .alert {
+        background-color: #f8d7da; 
+        color: #721c24; 
+        border: 1px solid #f5c6cb;
+        border-radius: 5px;
+        padding: 12px 20px;
+        margin-bottom: 0;
+    } */
+    .alert-danger {
+        font-weight: 500;
+    }
+    /* When no alerts are present */
+    .alert-fixed-height:empty {
+        min-height: 0;
+        margin-bottom: 0;
+    }
+</style> 

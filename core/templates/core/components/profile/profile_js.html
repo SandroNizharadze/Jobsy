@@ -1,0 +1,170 @@
+{% load i18n %}
+
+<script>
+    // Form validation
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
+
+    // Profile picture preview
+    document.getElementById('id_profile_picture').addEventListener('change', function(e) {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const container = document.querySelector('.profile-picture-wrapper');
+                container.innerHTML = `
+                    <img src="${e.target.result}" alt="Profile Picture" class="profile-picture">
+                    <div class="profile-picture-overlay">
+                        <label for="id_profile_picture" class="profile-picture-edit">
+                            <i class="fas fa-camera"></i>
+                            <span>{% trans "Change Photo" %}</span>
+                        </label>
+                    </div>
+                `
+            }
+        }
+    })
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check URL parameters to show correct tabs
+        const urlParams = new URLSearchParams(window.location.search);
+        const tabParam = urlParams.get('tab');
+        
+        // Activate main section tab if specified in URL
+        if (tabParam === 'applications') {
+            const jobActivityTab = document.getElementById('job-activity-tab');
+            if (jobActivityTab) {
+                jobActivityTab.click();
+            }
+        }
+        
+        // Show CV upload form
+        const showCvFormBtn = document.getElementById('show-cv-form-btn');
+        const cvUploadForm = document.getElementById('cv-upload-form');
+        const cancelCvFormBtn = document.getElementById('cancel-cv-form-btn');
+        const cvUploadFormElement = document.getElementById('cv-upload-form-element');
+        const removeCvBtn = document.getElementById('remove-cv-btn');
+
+        if (showCvFormBtn) {
+            showCvFormBtn.addEventListener('click', function() {
+                cvUploadForm.style.display = 'block';
+                showCvFormBtn.style.display = 'none';
+            });
+        }
+
+        if (cancelCvFormBtn) {
+            cancelCvFormBtn.addEventListener('click', function() {
+                cvUploadForm.style.display = 'none';
+                if (showCvFormBtn) {
+                    showCvFormBtn.style.display = 'block';
+                }
+            });
+        }
+
+        // Handle CV upload form submission
+        if (cvUploadFormElement) {
+            cvUploadFormElement.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+
+                fetch(window.location.href, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                    } else {
+                        const errorDiv = document.getElementById('cv-form-error');
+                        errorDiv.textContent = data.error || 'An error occurred while uploading the CV.';
+                        errorDiv.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    const errorDiv = document.getElementById('cv-form-error');
+                    errorDiv.textContent = 'An error occurred while uploading the CV.';
+                    errorDiv.style.display = 'block';
+                });
+            });
+        }
+
+        // Handle CV removal
+        if (removeCvBtn) {
+            removeCvBtn.addEventListener('click', function() {
+                if (confirm('{% trans "Are you sure you want to remove your CV?" %}')) {
+                    fetch('{% url "remove_cv" %}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.reload();
+                        } else {
+                            alert('{% trans "An error occurred while removing the CV." %}');
+                        }
+                    })
+                    .catch(error => {
+                        alert('{% trans "An error occurred while removing the CV." %}');
+                    });
+                }
+            });
+        }
+        
+        // Sort application rows by status
+        const sortApplicationsByStatus = () => {
+            const applicationsTable = document.querySelector('#applications table tbody');
+            if (!applicationsTable) return;
+            
+            const rows = Array.from(applicationsTable.querySelectorAll('tr'));
+            
+            // Define the status order
+            const statusOrder = {
+                'გასაუბრება': 1,
+                'რეზერვი': 2,
+                'განხილვის_პროცესში': 3
+            };
+            
+            // Sort rows by status
+            rows.sort((a, b) => {
+                const statusA = a.querySelector('.badge').textContent.trim();
+                const statusB = b.querySelector('.badge').textContent.trim();
+                
+                // Map displayed text back to internal status values
+                let orderA = 3; // Default to lowest priority
+                let orderB = 3;
+                
+                if (statusA === 'გასაუბრება') orderA = 1;
+                else if (statusA === 'რეზერვი') orderA = 2;
+                
+                if (statusB === 'გასაუბრება') orderB = 1;
+                else if (statusB === 'რეზერვი') orderB = 2;
+                
+                return orderA - orderB;
+            });
+            
+            // Reinsert rows in sorted order
+            rows.forEach(row => applicationsTable.appendChild(row));
+        };
+        
+        // Call sort function when DOM is loaded
+        sortApplicationsByStatus();
+    });
+</script> 

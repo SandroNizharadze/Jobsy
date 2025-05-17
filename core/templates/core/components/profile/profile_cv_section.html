@@ -1,0 +1,167 @@
+{% load i18n %}
+
+<div class="profile-section">
+    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="user_profile">
+        <div class="profile-header">
+            <div class="profile-picture-container">
+                <div class="profile-picture-wrapper">
+                    {% if user.userprofile.profile_picture %}
+                        <img src="{{ user.userprofile.profile_picture.url }}" alt="{% trans 'Profile Picture' %}" class="profile-picture">
+                    {% else %}
+                        <div class="profile-picture-placeholder">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    {% endif %}
+                    <div class="profile-picture-overlay">
+                        <label for="{{ user_form.profile_picture.id_for_label }}" class="profile-picture-edit">
+                            <i class="fas fa-camera"></i>
+                            <span>{% trans "Change Photo" %}</span>
+                        </label>
+                    </div>
+                </div>
+                {{ user_form.profile_picture }}
+                {% if user_form.profile_picture.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ user_form.profile_picture.errors|join:", " }}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="profile-info">
+                <h1>{{ user.get_full_name|default:user.username }}</h1>
+                <p class="text-muted">{{ user.email }}</p>
+                {% if user.userprofile.role == 'employer' %}
+                    <span class="badge bg-primary">{% trans "Employer" %}</span>
+                {% elif user.userprofile.role == 'admin' %}
+                    <span class="badge bg-danger">{% trans "Admin" %}</span>
+                {% else %}
+                    <span class="badge bg-success">{% trans "Job Seeker" %}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if user.userprofile.role == 'employer' %}
+            <div class="employer-section mb-4">
+                <h3 class="h4 mb-3">{% trans "Company Information" %}</h3>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label" for="{{ employer_form.company_name.id_for_label }}">{% trans "Company Name" %}</label>
+                        {{ employer_form.company_name }}
+                        {% if employer_form.company_name.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ employer_form.company_name.errors|join:", " }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label" for="{{ employer_form.company_website.id_for_label }}">{% trans "Company Website" %}</label>
+                        {{ employer_form.company_website }}
+                        {% if employer_form.company_website.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ employer_form.company_website.errors|join:", " }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="{{ employer_form.company_description.id_for_label }}">{% trans "Company Description" %}</label>
+                    {{ employer_form.company_description }}
+                    {% if employer_form.company_description.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ employer_form.company_description.errors|join:", " }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="{{ employer_form.company_logo.id_for_label }}">{% trans "Company Logo" %}</label>
+                        {{ employer_form.company_logo }}
+                        {% if employer_form.company_logo.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ employer_form.company_logo.errors|join:", " }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="{{ employer_form.company_size.id_for_label }}">{% trans "Company Size" %}</label>
+                        {{ employer_form.company_size }}
+                        {% if employer_form.company_size.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ employer_form.company_size.errors|join:", " }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="{{ employer_form.industry.id_for_label }}">{% trans "Industry" %}</label>
+                        {{ employer_form.industry }}
+                        {% if employer_form.industry.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ employer_form.industry.errors|join:", " }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="{{ employer_form.location.id_for_label }}">{% trans "Location" %}</label>
+                    {{ employer_form.location }}
+                    {% if employer_form.location.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ employer_form.location.errors|join:", " }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="d-flex gap-2 justify-content-end mt-4">
+                <button type="submit" class="btn btn-linkedin">
+                    <i class="fas fa-save me-1"></i>{% trans "Save Profile" %}
+                </button>
+            </div>
+        {% endif %}
+    </form>
+
+    {% if user.userprofile.role == 'candidate' %}
+    <div class="cv-card">
+        <h3 class="cv-title">{% trans "Your CV" %}</h3>
+        <div class="cv-actions" id="cv-actions">
+            {% if user.userprofile.cv %}
+                <a href="{{ user.userprofile.cv.url }}" target="_blank" class="btn btn-cv-view">
+                    <i class="fas fa-file-alt me-1"></i>{% trans "View Current CV" %}
+                </a>
+                <button type="button" class="btn-cv-remove" id="remove-cv-btn" aria-label="{% trans 'Remove CV' %}">
+                        <i class="fas fa-times"></i>
+                    </button>
+            {% endif %}
+        </div>
+
+        <div id="cv-upload-form" class="cv-upload-form" style="display: {% if user_form.cv.errors or user_form.cv_consent.errors or user_form.cv_share_with_employers.errors %}block{% else %}none{% endif %};">
+            <form method="post" enctype="multipart/form-data" class="needs-validation" id="cv-upload-form-element" novalidate>
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="user_profile">
+                <div class="mb-3">
+                    <label class="form-label" for="{{ user_form.cv.id_for_label }}">{% trans "Upload CV" %}</label>
+                    {{ user_form.cv }}
+                    {% if user_form.cv.help_text %}<div class="form-text">{% trans user_form.cv.help_text %}</div>{% endif %}
+                    {% if user_form.cv.errors %}
+                        <div class="invalid-feedback d-block">{{ user_form.cv.errors|join:", " }}</div>
+                    {% endif %}
+                </div>
+                <div id="cv-form-error" class="invalid-feedback d-block" style="display: none;"></div>
+                <div class="d-flex gap-2 justify-content-end">
+                    <button type="submit" class="btn btn-linkedin">
+                        <i class="fas fa-save me-1"></i>{% trans "Save" %}
+                    </button>
+                    <button type="button" id="cancel-cv-form-btn" class="btn btn-outline-secondary">
+                        <i class="fas fa-times me-1"></i>{% trans "Cancel" %}
+                    </button>
+                </div>
+            </form>
+        </div>
+        {% if not user.userprofile.cv %}
+            <button id="show-cv-form-btn" type="button" class="btn btn-cv-upload">
+                <i class="fas fa-upload me-1"></i>{% trans "Add/Upload CV" %}
+            </button>
+        {% endif %}
+    </div>
+    {% endif %}
+</div> 

@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 from ..models import UserProfile, EmployerProfile, JobApplication, SavedJob
 from ..forms import UserProfileForm, EmployerProfileForm
 import logging
@@ -35,8 +35,31 @@ def profile(request):
     else:
         form = UserProfileForm(instance=user_profile)
     
-    # Get user's job applications
-    applications = JobApplication.objects.filter(user=request.user).order_by('-applied_at')
+    # Get filter parameters
+    name_filter = request.GET.get('name', '')
+    status_filter = request.GET.get('status', '')
+    tab = request.GET.get('tab')
+    
+    # Start with all user's applications
+    applications_query = JobApplication.objects.filter(user=request.user)
+    
+    # Apply name filter if provided
+    if name_filter:
+        name_filter_q = Q(job__title__icontains=name_filter)
+        # Also search in job_title for deleted jobs
+        name_filter_q |= Q(job_title__icontains=name_filter)
+        # Search in company name as well
+        name_filter_q |= Q(job__company__icontains=name_filter)
+        name_filter_q |= Q(job_company__icontains=name_filter)
+        
+        applications_query = applications_query.filter(name_filter_q)
+    
+    # Apply status filter if provided
+    if status_filter:
+        applications_query = applications_query.filter(status=status_filter)
+    
+    # Get applications ordered by most recent first
+    applications = applications_query.order_by('-applied_at')
     
     # Get user's saved jobs
     saved_jobs = SavedJob.objects.filter(user=request.user).order_by('-saved_at')
@@ -69,6 +92,9 @@ def profile(request):
         'saved_jobs': saved_jobs,
         'show_employer_form': show_employer_form,
         'employer_form': employer_form,
+        'active_tab': tab,
+        'name_filter': name_filter,
+        'status_filter': status_filter,
     }
     
     return render(request, 'core/profile.html', context)
@@ -96,4 +122,4 @@ def remove_cv(request):
         return JsonResponse({'success': True})
     except Exception as e:
         logger.error(f"Error removing CV: {str(e)}")
-        return JsonResponse({'success': False, 'error': str(e)}, status=400) 
+        return JsonResponse({'success': False, 'error': str(e)}, status=400)

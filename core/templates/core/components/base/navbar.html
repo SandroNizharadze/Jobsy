@@ -1,0 +1,70 @@
+{% load i18n %}
+
+<nav class="navbar jobsy-navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'job_list' %}">Jobsy.</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-center">
+                <li class="nav-item"><a class="nav-link" href="{% url 'job_list' %}">{% trans "მთავარი" %}</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'job_list' %}?show_filters=1#filters">{% trans "ვაკანსიები" %}</a></li>
+                
+                {% if user.is_authenticated %}
+                    {% if user.userprofile.role == 'employer' %}
+                        <li class="nav-item"><a class="btn btn-primary px-3 py-1" style="border-radius:18px; font-weight:600; background:var(--jobsy-blue); border:none;" href="{% url 'post_job' %}">{% trans "გამოქვეყნება" %}</a></li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="#">{% trans "დამატება CV" %}</a></li>
+                    {% endif %}
+                {% endif %}
+                <li class="nav-item d-none d-lg-block"><a href="#" class="facebook-icon"><i class="fab fa-facebook-square"></i></a></li>
+            </ul>
+            
+            <div class="language-switcher me-3">
+                <form action="{% url 'set_language' %}" method="post" style="display:inline;" class="lang-switch-form">
+                    {% csrf_token %}
+                    <input name="next" type="hidden" value="{% if not request.path|slice:':4' == '/en/' %}/en{{ request.path }}{% else %}{{ request.path }}{% endif %}">
+                    <input name="language" type="hidden" value="en">
+                    <button type="submit" class="btn btn-link p-0 {% if LANGUAGE_CODE == 'en' %}active{% endif %}" style="color: rgba(255,255,255,0.8); font-size: 0.9rem; text-decoration: none; background: none; border: none;">EN</button>
+                </form>
+                <span>|</span>
+                <form action="{% url 'set_language' %}" method="post" style="display:inline;" class="lang-switch-form">
+                    {% csrf_token %}
+                    <input name="next" type="hidden" value="{{ request.path|cut:'/en' }}">
+                    <input name="language" type="hidden" value="ka">
+                    <button type="submit" class="btn btn-link p-0 {% if LANGUAGE_CODE == 'ka' %}active{% endif %}" style="color: rgba(255,255,255,0.8); font-size: 0.9rem; text-decoration: none; background: none; border: none;">KA</button>
+                </form>
+            </div>
+            
+            <div class="auth-buttons d-flex align-items-center">
+                {% if user.is_authenticated %}
+                    <div class="dropdown">
+                        <a class="btn btn-outline-light me-2 dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% if user.userprofile.profile_picture %}
+                                <img src="{{ user.userprofile.profile_picture.url }}" alt="Profile" class="rounded-circle me-2" style="width:32px; height:32px; object-fit:cover;">
+                            {% else %}
+                                <i class="fas fa-user-circle fa-lg me-2"></i>
+                            {% endif %}
+                            <span>
+                                {{ user.first_name|default:user.username }}
+                                {% if user.userprofile.role == 'employer' %}({% trans "Employer" %}){% endif %}
+                            </span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                            <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user me-2"></i>{% trans "Profile" %}</a></li>
+                            {% if user.userprofile.role == 'employer' %}
+                                <li><a class="dropdown-item" href="{% url 'employer_home' %}"><i class="fas fa-chart-bar me-2"></i>{% trans "Metrics" %}</a></li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>{% trans "Log out" %}</a></li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <a class="btn btn-outline-light" href="{% url 'login' %}">{% trans "შესვლა" %}</a>
+                    <a class="btn btn-yellow" href="{% url 'register' %}">{% trans "რეგისტრაცია" %}</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav> 

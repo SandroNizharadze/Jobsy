@@ -1,0 +1,228 @@
+{% load i18n %}
+
+<div class="applications-section">
+    <h3 class="h4 mb-3">{% trans "Your Job Activity" %}</h3>
+    
+    <!-- Main Activity Tabs -->
+    <ul class="nav nav-pills status-pills mb-4" id="activityMainTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="applications-tab" data-bs-toggle="tab" data-bs-target="#applications" type="button" role="tab" aria-controls="applications" aria-selected="true">
+                <i class="fas fa-paper-plane me-1"></i>{% trans "Applications" %}
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="saved-tab" data-bs-toggle="tab" data-bs-target="#saved-jobs" type="button" role="tab" aria-controls="saved-jobs" aria-selected="false">
+                <i class="fas fa-bookmark me-1"></i>{% trans "შენახული" %}
+            </button>
+        </li>
+    </ul>
+    
+    <div class="tab-content" id="activityTabContent">
+        <!-- Applications Tab -->
+        <div class="tab-pane fade show active" id="applications" role="tabpanel" aria-labelledby="applications-tab">
+            {% if applications %}
+            <!-- Status Explanations -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card status-card status-interview">
+                        <div class="card-body">
+                            <h5 class="card-title">{% trans "გასაუბრება" %}</h5>
+                            <p class="card-text">{% trans "ნიშნავს რომ კომპანიამ განიხილა თქვენი კანდიდატურა, თვლის რომ შეესაბამებით პოზიციას და დაგიკავშირდებიან გასაუბრებაზე დასაბარებლად" %}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card status-card status-reserve">
+                        <div class="card-body">
+                            <h5 class="card-title">{% trans "რეზერვი" %}</h5>
+                            <p class="card-text">{% trans "ნიშნავს, რომ კომპანიამ განიხილა თქვენი კანდიდატურა, თვლის რომ არ შეესაბამებით პოზიციას და ამ ეტაპზე ვერ აგიყვანენ, თუმცა თქვენი სივი შეინახება ბაზაში მომავალში დაინტერესების შემთვევაში დასაკონტაქტებლად" %}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card status-card status-review">
+                        <div class="card-body">
+                            <h5 class="card-title">{% trans "განხილვის პროცესში" %}</h5>
+                            <p class="card-text">{% trans "ნიშნავს რომ თქვენი კანდიდატურა ჯერ არ განუხილავთ" %}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="applications-container">
+            <!-- Applications List -->
+            <div class="card">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>{% trans "Position" %}</th>
+                                    <th>{% trans "Company" %}</th>
+                                    <th>{% trans "Applied On" %}</th>
+                                    <th>{% trans "Status" %}</th>
+                                    <th class="text-center">{% trans "Action" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for application in applications %}
+                                <tr{% if application.status == 'გასაუბრება' %} class="table-success"{% elif application.status == 'რეზერვი' %} class="table-warning"{% endif %}>
+                                    <td>
+                                        <div class="job-title-container">
+                                            {% if application.job %}
+                                                <span class="fw-medium">{{ application.job.title }}</span>
+                                            {% else %}
+                                                <span class="fw-medium">{{ application.job_title|default:"Deleted Job" }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if application.job %}
+                                            <div class="company-info">
+                                                {% if application.job.employer_profile.company_logo %}
+                                                    <img src="{{ application.job.employer_profile.company_logo.url }}" alt="Company Logo" class="company-logo me-2" style="width: 28px; height: 28px; object-fit: contain;">
+                                                {% endif %}
+                                                <span>{{ application.job.company }}</span>
+                                            </div>
+                                        {% else %}
+                                            {{ application.job_company|default:"Deleted Company" }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div>{{ application.applied_at|date:"d M Y" }}</div>
+                                        <small class="text-muted">{{ application.applied_at|time:"H:i" }}</small>
+                                    </td>
+                                    <td>
+                                        {% if application.status == 'განხილვის_პროცესში' %}
+                                        <span class="badge status-review-badge">{% trans "განხილვის პროცესში" %}</span>
+                                        {% elif application.status == 'გასაუბრება' %}
+                                        <span class="badge status-interview-badge">{% trans "გასაუბრება" %}</span>
+                                        {% elif application.status == 'რეზერვი' %}
+                                        <span class="badge status-reserve-badge">{% trans "რეზერვი" %}</span>
+                                        {% elif application.status == 'pending' %}
+                                        <span class="badge bg-secondary">{% trans "Pending" %}</span>
+                                        {% elif application.status == 'reviewed' %}
+                                        <span class="badge bg-info">{% trans "Reviewed" %}</span>
+                                        {% elif application.status == 'interviewed' %}
+                                        <span class="badge bg-primary">{% trans "Interviewed" %}</span>
+                                        {% elif application.status == 'offered' %}
+                                        <span class="badge bg-success">{% trans "Offer Extended" %}</span>
+                                        {% elif application.status == 'accepted' %}
+                                        <span class="badge bg-success">{% trans "Accepted" %}</span>
+                                        {% elif application.status == 'rejected' %}
+                                        <span class="badge bg-danger">{% trans "Rejected" %}</span>
+                                        {% elif application.status == 'withdrawn' %}
+                                        <span class="badge bg-secondary">{% trans "Withdrawn" %}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if application.job %}
+                                        <div class="btn-group">
+                                            <a href="{% url 'job_detail' application.job.id %}" class="btn btn-sm btn-outline-primary me-2" title="{% trans 'View Job' %}">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </div>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <h5>{% trans "No Applications Yet" %}</h5>
+                    <p class="text-muted mb-0">{% trans "You haven't applied to any jobs yet." %}</p>
+                    <a href="{% url 'job_list' %}" class="btn btn-outline-primary mt-3">
+                        <i class="fas fa-search me-1"></i>{% trans "Browse Job Listings" %}
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+            </div><!-- End of applications-container -->
+        </div>
+        
+        <!-- Saved Jobs Tab -->
+        <div class="tab-pane fade" id="saved-jobs" role="tabpanel">
+            {% if saved_jobs %}
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>{% trans "ვაკანსია" %}</th>
+                                        <th>{% trans "კომპანია" %}</th>
+                                        <th>{% trans "შენახვის თარიღი" %}</th>
+                                        <th class="text-center">{% trans "ქმედებები" %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for saved in saved_jobs %}
+                                    <tr>
+                                        <td>
+                                            <div class="job-title-container">
+                                                {% if saved.job %}
+                                                    <span class="fw-medium">{{ saved.job.title }}</span>
+                                                {% else %}
+                                                    <span class="fw-medium">{{ saved.job_title|default:"Deleted Job" }}</span>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if saved.job %}
+                                                <div class="company-info">
+                                                    {% if saved.job.employer_profile.company_logo %}
+                                                        <img src="{{ saved.job.employer_profile.company_logo.url }}" alt="Company Logo" class="company-logo me-2" style="width: 28px; height: 28px; object-fit: contain;">
+                                                    {% endif %}
+                                                    <span>{{ saved.job.company }}</span>
+                                                </div>
+                                            {% else %}
+                                                {{ saved.job_company|default:"Deleted Company" }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div>{{ saved.saved_at|date:"d M Y" }}</div>
+                                            <small class="text-muted">{{ saved.saved_at|time:"H:i" }}</small>
+                                        </td>
+                                        <td class="text-center">
+                                            {% if saved.job %}
+                                            <div class="btn-group">
+                                                <a href="{% url 'job_detail' saved.job.id %}" class="btn btn-sm btn-outline-primary me-2" title="{% trans 'ნახვა' %}">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <form action="{% url 'unsave_job' saved.job.id %}" method="post" class="d-inline">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="{% trans 'წაშლა' %}">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="far fa-bookmark fa-3x text-muted mb-3"></i>
+                        <h5>{% trans "შენახული ვაკანსიები არ გაქვთ" %}</h5>
+                        <p class="text-muted mb-0">{% trans "თქვენს მიერ შენახული ვაკანსიები აქ გამოჩნდება" %}</p>
+                        <a href="{% url 'job_list' %}" class="btn btn-outline-primary mt-3">
+                            <i class="fas fa-search me-1"></i>{% trans "ვაკანსიების გადახედვა" %}
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div> 
