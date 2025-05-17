@@ -1,0 +1,21 @@
+{% extends "admin/index.html" %}
+{% load i18n %}
+
+{% block content %}
+{{ block.super }}
+
+<div class="module" style="margin-top: 20px;">
+  <table>
+    <caption><h2>{% trans "Historical Data" %}</h2></caption>
+    <tbody>
+      <tr>
+        <th scope="row">
+          <a href="{% url 'admin_historical_data' %}">{% trans "View Historical Database" %}</a>
+        </th>
+        <td> </td>
+        <td> </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+{% endblock %} 

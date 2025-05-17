@@ -5,12 +5,58 @@ from django.dispatch import receiver
 from django.urls import reverse
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 import logging
 from django.db import transaction
 
 logger = logging.getLogger(__name__)
 
-class JobListing(models.Model):
+class SoftDeletionQuerySet(models.QuerySet):
+    def delete(self):
+        return super().update(deleted_at=timezone.now())
+        
+    def hard_delete(self):
+        return super().delete()
+        
+    def alive(self):
+        return self.filter(deleted_at=None)
+        
+    def deleted(self):
+        return self.exclude(deleted_at=None)
+
+class SoftDeletionManager(models.Manager):
+    def __init__(self, *args, **kwargs):
+        self.with_deleted = kwargs.pop('with_deleted', False)
+        super().__init__(*args, **kwargs)
+        
+    def get_queryset(self):
+        if self.with_deleted:
+            return SoftDeletionQuerySet(self.model, using=self._db)
+        return SoftDeletionQuerySet(self.model, using=self._db).filter(deleted_at=None)
+        
+    def hard_delete(self):
+        return self.get_queryset().hard_delete()
+        
+    def deleted(self):
+        return self.get_queryset().deleted()
+
+class SoftDeletionModel(models.Model):
+    deleted_at = models.DateTimeField(blank=True, null=True, verbose_name=_("წაშლის თარიღი"))
+    
+    objects = SoftDeletionManager()
+    all_objects = SoftDeletionManager(with_deleted=True)
+    
+    class Meta:
+        abstract = True
+        
+    def delete(self, using=None, keep_parents=False):
+        self.deleted_at = timezone.now()
+        self.save()
+        
+    def hard_delete(self):
+        super().delete()
+
+class JobListing(SoftDeletionModel):
     CATEGORY_CHOICES = [
         ('მენეჯმენტი/ადმინისტრირება', _('მენეჯმენტი/ ადმინისტრირება')),
         ('მარკეტინგი', _('მარკეტინგი')),
@@ -131,7 +177,9 @@ class JobApplication(models.Model):
         ('withdrawn', _('Withdrawn')),
     ]
     
-    job = models.ForeignKey(JobListing, on_delete=models.CASCADE, related_name='applications', verbose_name=_("ვაკანსია"))
+    job = models.ForeignKey(JobListing, on_delete=models.SET_NULL, null=True, related_name='applications', verbose_name=_("ვაკანსია"))
+    job_title = models.CharField(max_length=255, blank=True, null=True, verbose_name=_("ვაკანსიის სათაური"))
+    job_company = models.CharField(max_length=255, blank=True, null=True, verbose_name=_("კომპანია"))
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='applications', null=True, blank=True, verbose_name=_("მომხმარებელი"))
     guest_name = models.CharField(max_length=255, blank=True, null=True, verbose_name=_("სტუმრის სახელი"))
     guest_email = models.EmailField(blank=True, null=True, verbose_name=_("სტუმრის ელ-ფოსტა"))
@@ -140,6 +188,12 @@ class JobApplication(models.Model):
     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default='განხილვის_პროცესში', db_index=True, verbose_name=_("სტატუსი"))
     applied_at = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name=_("აპლიკაციის თარიღი"))
     updated_at = models.DateTimeField(auto_now=True, verbose_name=_("განახლების თარიღი"))
+    
+    def save(self, *args, **kwargs):
+        if self.job and (not self.job_title or not self.job_company):
+            self.job_title = self.job.title
+            self.job_company = self.job.company
+        super().save(*args, **kwargs)
     
     class Meta:
         ordering = ['-applied_at']
@@ -151,7 +205,9 @@ class JobApplication(models.Model):
         verbose_name_plural = _("აპლიკაციები")
     
     def __str__(self):
-        return f"Application for {self.job.title} by {self.user.username if self.user else 'Guest'}"
+        job_info = self.job_title if self.job is None else self.job.title
+        user_info = self.user.username if self.user else 'Guest'
+        return f"Application for {job_info} by {user_info}"
 
 class UserProfile(models.Model):
     ROLE_CHOICES = [
@@ -209,7 +265,7 @@ class UserProfile(models.Model):
         verbose_name = _("მომხმარებლის პროფილი")
         verbose_name_plural = _("მომხმარებლების პროფილები")
 
-class EmployerProfile(models.Model):
+class EmployerProfile(SoftDeletionModel):
     COMPANY_SIZE_CHOICES = [
         ('1-10', _('1-10 employees')),
         ('11-50', _('11-50 employees')),
@@ -285,8 +341,18 @@ class EmployerProfile(models.Model):
 
 class SavedJob(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='saved_jobs', verbose_name=_("მომხმარებელი"))
-    job = models.ForeignKey('JobListing', on_delete=models.CASCADE, related_name='saved_by', verbose_name=_("ვაკანსია"))
+    job = models.ForeignKey('JobListing', on_delete=models.SET_NULL, null=True, related_name='saved_by', verbose_name=_("ვაკანსია"))
+    # Store job details for historical record
+    job_title = models.CharField(max_length=255, blank=True, null=True, verbose_name=_("ვაკანსიის სათაური"))
+    job_company = models.CharField(max_length=255, blank=True, null=True, verbose_name=_("კომპანია"))
     saved_at = models.DateTimeField(auto_now_add=True, verbose_name=_("შენახვის თარიღი"))
+
+    def save(self, *args, **kwargs):
+        # Save job details for historical record
+        if self.job and (not self.job_title or not self.job_company):
+            self.job_title = self.job.title
+            self.job_company = self.job.company
+        super().save(*args, **kwargs)
 
     class Meta:
         unique_together = ('user', 'job')
@@ -295,7 +361,8 @@ class SavedJob(models.Model):
         ordering = ['-saved_at']
 
     def __str__(self):
-        return f"{self.user.username} - {self.job.title}"
+        job_info = self.job_title if self.job is None else self.job.title
+        return f"{self.user.username} - {job_info}"
 
 # Add signals to ensure user profile and employer profile are properly created
 @receiver(post_save, sender=UserProfile)

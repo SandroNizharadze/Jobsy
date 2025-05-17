@@ -13,77 +13,62 @@ logger = logging.getLogger(__name__)
 @login_required
 def profile(request):
     """
-    Handle user profile view and updates
+    Display and manage user profile
     """
-    user_profile = request.user.userprofile
-    is_employer = user_profile.role == 'employer'
+    if not request.user.is_authenticated:
+        return redirect('login')
     
-    # Initialize forms
-    user_form = UserProfileForm(instance=user_profile)
+    # Get or create user profile
+    try:
+        user_profile = request.user.userprofile
+    except UserProfile.DoesNotExist:
+        user_profile = UserProfile(user=request.user)
+        user_profile.save()
+    
+    # Handle profile form
+    if request.method == 'POST' and 'profile_form' in request.POST:
+        form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profile updated successfully!")
+            return redirect('profile')
+    else:
+        form = UserProfileForm(instance=user_profile)
+    
+    # Get user's job applications
+    applications = JobApplication.objects.filter(user=request.user).order_by('-applied_at')
+    
+    # Get user's saved jobs
+    saved_jobs = SavedJob.objects.filter(user=request.user).order_by('-saved_at')
+    
+    # Determine if employer profile form should be shown
+    show_employer_form = (user_profile.role == 'employer')
     employer_form = None
     
-    if is_employer:
-        employer_profile = user_profile.employer_profile
-        employer_form = EmployerProfileForm(instance=employer_profile)
-    
-    if request.method == 'POST':
-        # Determine which form was submitted
-        form_type = request.POST.get('form_type')
+    # Handle employer form if needed
+    if show_employer_form:
+        try:
+            employer_profile = user_profile.employer_profile
+        except EmployerProfile.DoesNotExist:
+            employer_profile = EmployerProfile(user_profile=user_profile)
+            employer_profile.save()
         
-        if form_type == 'user_profile':
-            # Process user profile form
-            user_form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
-            
-            if user_form.is_valid():
-                user_form.save()
-                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    return JsonResponse({'success': True})
-                messages.success(request, "Your profile has been updated.")
-                return redirect('profile')
-            else:
-                # If the form is invalid, display errors
-                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    return JsonResponse({
-                        'success': False,
-                        'error': ' '.join([error for errors in user_form.errors.values() for error in errors])
-                    })
-                for field, errors in user_form.errors.items():
-                    for error in errors:
-                        messages.error(request, f"{error}")
-                
-                # Create a fresh employer form if needed
-                if is_employer:
-                    employer_form = EmployerProfileForm(instance=employer_profile)
-        
-        elif form_type == 'employer_profile' and is_employer:
-            # Process employer profile form
+        if request.method == 'POST' and 'employer_form' in request.POST:
             employer_form = EmployerProfileForm(request.POST, request.FILES, instance=employer_profile)
-            
             if employer_form.is_valid():
                 employer_form.save()
-                messages.success(request, "Your company profile has been updated.")
+                messages.success(request, "Employer profile updated successfully!")
                 return redirect('profile')
-            else:
-                # If the form is invalid, display errors
-                for field, errors in employer_form.errors.items():
-                    for error in errors:
-                        messages.error(request, f"{error}")
-                
-                # Create a fresh user profile form
-                user_form = UserProfileForm(instance=user_profile)
-    
-    # Get user's job applications if they are a candidate
-    applications = None
-    saved_jobs = None
-    if user_profile.role == 'candidate':
-        applications = JobApplication.objects.filter(user=request.user).select_related('job').order_by('-applied_at')
-        saved_jobs = SavedJob.objects.filter(user=request.user).select_related('job').order_by('-saved_at')
+        else:
+            employer_form = EmployerProfileForm(instance=employer_profile)
     
     context = {
-        'user_form': user_form,
-        'employer_form': employer_form,
+        'user_profile': user_profile,
+        'profile_form': form,
         'applications': applications,
         'saved_jobs': saved_jobs,
+        'show_employer_form': show_employer_form,
+        'employer_form': employer_form,
     }
     
     return render(request, 'core/profile.html', context)

@@ -22,8 +22,20 @@
                 <tbody>
                     {% for application in applications %}
                     <tr>
-                        <td>{{ application.job.title }}</td>
-                        <td>{{ application.job.employer.company_name }}</td>
+                        <td>
+                            {% if application.job %}
+                                {{ application.job.title }}
+                            {% else %}
+                                {{ application.job_title|default:"Deleted Job" }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if application.job %}
+                                {{ application.job.employer.company_name }}
+                            {% else %}
+                                {{ application.job_company|default:"Deleted Company" }}
+                            {% endif %}
+                        </td>
                         <td>{{ application.applied_at|date:"M d, Y" }}</td>
                         <td>
                             <span class="badge 

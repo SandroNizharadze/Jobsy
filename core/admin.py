@@ -1,10 +1,58 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
-from .models import JobListing, UserProfile, EmployerProfile, JobApplication
+from .models import JobListing, UserProfile, EmployerProfile, JobApplication, SavedJob
 from import_export.admin import ImportExportModelAdmin, ImportExportActionModelAdmin
 from import_export import resources
 from rangefilter.filters import DateRangeFilter
+from django.utils.html import format_html
+from django.db.models import Q
+from django.urls import path
+from django.template.response import TemplateResponse
+from django.contrib.admin.views.decorators import staff_member_required
+from django.utils.decorators import method_decorator
+
+# Add a historical data view to the admin site
+@staff_member_required
+def historical_data_view(request):
+    # Get all jobs, including deleted ones
+    all_jobs = JobListing.all_objects.all().order_by('-posted_at')
+    active_jobs = JobListing.objects.all().count()
+    deleted_jobs = all_jobs.filter(deleted_at__isnull=False).count()
+    total_jobs = all_jobs.count()
+    
+    # Get all employers, including deleted ones
+    all_employers = EmployerProfile.all_objects.all().order_by('-created_at')
+    active_employers = EmployerProfile.objects.all().count()
+    deleted_employers = all_employers.filter(deleted_at__isnull=False).count()
+    total_employers = all_employers.count()
+    
+    # Get all applications, including those for deleted jobs
+    all_applications = JobApplication.objects.all().order_by('-applied_at')
+    applications_with_deleted_jobs = all_applications.filter(job__isnull=True).count()
+    total_applications = all_applications.count()
+    
+    # Get all saved jobs, including those for deleted jobs
+    all_saved_jobs = SavedJob.objects.all().order_by('-saved_at')
+    saved_with_deleted_jobs = all_saved_jobs.filter(job__isnull=True).count()
+    total_saved = all_saved_jobs.count()
+    
+    context = {
+        'title': 'Historical Data',
+        'all_jobs': all_jobs[:100],  # Limit to the first 100 for performance
+        'active_jobs': active_jobs,
+        'deleted_jobs': deleted_jobs,
+        'total_jobs': total_jobs,
+        'all_employers': all_employers[:100],  # Limit to the first 100 for performance
+        'active_employers': active_employers,
+        'deleted_employers': deleted_employers,
+        'total_employers': total_employers,
+        'applications_with_deleted_jobs': applications_with_deleted_jobs,
+        'total_applications': total_applications,
+        'saved_with_deleted_jobs': saved_with_deleted_jobs,
+        'total_saved': total_saved,
+    }
+    return TemplateResponse(request, 'admin/historical_data.html', context)
 
 # Resources for model export
 class JobListingResource(resources.ModelResource):
@@ -12,20 +60,21 @@ class JobListingResource(resources.ModelResource):
         model = JobListing
         fields = ('id', 'title', 'company', 'description', 'salary_min', 'salary_max', 
                   'salary_type', 'category', 'location', 'posted_at', 'experience',
-                  'job_preferences', 'considers_students', 'status', 'premium_level')
+                  'job_preferences', 'considers_students', 'status', 'premium_level',
+                  'deleted_at')
 
 class EmployerProfileResource(resources.ModelResource):
     class Meta:
         model = EmployerProfile
         fields = ('id', 'company_name', 'company_id', 'phone_number', 'company_website', 
                  'company_description', 'company_size', 'industry', 'location', 
-                 'user_profile__user__email', 'created_at')
+                 'user_profile__user__email', 'created_at', 'deleted_at')
 
 class JobApplicationResource(resources.ModelResource):
     class Meta:
         model = JobApplication
-        fields = ('id', 'job__title', 'job__company', 'user__email', 'guest_name', 
-                 'guest_email', 'status', 'applied_at')
+        fields = ('id', 'job__title', 'job__company', 'job_title', 'job_company',
+                 'user__email', 'guest_name', 'guest_email', 'status', 'applied_at')
 
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
@@ -78,24 +127,58 @@ class CustomUserAdmin(UserAdmin, ImportExportActionModelAdmin):
 admin.site.unregister(User)
 admin.site.register(User, CustomUserAdmin)
 
+class SoftDeletionAdmin(ImportExportModelAdmin):
+    """Base admin class for models with soft deletion"""
+    
+    def get_queryset(self, request):
+        # Override to show all objects, including deleted ones
+        qs = self.model.all_objects.get_queryset()
+        ordering = self.get_ordering(request)
+        if ordering:
+            qs = qs.order_by(*ordering)
+        return qs
+    
+    def get_deleted_state(self, obj):
+        if obj.deleted_at:
+            return format_html('<span style="color: red;">Deleted</span>')
+        return format_html('<span style="color: green;">Active</span>')
+    get_deleted_state.short_description = 'Status'
+    
+    def restore_selected(self, request, queryset):
+        count = queryset.filter(deleted_at__isnull=False).count()
+        for obj in queryset.filter(deleted_at__isnull=False):
+            obj.deleted_at = None
+            obj.save()
+        
+        if count:
+            self.message_user(request, f"Successfully restored {count} records.")
+        else:
+            self.message_user(request, "No deleted records were selected.")
+    restore_selected.short_description = "Restore selected records"
+
 @admin.register(EmployerProfile)
-class EmployerProfileAdmin(ImportExportModelAdmin):
+class EmployerProfileAdmin(SoftDeletionAdmin):
     resource_class = EmployerProfileResource
-    list_display = ('company_name', 'get_employer_email', 'industry', 'company_size', 'location')
+    list_display = ('company_name', 'get_employer_email', 'industry', 'company_size', 
+                   'location', 'get_deleted_state')
     search_fields = ('company_name', 'user_profile__user__email')
-    list_filter = ('company_size', 'industry')
+    list_filter = ('company_size', 'industry', ('deleted_at', admin.EmptyFieldListFilter))
+    actions = ['restore_selected']
 
     def get_employer_email(self, obj):
         return obj.user_profile.user.email
     get_employer_email.short_description = 'Employer Email'
 
 @admin.register(JobListing)
-class JobListingAdmin(ImportExportModelAdmin):
+class JobListingAdmin(SoftDeletionAdmin):
     resource_class = JobListingResource
-    list_display = ('title', 'company', 'get_employer', 'salary_range', 'location', 'premium_level', 'posted_at')
-    list_filter = (('posted_at', DateRangeFilter), 'employer__company_name', 'location', 'premium_level', 'status')
+    list_display = ('title', 'company', 'get_employer', 'salary_range', 'location', 
+                   'premium_level', 'posted_at', 'get_deleted_state')
+    list_filter = (('posted_at', DateRangeFilter), ('deleted_at', admin.EmptyFieldListFilter), 
+                  'employer__company_name', 'location', 'premium_level', 'status')
     search_fields = ('title', 'company', 'description', 'location')
     date_hierarchy = 'posted_at'
+    actions = ['restore_selected']
 
     def salary_range(self, obj):
         if obj.salary_min and obj.salary_max:
@@ -117,16 +200,20 @@ class JobListingAdmin(ImportExportModelAdmin):
 class JobApplicationAdmin(ImportExportModelAdmin):
     resource_class = JobApplicationResource
     list_display = ('get_job_title', 'get_company', 'get_applicant', 'status', 'applied_at')
-    list_filter = (('applied_at', DateRangeFilter), 'status', 'job__title', 'job__company')
-    search_fields = ('job__title', 'job__company', 'user__email', 'guest_name', 'guest_email')
+    list_filter = (('applied_at', DateRangeFilter), 'status')
+    search_fields = ('job_title', 'job_company', 'job__title', 'job__company', 'user__email', 'guest_name', 'guest_email')
     date_hierarchy = 'applied_at'
     
     def get_job_title(self, obj):
-        return obj.job.title
+        if obj.job:
+            return obj.job.title
+        return obj.job_title or "Deleted Job"
     get_job_title.short_description = 'Job Title'
     
     def get_company(self, obj):
-        return obj.job.company
+        if obj.job:
+            return obj.job.company
+        return obj.job_company or "Deleted Company"
     get_company.short_description = 'Company'
     
     def get_applicant(self, obj):
@@ -134,3 +221,26 @@ class JobApplicationAdmin(ImportExportModelAdmin):
             return obj.user.email
         return f"{obj.guest_name} ({obj.guest_email})"
     get_applicant.short_description = 'Applicant'
+
+@admin.register(SavedJob)
+class SavedJobAdmin(ImportExportModelAdmin):
+    list_display = ('get_user_email', 'get_job_title', 'get_company', 'saved_at')
+    list_filter = (('saved_at', DateRangeFilter), 'user')
+    search_fields = ('job_title', 'job_company', 'job__title', 'job__company', 'user__email')
+    date_hierarchy = 'saved_at'
+    
+    def get_user_email(self, obj):
+        return obj.user.email
+    get_user_email.short_description = 'User'
+    
+    def get_job_title(self, obj):
+        if obj.job:
+            return obj.job.title
+        return obj.job_title or "Deleted Job"
+    get_job_title.short_description = 'Job Title'
+    
+    def get_company(self, obj):
+        if obj.job:
+            return obj.job.company
+        return obj.job_company or "Deleted Company"
+    get_company.short_description = 'Company'

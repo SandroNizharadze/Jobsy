@@ -218,8 +218,20 @@
                                 <tbody>
                                     {% for application in applications %}
                                     <tr>
-                                        <td>{{ application.job.title }}</td>
-                                        <td>{{ application.job.company }}</td>
+                                        <td>
+                                            {% if application.job %}
+                                                {{ application.job.title }}
+                                            {% else %}
+                                                {{ application.job_title|default:"Deleted Job" }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if application.job %}
+                                                {{ application.job.company }}
+                                            {% else %}
+                                                {{ application.job_company|default:"Deleted Company" }}
+                                            {% endif %}
+                                        </td>
                                         <td>{{ application.applied_at|date:"d M Y" }}</td>
                                         <td>
                                             {% if application.status == 'განხილვის_პროცესში' %}
@@ -306,8 +318,20 @@
                                     <tbody>
                                         {% for saved in saved_jobs %}
                                         <tr>
-                                            <td>{{ saved.job.title }}</td>
-                                            <td>{{ saved.job.company }}</td>
+                                            <td>
+                                                {% if saved.job %}
+                                                    {{ saved.job.title }}
+                                                {% else %}
+                                                    {{ saved.job_title|default:"Deleted Job" }}
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if saved.job %}
+                                                    {{ saved.job.company }}
+                                                {% else %}
+                                                    {{ saved.job_company|default:"Deleted Company" }}
+                                                {% endif %}
+                                            </td>
                                             <td>{{ saved.saved_at|date:"d M Y" }}</td>
                                             <td>
                                                 <div class="d-flex">

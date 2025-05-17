@@ -1,0 +1,187 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+<style>
+  .card {
+    margin-bottom: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  .card-header {
+    padding: 15px;
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #ddd;
+    font-weight: bold;
+  }
+  .card-body {
+    padding: 15px;
+  }
+  .stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    flex: 1;
+    min-width: 200px;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  .stat-number {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #417690;
+  }
+  .deleted {
+    color: #ba2121;
+  }
+  .active {
+    color: #417690;
+  }
+  .table-responsive {
+    overflow-x: auto;
+  }
+  .historical-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .historical-table th, .historical-table td {
+    padding: 8px;
+    border: 1px solid #ddd;
+  }
+  .historical-table th {
+    background-color: #f2f2f2;
+    text-align: left;
+  }
+  .historical-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  .deleted-row {
+    background-color: #ffeeee !important;
+  }
+</style>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+  &rsaquo; {% trans 'Historical Data' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  <h1>Historical Database</h1>
+  <p class="help">This page shows all data in the system, including deleted records that are no longer visible on the website.</p>
+  
+  <div class="stats">
+    <div class="stat-card">
+      <h3>Job Listings</h3>
+      <div class="stat-number">{{ total_jobs }}</div>
+      <div>
+        <span class="active">{{ active_jobs }} active</span> / 
+        <span class="deleted">{{ deleted_jobs }} deleted</span>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <h3>Employers</h3>
+      <div class="stat-number">{{ total_employers }}</div>
+      <div>
+        <span class="active">{{ active_employers }} active</span> / 
+        <span class="deleted">{{ deleted_employers }} deleted</span>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <h3>Applications</h3>
+      <div class="stat-number">{{ total_applications }}</div>
+      <div>
+        <span class="deleted">{{ applications_with_deleted_jobs }} for deleted jobs</span>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <h3>Saved Jobs</h3>
+      <div class="stat-number">{{ total_saved }}</div>
+      <div>
+        <span class="deleted">{{ saved_with_deleted_jobs }} for deleted jobs</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="card">
+    <div class="card-header">
+      Recent Job Listings (including deleted)
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="historical-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Company</th>
+              <th>Category</th>
+              <th>Posted At</th>
+              <th>Status</th>
+              <th>Deleted At</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for job in all_jobs %}
+            <tr {% if job.deleted_at %}class="deleted-row"{% endif %}>
+              <td>{{ job.id }}</td>
+              <td>{{ job.title }}</td>
+              <td>{{ job.company }}</td>
+              <td>{{ job.category }}</td>
+              <td>{{ job.posted_at }}</td>
+              <td>{{ job.get_status_display }}</td>
+              <td>{{ job.deleted_at|default_if_none:"-" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  
+  <div class="card">
+    <div class="card-header">
+      Recent Employers (including deleted)
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="historical-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Company Name</th>
+              <th>Industry</th>
+              <th>Location</th>
+              <th>Created At</th>
+              <th>Deleted At</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for employer in all_employers %}
+            <tr {% if employer.deleted_at %}class="deleted-row"{% endif %}>
+              <td>{{ employer.id }}</td>
+              <td>{{ employer.company_name }}</td>
+              <td>{{ employer.industry }}</td>
+              <td>{{ employer.location }}</td>
+              <td>{{ employer.created_at }}</td>
+              <td>{{ employer.deleted_at|default_if_none:"-" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} 
