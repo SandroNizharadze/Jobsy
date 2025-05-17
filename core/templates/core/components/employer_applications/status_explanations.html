@@ -1,0 +1,29 @@
+{% load i18n %}
+
+<!-- Status Explanations -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card status-card status-interview">
+            <div class="card-body">
+                <h5 class="card-title">{% trans "გასაუბრება" %}</h5>
+                <p class="card-text">{% trans "ნიშნავს რომ განიხილეთ კანდიდატურა, თვლით რომ შეესაბამება პოზიციას და დაუკავშირდებით გასაუბრებაზე დასაბარებლად" %}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card status-card status-reserve">
+            <div class="card-body">
+                <h5 class="card-title">{% trans "რეზერვი" %}</h5>
+                <p class="card-text">{% trans "ნიშნავს, რომ განიხილეთ კანდიდატურა, თვლით რომ არ შეესაბამება პოზიციას და ამ ეტაპზე ვერ აიყვანთ, თუმცა მისი სივი შეინახება ბაზაში მომავალში დაინტერესების შემთვევაში დასაკონტაქტებლად" %}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card status-card status-review">
+            <div class="card-body">
+                <h5 class="card-title">{% trans "განხილვის პროცესში" %}</h5>
+                <p class="card-text">{% trans "ნიშნავს რომ კანდიდატურა ჯერ არ განგიხილავთ" %}</p>
+            </div>
+        </div>
+    </div>
+</div> 

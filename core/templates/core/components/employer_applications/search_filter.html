@@ -1,0 +1,20 @@
+{% load i18n %}
+
+<!-- Search Filter -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="input-group">
+            <input type="text" name="search" class="form-control" placeholder="{% trans 'მოძებნა სახელით...' %}" value="{{ request.GET.search|default:'' }}">
+            <button class="btn btn-outline-secondary" type="submit">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
+    <div class="col-md-6 text-end">
+        {% if request.GET.search %}
+        <a href="{% url 'job_applications' job.id %}{% if request.GET.status %}?status={{ request.GET.status }}{% endif %}" class="btn btn-outline-secondary">
+            <i class="fas fa-times me-1"></i>{% trans "ძიების გასუფთავება" %}
+        </a>
+        {% endif %}
+    </div>
+</div> 

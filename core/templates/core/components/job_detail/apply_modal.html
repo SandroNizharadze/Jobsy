@@ -1,0 +1,90 @@
+{% load i18n %}
+
+<!-- Apply Modal -->
+<div class="modal fade" id="applyModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="border-radius:16px;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" style="font-size:1.5rem; font-weight:700; color:var(--jobsy-blue);">{% trans "განაცხადი" %} - {{ job.title }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            {% if user.is_authenticated and user.userprofile.cv %}
+                <form method="post" action="{% url 'apply_job' job.id %}">
+                    {% csrf_token %}
+                    <div class="modal-body p-4">
+                        <div class="mb-4 text-center">
+                            <i class="fas fa-file-alt fa-3x mb-3 text-success"></i>
+                            <h5>{% trans "თქვენი პროფილის CV გამოყენებით მოხდება განაცხადის გაგზავნა." %}</h5>
+                            <p class="text-muted">{% trans "თქვენი პროფილში ატვირთული CV ავტომატურად გადაეგზავნება დამსაქმებელს." %}</p>
+                        </div>
+                        <div class="mb-4">
+                            <label for="id_cover_letter_profile_cv" class="form-label" style="font-weight:600;">{% trans "მოტივაციის წერილი" %}</label>
+                            <textarea class="form-control" id="id_cover_letter_profile_cv" name="cover_letter" rows="5" style="border-radius:12px;"></textarea>
+                            <div class="form-text text-muted">{% trans "Cover letter is optional." %}</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 pt-0 justify-content-center">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius:12px;">{% trans "გაუქმება" %}</button>
+                        <button type="submit" class="btn btn-linkedin" style="border-radius:12px; font-weight:600;">{% trans "განაცხადის გაგზავნა" %}</button>
+                    </div>
+                </form>
+            {% elif user.is_authenticated %}
+            <form method="post" action="{% url 'apply_job' job.id %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body p-4">
+                        <div class="mb-4">
+                            <label for="id_applicant_name" class="form-label" style="font-weight:600;">{% trans "Name" %}</label>
+                            <input type="text" class="form-control" id="id_applicant_name" name="applicant_name" style="border-radius:12px;" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="id_applicant_email" class="form-label" style="font-weight:600;">{% trans "Email" %}</label>
+                            <input type="email" class="form-control" id="id_applicant_email" name="applicant_email" style="border-radius:12px;" required>
+                        </div>
+                    <div class="mb-4">
+                        <label for="id_cover_letter" class="form-label" style="font-weight:600;">{% trans "მოტივაციის წერილი" %}</label>
+                        <textarea class="form-control" id="id_cover_letter" name="cover_letter" rows="5" style="border-radius:12px;"></textarea>
+                            <div class="form-text text-muted">{% trans "Cover letter is optional." %}</div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="id_resume" class="form-label" style="font-weight:600;">{% trans "CV / რეზიუმე" %}</label>
+                            <input type="file" class="form-control" id="id_resume" name="resume" accept=".pdf,.doc,.docx" style="border-radius:12px;" required>
+                        <div class="form-text">{% trans "დასაშვები ფორმატი: PDF, DOC, DOCX" %}</div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn" data-bs-dismiss="modal" style="border-radius:12px;">{% trans "გაუქმება" %}</button>
+                    <button type="submit" class="btn" style="background-color:var(--jobsy-blue); color:white; border-radius:12px; font-weight:600;">{% trans "განაცხადის გაგზავნა" %}</button>
+                </div>
+            </form>
+            {% else %}
+                <form method="post" action="{% url 'apply_job' job.id %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="modal-body p-4">
+                        <div class="mb-4">
+                            <label for="id_applicant_name" class="form-label" style="font-weight:600;">{% trans "სახელი" %}</label>
+                            <input type="text" class="form-control" id="id_applicant_name" name="applicant_name" style="border-radius:12px;" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="id_applicant_email" class="form-label" style="font-weight:600;">{% trans "ელ-ფოსტა" %}</label>
+                            <input type="email" class="form-control" id="id_applicant_email" name="applicant_email" style="border-radius:12px;" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="id_cover_letter" class="form-label" style="font-weight:600;">{% trans "მოტივაციის წერილი" %}</label>
+                            <textarea class="form-control" id="id_cover_letter" name="cover_letter" rows="5" style="border-radius:12px;"></textarea>
+                            <div class="form-text text-muted">{% trans "Cover letter is optional." %}</div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="id_resume" class="form-label" style="font-weight:600;">{% trans "CV / რეზიუმე" %}</label>
+                            <input type="file" class="form-control" id="id_resume" name="resume" accept=".pdf,.doc,.docx" style="border-radius:12px;" required>
+                            <div class="form-text">{% trans "დასაშვები ფორმატი: PDF, DOC, DOCX" %}</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn" data-bs-dismiss="modal" style="border-radius:12px;">{% trans "გაუქმება" %}</button>
+                        <button type="submit" class="btn" style="background-color:var(--jobsy-blue); color:white; border-radius:12px; font-weight:600;">{% trans "განაცხადის გაგზავნა" %}</button>
+                    </div>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</div> 

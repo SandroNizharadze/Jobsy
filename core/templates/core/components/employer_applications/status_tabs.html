@@ -1,0 +1,29 @@
+{% load i18n %}
+
+<!-- Status Tabs -->
+<div class="row mb-4">
+    <div class="col-12">
+        <ul class="nav nav-pills status-pills">
+            <li class="nav-item">
+                <a class="nav-link {% if not request.GET.status %}active{% endif %}" href="{% url 'job_applications' job.id %}">
+                    {% trans "ყველა" %}
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.GET.status == 'გასაუბრება' %}active{% endif %}" href="{% url 'job_applications' job.id %}?status=გასაუბრება">
+                    {% trans "გასაუბრება" %}
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.GET.status == 'რეზერვი' %}active{% endif %}" href="{% url 'job_applications' job.id %}?status=რეზერვი">
+                    {% trans "რეზერვი" %}
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.GET.status == 'განხილვის_პროცესში' %}active{% endif %}" href="{% url 'job_applications' job.id %}?status=განხილვის_პროცესში">
+                    {% trans "განხილვის პროცესში" %}
+                </a>
+            </li>
+        </ul>
+    </div>
+</div> 

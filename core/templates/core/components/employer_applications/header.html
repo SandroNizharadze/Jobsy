@@ -1,0 +1,17 @@
+{% load i18n %}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">{% trans "შემოსული სიცვები:" %} {{ job.title }}</h2>
+            <a href="{% url 'employer_dashboard' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>{% trans "უკან დაბრუნება" %}
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Status Explanation Box -->
+<div class="alert alert-info mb-4">
+    <p class="mb-0"><i class="fas fa-info-circle me-2"></i>{% trans "არ გამოგრჩეთ კანდიდატების სტატუსების მინიჭება, ეს გეხმარებათ მარტივად გამოარჩიოთ და დაახარისხოთ მეტად სასურველი კანდიდატები" %}</p>
+</div> 

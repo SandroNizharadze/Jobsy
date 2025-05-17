@@ -1,0 +1,50 @@
+{% load i18n %}
+
+<script>
+function editJob(jobId) {
+    fetch(`/employer/jobs/${jobId}/edit/`)
+        .then(response => response.json())
+        .then(job => {
+            const form = document.getElementById('jobForm');
+            form.action = `/employer/jobs/${jobId}/edit/`;
+            Object.keys(job).forEach(key => {
+                const input = form.querySelector(`#id_${key}`);
+                if (input) input.value = job[key];
+            });
+            const modal = new bootstrap.Modal(document.getElementById('newJobModal'));
+            modal.show();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to load job details. Please try again.');
+        });
+}
+
+function deleteJob(jobId) {
+    if (confirm('Are you sure you want to delete this job listing?')) {
+        fetch(`/employer/jobs/${jobId}/delete/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            },
+        })
+        .then(response => {
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                throw new Error('Failed to delete job');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to delete job. Please try again.');
+        });
+    }
+}
+
+// Reset form when modal is closed
+document.getElementById('newJobModal').addEventListener('hidden.bs.modal', function () {
+    document.getElementById('jobForm').reset();
+    document.getElementById('jobForm').action = '{% url "post_job" %}';
+});
+</script> 

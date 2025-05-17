@@ -1,0 +1,19 @@
+{% load static %}
+{% load i18n %}
+
+<section class="hero-section">
+    <div class="container position-relative">
+        <div class="row align-items-center" style="min-height:400px;">
+            <div class="col-lg-6 col-md-12">
+                <div class="hero-box mb-4" style="background-color:var(--jobsy-yellow); border-radius:18px; padding:40px 30px; height:100%;">
+                    <h1 style="font-weight:800; font-size:2.6rem; color:white; margin-bottom:15px;">{% trans "ჩვენი ვაკანსიები დაგეხმარება!" %}</h1>
+                    <p style="font-size:1.3rem; color:white; margin-bottom:25px;">{% trans "საუკეთესო სამსახურის მოძიებაში ჯობსის ვაკანსიები დაგეხმარება" %}</p>
+                    <a href="{% url 'job_list' %}?show_filters=1#filters" class="btn btn-dark" style="font-weight:600; border-radius:12px; padding:12px 30px; font-size:1.1rem; background-color:#0a2342; border:none;">{% trans "ყველა ვაკანსია" %}</a>
+                </div>
+            </div>
+            <div class="col-lg-6 d-none d-lg-block position-relative" style="min-height:400px;">
+                <img src="{% static 'images/hero_woman.png' %}" alt="Hero" class="img-fluid" style="position:absolute; bottom:-33px; right:0; max-height:128%; z-index:1;">
+            </div>
+        </div>
+    </div>
+</section> 

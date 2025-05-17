@@ -1,0 +1,49 @@
+{% load i18n %}
+
+<!-- Company Card -->
+<div class="card mb-4 border-0 shadow-sm" style="border-radius:18px; background-color:#fff;">
+    <div class="card-body p-4">
+        <h3 style="font-size:1.4rem; font-weight:700; color:var(--jobsy-blue);">{% trans "კომპანიის შესახებ" %}</h3>
+        
+        <div class="d-flex align-items-center mb-3 mt-4">
+            {% if job.employer and job.employer.company_logo %}
+            <img src="{{ job.employer.company_logo.url }}" alt="{{ job.company }}" class="rounded-circle me-3" style="width:50px; height:50px; object-fit:cover;">
+            {% else %}
+            <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width:50px; height:50px; background-color:var(--jobsy-light);">
+                <span style="font-size:1.4rem; color:var(--jobsy-blue); font-weight:700;">{{ job.company|slice:":1" }}</span>
+            </div>
+            {% endif %}
+            <div>
+                <h4 style="font-size:1.1rem; font-weight:600; margin-bottom:0;">{{ job.company }}</h4>
+                <p class="text-muted mb-0" style="font-size:0.9rem;">{{ job.employer.industry|default:_("IT სფერო") }}</p>
+            </div>
+        </div>
+        
+        <div class="mb-3">
+            <p>{{ job.employer.company_description|default:_("კომპანიის აღწერა არ არის მითითებული.")|linebreaks }}</p>
+        </div>
+        
+        <div class="company-meta mb-4">
+            {% if job.employer %}
+            <div class="d-flex align-items-center mb-2">
+                <i class="fas fa-user-friends me-2 text-muted"></i>
+                <span>{{ job.employer.get_company_size_display }}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2">
+                <i class="fas fa-map-marker-alt me-2 text-muted"></i>
+                <span>{{ job.employer.location }}</span>
+            </div>
+            {% if job.employer.company_website %}
+            <div class="d-flex align-items-center">
+                <i class="fas fa-globe me-2 text-muted"></i>
+                <a href="{{ job.employer.company_website }}" target="_blank" class="text-decoration-none">{{ job.employer.company_website }}</a>
+            </div>
+            {% endif %}
+            {% endif %}
+        </div>
+        
+        <a href="#" class="btn w-100" style="background-color:var(--jobsy-card); color:var(--jobsy-blue); border-radius:12px; font-weight:600; padding:0.8rem;">
+            <i class="fas fa-building me-2"></i> {% trans "კომპანიის პროფილი" %}
+        </a>
+    </div>
+</div> 

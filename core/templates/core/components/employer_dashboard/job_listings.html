@@ -1,0 +1,85 @@
+{% load i18n %}
+
+<!-- Job Listings -->
+<div class="col-md-8">
+    <div class="card">
+        <div class="card-header bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="h5 mb-0">Your Job Listings</h3>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="fas fa-filter me-1"></i>Filter
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#" data-filter="all">All Jobs</a></li>
+                        <li><a class="dropdown-item" href="#" data-filter="active">Active</a></li>
+                        <li><a class="dropdown-item" href="#" data-filter="expired">Expired</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            {% for job in jobs %}
+                <div class="job-card {% if not forloop.last %}border-bottom{% endif %}">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="job-title">{{ job.title }}</div>
+                            <div class="job-meta mb-2">
+                                <span class="me-3"><i class="far fa-clock me-1"></i>Posted {{ job.posted_at|timesince }} ago</span>
+                                <span class="me-3"><i class="fas fa-briefcase me-1"></i>{{ job.get_experience_display }}</span>
+                                <span><i class="fas fa-map-marker-alt me-1"></i>{{ job.job_preferences }}</span>
+                            </div>
+                            <div class="job-requirements mb-2">
+                                <span class="badge bg-light text-dark me-2">{{ job.fields }}</span>
+                                {% for interest in job.interests.split|slice:":3" %}
+                                    <span class="badge bg-light text-dark me-2">{{ interest }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="job-status mb-2">
+                                {% if job.status == 'pending_review' %}
+                                    <span class="badge bg-warning text-dark">In Review</span>
+                                {% elif job.status == 'approved' %}
+                                    <span class="badge bg-success">Approved</span>
+                                {% elif job.status == 'rejected' %}
+                                    <span class="badge bg-danger">Rejected</span>
+                                {% endif %}
+                                {% if job.status == 'rejected' and job.admin_feedback %}
+                                    <div class="text-danger small mt-1"><i class="fas fa-info-circle me-1"></i>{{ job.admin_feedback }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a href="{% url 'job_applications' job.id %}" class="dropdown-item">
+                                        <i class="fas fa-users me-1"></i>{% trans "მოსული სივები" %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item" onclick="editJob({{ job.id }})">
+                                        <i class="fas fa-edit me-1"></i>Edit
+                                    </button>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <button class="dropdown-item text-danger" onclick="deleteJob({{ job.id }})">
+                                        <i class="fas fa-trash me-1"></i>Delete
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="text-center py-5">
+                    <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+                    <p class="mb-0">You haven't posted any jobs yet.</p>
+                    <p class="text-muted">Click the "Post New Job" button to get started.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div> 

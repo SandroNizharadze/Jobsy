@@ -1,0 +1,55 @@
+{% load i18n %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-submit status form on change
+    const statusSelects = document.querySelectorAll('.status-select');
+    statusSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            const formId = this.dataset.formId;
+            
+            // Update select appearance immediately based on new status
+            const selectedValue = this.value;
+            this.className = 'form-select form-select-sm status-select';
+            
+            if (selectedValue === 'გასაუბრება') {
+                this.classList.add('status-interview-select');
+                this.closest('tr').className = 'table-success';
+            } else if (selectedValue === 'რეზერვი') {
+                this.classList.add('status-reserve-select');
+                this.closest('tr').className = 'table-warning';
+            } else if (selectedValue === 'განხილვის_პროცესში') {
+                this.classList.add('status-review-select');
+                this.closest('tr').className = '';
+            }
+            
+            document.getElementById(formId).submit();
+        });
+    });
+    
+    // Handle search form submission
+    const searchInput = document.querySelector('input[name="search"]');
+    const searchButton = searchInput.nextElementSibling;
+    
+    searchButton.addEventListener('click', function() {
+        const currentUrl = new URL(window.location.href);
+        const searchValue = searchInput.value.trim();
+        
+        if (searchValue) {
+            currentUrl.searchParams.set('search', searchValue);
+        } else {
+            currentUrl.searchParams.delete('search');
+        }
+        
+        window.location.href = currentUrl.toString();
+    });
+    
+    // Also submit on Enter key
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            searchButton.click();
+        }
+    });
+});
+</script> 

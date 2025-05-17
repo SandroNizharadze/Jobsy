@@ -1,0 +1,58 @@
+{% load i18n %}
+
+<!-- Similar Jobs Card -->
+<div class="card border-0 shadow-sm" style="border-radius:18px; background-color:#fff;">
+    <div class="card-body p-4">
+        <h3 style="font-size:1.4rem; font-weight:700; color:var(--jobsy-blue); margin-bottom:1.5rem;">{% trans "მსგავსი ვაკანსიები" %}</h3>
+        
+        {% for similar_job in similar_jobs|slice:":3" %}
+        <div class="similar-job-item mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+            <a href="{% url 'job_detail' similar_job.id %}" class="text-decoration-none">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h4 style="font-size:1.1rem; font-weight:600; color:#000; margin-bottom:5px;">{{ similar_job.title }}</h4>
+                        <p class="text-muted mb-1" style="font-size:0.95rem;">{{ similar_job.company }}</p>
+                        <div class="d-flex align-items-center" style="font-size:0.9rem;">
+                            <i class="fas fa-wallet me-1" style="color:#666;"></i>
+                            <span style="font-weight:500;">
+                                {% if similar_job.salary_min and similar_job.salary_max %}
+                                {{ similar_job.salary_min }} - {{ similar_job.salary_max }} ₾
+                                {% elif similar_job.salary_min %}
+                                {{ similar_job.salary_min }} ₾
+                                {% elif similar_job.salary_max %}
+                                {{ similar_job.salary_max }} ₾
+                                {% else %}
+                                {% trans "შეთანხმებით" %}
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-column align-items-end">
+                        {% if similar_job.premium_level == 'premium_plus' %}
+                        <span class="badge rounded-pill mb-2" style="background-color:#a64dff; color:white; padding:0.3em 0.6em; font-size:0.75rem;">
+                            Premium+
+                        </span>
+                        {% elif similar_job.premium_level == 'premium' %}
+                        <span class="badge rounded-pill mb-2" style="background-color:#4d7bff; color:white; padding:0.3em 0.6em; font-size:0.75rem;">
+                            Premium
+                        </span>
+                        {% endif %}
+                        <span class="badge rounded-pill" style="background-color:var(--jobsy-card); color:#333; padding:0.4em 0.8em; font-size:0.8rem;">
+                        {{ similar_job.job_preferences|default:_("სრული განაკვეთი")|truncatechars:12 }}
+                        </span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% empty %}
+        <div class="text-center text-muted py-4">
+            <i class="fas fa-briefcase fa-2x mb-3"></i>
+            <p>{% trans "მსგავსი ვაკანსიები არ მოიძებნა." %}</p>
+        </div>
+        {% endfor %}
+        
+        <a href="{% url 'job_list' %}" class="btn w-100 mt-3" style="background-color:var(--jobsy-light); color:#333; border-radius:12px; font-weight:600; padding:0.8rem;">
+            <i class="fas fa-search me-2"></i> {% trans "ყველა ვაკანსია" %}
+        </a>
+    </div>
+</div> 

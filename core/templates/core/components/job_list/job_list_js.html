@@ -1,0 +1,208 @@
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if URL has show_filters parameter and filters should be visible
+    if (window.location.href.includes('show_filters=1') && window.location.hash === '#filters') {
+        const filtersSection = document.getElementById('filters');
+        if (filtersSection) {
+            filtersSection.classList.remove('d-none');
+        }
+    }
+
+    // Salary slider
+    const salarySlider = document.getElementById('salary-slider');
+    const salaryValue = document.getElementById('salary-value');
+    
+    if (salarySlider && salaryValue) {
+        // Update display value while sliding
+        salarySlider.addEventListener('input', function() {
+            salaryValue.textContent = '₾ ' + salarySlider.value;
+        });
+        
+        // Filter after slider stops (when user releases mouse)
+        salarySlider.addEventListener('change', function() {
+            applyFiltersWithAjax();
+        });
+    }
+    
+    // Auto-submit on select changes
+    const filterSelects = document.querySelectorAll('select.filter-auto-submit');
+    filterSelects.forEach(function(select) {
+        select.addEventListener('change', function() {
+            applyFiltersWithAjax();
+        });
+    });
+    
+    // Auto-submit on text input (with debounce)
+    const searchInput = document.querySelector('input[name="search"]');
+    if (searchInput) {
+        let searchTimeout;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(function() {
+                applyFiltersWithAjax();
+            }, 500); // Wait 500ms after user stops typing
+        });
+    }
+    
+    // Auto-submit on checkbox changes
+    const filterCheckboxes = document.querySelectorAll('.filter-auto-submit[type="checkbox"]');
+    filterCheckboxes.forEach(function(checkbox) {
+        checkbox.addEventListener('change', function() {
+            applyFiltersWithAjax();
+        });
+    });
+    
+    // Variables to track AJAX state
+    let currentRequest = null;
+    
+    // AJAX-based filtering to avoid page refreshes
+    function applyFiltersWithAjax() {
+        const form = document.getElementById('filter-form');
+        if (!form) return;
+        
+        // Cancel any in-progress request
+        if (currentRequest) {
+            currentRequest.abort();
+        }
+        
+        // Create form data object
+        const formData = new FormData(form);
+        const searchParams = new URLSearchParams();
+        
+        // Add all form values to search params
+        for (const [key, value] of formData.entries()) {
+            // Skip empty values
+            if (value !== '' && key !== 'job_preferences') {
+                searchParams.append(key, value);
+            }
+        }
+        
+        // Handle job preferences checkboxes (combine them)
+        const checkedPreferences = [];
+        form.querySelectorAll('input[name="job_preferences"]:checked').forEach(function(checkbox) {
+            checkedPreferences.push(checkbox.value);
+        });
+        
+        if (checkedPreferences.length > 0) {
+            searchParams.append('job_preferences', checkedPreferences.join(','));
+        }
+        
+        // Ensure the filters stay visible
+        searchParams.append('show_filters', '1');
+        searchParams.append('ajax', '1'); // Add indicator for AJAX request
+        
+        // Show a subtle loading indicator within the job results container
+        const jobsContainer = document.querySelector('.row.g-4');
+        if (jobsContainer) {
+            // Add subtle opacity transition
+            jobsContainer.style.opacity = '0.6';
+            jobsContainer.style.transition = 'opacity 0.2s';
+        }
+        
+        // Update URL without refreshing the page (for bookmarking and sharing)
+        const newUrl = window.location.pathname + '?' + searchParams.toString();
+        window.history.pushState({ path: newUrl }, '', newUrl);
+        
+        // Make AJAX request
+        currentRequest = new XMLHttpRequest();
+        currentRequest.open('GET', '{% url "job_list" %}?' + searchParams.toString(), true);
+        
+        currentRequest.onload = function() {
+            if (this.status >= 200 && this.status < 400) {
+                // Success!
+                const response = this.responseText;
+                
+                // Parse the HTML response
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(response, 'text/html');
+                
+                // Extract just the job results
+                const newJobsContainer = doc.querySelector('.row.g-4');
+                
+                // Update the job count if present
+                const resultCount = doc.querySelector('h2 small');
+                if (resultCount) {
+                    const currentHeading = document.querySelector('h2');
+                    if (currentHeading) {
+                        const currentSmall = currentHeading.querySelector('small');
+                        if (currentSmall) {
+                            currentSmall.textContent = resultCount.textContent;
+                        } else {
+                            const newSmall = document.createElement('small');
+                            newSmall.textContent = resultCount.textContent;
+                            currentHeading.appendChild(newSmall);
+                        }
+                    }
+                }
+                
+                // Replace the job listings with a smooth transition
+                if (newJobsContainer && jobsContainer) {
+                    // Extract all job cards
+                    const jobCards = newJobsContainer.querySelectorAll('.col-12');
+                    
+                    // Clear existing content
+                    jobsContainer.innerHTML = '';
+                    
+                    // Add new job cards with a staggered delay for a smoother effect
+                    jobCards.forEach(function(card, index) {
+                        setTimeout(function() {
+                            jobsContainer.appendChild(card.cloneNode(true));
+                            
+                            // If this is the last card, restore opacity
+                            if (index === jobCards.length - 1) {
+                                jobsContainer.style.opacity = '1';
+                            }
+                        }, index * 50); // Stagger card appearance by 50ms
+                    });
+                    
+                    // If there are no cards, restore opacity immediately
+                    if (jobCards.length === 0) {
+                        jobsContainer.innerHTML = newJobsContainer.innerHTML;
+                        jobsContainer.style.opacity = '1';
+                    }
+                }
+                
+                currentRequest = null;
+            } else {
+                // Error handler
+                console.error('Server returned an error');
+                if (jobsContainer) {
+                    jobsContainer.style.opacity = '1';
+                }
+                currentRequest = null;
+            }
+        };
+        
+        currentRequest.onerror = function() {
+            // Connection error
+            console.error('Connection error');
+            if (jobsContainer) {
+                jobsContainer.style.opacity = '1';
+            }
+            currentRequest = null;
+        };
+        
+        currentRequest.send();
+    }
+    
+    // Handle filter reset button without page refresh
+    const resetButton = document.querySelector('a[href*="show_filters=1"]:not([href*="#filters"])');
+    if (resetButton) {
+        resetButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Reset all form fields
+            const form = document.getElementById('filter-form');
+            if (form) {
+                form.reset();
+                // Manually update the salary value display
+                if (salaryValue && salarySlider) {
+                    salarySlider.value = 0;
+                    salaryValue.textContent = '₾ 0';
+                }
+                // Apply filters with empty values
+                applyFiltersWithAjax();
+            }
+        });
+    }
+});
+</script> 

@@ -1,0 +1,34 @@
+{% load static %}
+{% load i18n %}
+
+<style>
+    /* Hide hero section only on job detail pages */
+    .hero-section {
+        display: none;
+    }
+    
+    /* Add custom styling for job details page */
+    .main-bg {
+        background-color: var(--jobsy-light);
+        padding-top: 20px;
+    }
+    
+    .job-detail-header {
+        background-color: var(--jobsy-blue);
+        color: white;
+        padding: 40px 0;
+        margin-bottom: 30px;
+    }
+    
+    .company-badge {
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: white;
+        border-radius: 50%;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+</style> 

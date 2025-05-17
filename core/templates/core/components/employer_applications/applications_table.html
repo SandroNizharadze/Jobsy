@@ -1,0 +1,128 @@
+{% load i18n %}
+
+<!-- Applications List -->
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">{% trans "აპლიკანტი" %}</th>
+                        <th scope="col">{% trans "თარიღი" %}</th>
+                        <th scope="col">{% trans "CV" %}</th>
+                        <th scope="col">{% trans "მოტივაციის წერილი" %}</th>
+                        <th scope="col">{% trans "სტატუსი" %}</th>
+                        <th scope="col" class="text-center">{% trans "მოქმედება" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for application in applications %}
+                    <tr{% if application.status == 'გასაუბრება' %} class="table-success"{% elif application.status == 'რეზერვი' %} class="table-warning"{% endif %}>
+                        <td>
+                            {% if application.user %}
+                                <div class="d-flex align-items-center">
+                                    {% if application.user.userprofile.profile_picture %}
+                                        <img src="{{ application.user.userprofile.profile_picture.url }}" alt="Profile" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                                    {% else %}
+                                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <p class="mb-0 fw-medium">{{ application.user.get_full_name|default:application.user.username }}</p>
+                                        <p class="mb-0 small text-muted">{{ application.user.email }}</p>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 fw-medium">{{ application.guest_name }}</p>
+                                        <p class="mb-0 small text-muted">{{ application.guest_email }}</p>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div>{{ application.applied_at|date:"d M Y" }}</div>
+                            <small class="text-muted">{{ application.applied_at|time:"H:i" }}</small>
+                        </td>
+                        <td>
+                            <a href="{{ application.resume.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                <i class="fas fa-file-pdf me-1"></i>{% trans "ნახვა" %}
+                            </a>
+                            <a href="{{ application.resume.url }}" class="btn btn-sm btn-outline-primary" download>
+                                <i class="fas fa-download"></i>
+                            </a>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#coverLetterModal{{ application.id }}">
+                                <i class="fas fa-envelope-open-text me-1"></i>{% trans "ნახვა" %}
+                            </button>
+                            
+                            <!-- Cover Letter Modal -->
+                            <div class="modal fade" id="coverLetterModal{{ application.id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">{% trans "მოტივაციის წერილი" %}</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>{{ application.cover_letter|linebreaks }}</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "დახურვა" %}</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <form id="statusForm{{ application.id }}" method="post" action="{% url 'update_application_status' application.id %}">
+                                {% csrf_token %}
+                                <select name="status" class="form-select form-select-sm status-select {% if application.status == 'გასაუბრება' %}status-interview-select{% elif application.status == 'რეზერვი' %}status-reserve-select{% elif application.status == 'განხილვის_პროცესში' %}status-review-select{% endif %}" data-form-id="statusForm{{ application.id }}">
+                                    <option value="განხილვის_პროცესში" {% if application.status == 'განხილვის_პროცესში' %}selected{% endif %}>
+                                        {% trans "განხილვის პროცესში" %}
+                                    </option>
+                                    <option value="გასაუბრება" {% if application.status == 'გასაუბრება' %}selected{% endif %}>
+                                        {% trans "გასაუბრება" %}
+                                    </option>
+                                    <option value="რეზერვი" {% if application.status == 'რეზერვი' %}selected{% endif %}>
+                                        {% trans "რეზერვი" %}
+                                    </option>
+                                </select>
+                            </form>
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group">
+                                {% if application.user and application.user.email %}
+                                <a href="mailto:{{ application.user.email }}" class="btn btn-sm btn-outline-info">
+                                    <i class="fas fa-envelope"></i>
+                                </a>
+                                {% elif application.guest_email %}
+                                <a href="mailto:{{ application.guest_email }}" class="btn btn-sm btn-outline-info">
+                                    <i class="fas fa-envelope"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <div class="my-4">
+                                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                <p class="mb-1">{% trans "ამ ვაკანსიაზე აპლიკაციები ჯერ არ გაქვთ" %}</p>
+                                <p class="text-muted mb-0">{% trans "როგორც კი ვინმე შემოიტანს აპლიკაციას, აქ გამოჩნდება" %}</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div> 

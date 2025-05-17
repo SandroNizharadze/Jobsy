@@ -1,0 +1,12 @@
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Activate apply modal when apply button is clicked
+    const applyBtn = document.querySelector('.apply-section button');
+    if (applyBtn) {
+        applyBtn.addEventListener('click', function() {
+            const modal = new bootstrap.Modal(document.getElementById('applyModal'));
+            modal.show();
+        });
+    }
+});
+</script> 
