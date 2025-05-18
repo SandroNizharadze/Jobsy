@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'social_django',
     'import_export',
     'rangefilter',
+    'storages',
     'core',
 ]
 
@@ -141,6 +142,15 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# S3 Settings - Apply when USE_S3 is True
+print(f"USE_S3 value from environment: {os.environ.get('USE_S3', 'NOT SET')}")
+if os.environ.get('USE_S3', 'False') == 'True':
+    print("Importing S3 settings...")
+    from .s3_settings import *
+    print("S3 settings imported successfully")
+else:
+    print("S3 settings not imported - condition not met")
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

@@ -22,9 +22,15 @@ DATABASES = {
     }
 }
 
-# Static files
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Enable S3 storage in production
+USE_S3 = os.environ.get('USE_S3', 'True') == 'True'
+
+if USE_S3:
+    from .s3_settings import *
+else:
+    # Static files
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Security settings
 SECURE_SSL_REDIRECT = True

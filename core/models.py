@@ -9,6 +9,13 @@ from django.utils import timezone
 import logging
 from django.db import transaction
 
+# Import storage backends if S3 is enabled
+if hasattr(settings, 'USE_S3') and settings.USE_S3:
+    from jobsy.storage_backends import PublicMediaStorage, PrivateMediaStorage
+else:
+    PublicMediaStorage = None
+    PrivateMediaStorage = None
+
 logger = logging.getLogger(__name__)
 
 class SoftDeletionQuerySet(models.QuerySet):
@@ -184,7 +191,18 @@ class JobApplication(models.Model):
     guest_name = models.CharField(max_length=255, blank=True, null=True, verbose_name=_("სტუმრის სახელი"))
     guest_email = models.EmailField(blank=True, null=True, verbose_name=_("სტუმრის ელ-ფოსტა"))
     cover_letter = models.TextField(verbose_name=_("მოტივაციის წერილი"))
-    resume = models.FileField(upload_to='resumes/', verbose_name=_("რეზიუმე"))
+    # Use PrivateMediaStorage for sensitive resume files when S3 is enabled
+    if PrivateMediaStorage:
+        resume = models.FileField(
+            upload_to='resumes/', 
+            storage=PrivateMediaStorage(),
+            verbose_name=_("რეზიუმე")
+        )
+    else:
+        resume = models.FileField(
+            upload_to='resumes/', 
+            verbose_name=_("რეზიუმე")
+        )
     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default='განხილვის_პროცესში', db_index=True, verbose_name=_("სტატუსი"))
     applied_at = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name=_("აპლიკაციის თარიღი"))
     updated_at = models.DateTimeField(auto_now=True, verbose_name=_("განახლების თარიღი"))
@@ -218,10 +236,43 @@ class UserProfile(models.Model):
     
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name=_("მომხმარებელი"))
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='candidate', db_index=True, verbose_name=_("როლი"))
-    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True, verbose_name=_("პროფილის სურათი"))
+    
+    # Use PublicMediaStorage for profile pictures when S3 is enabled
+    if PublicMediaStorage:
+        profile_picture = models.ImageField(
+            upload_to='profile_pictures/', 
+            storage=PublicMediaStorage(),
+            blank=True, 
+            null=True, 
+            verbose_name=_("პროფილის სურათი")
+        )
+    else:
+        profile_picture = models.ImageField(
+            upload_to='profile_pictures/', 
+            blank=True, 
+            null=True, 
+            verbose_name=_("პროფილის სურათი")
+        )
+    
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("შექმნის თარიღი"))
-    # New fields for CV workflow
-    cv = models.FileField(upload_to='cvs/', blank=True, null=True, verbose_name=_("CV"))
+    
+    # Use PrivateMediaStorage for CV files when S3 is enabled
+    if PrivateMediaStorage:
+        cv = models.FileField(
+            upload_to='cvs/', 
+            storage=PrivateMediaStorage(),
+            blank=True, 
+            null=True, 
+            verbose_name=_("CV")
+        )
+    else:
+        cv = models.FileField(
+            upload_to='cvs/', 
+            blank=True, 
+            null=True, 
+            verbose_name=_("CV")
+        )
+    
     cv_consent = models.BooleanField(default=False, verbose_name=_("CV-ის გაზიარების თანხმობა"))
     cv_share_with_employers = models.BooleanField(default=False, verbose_name=_("CV-ის გაზიარება დამსაქმებლებთან"))
     cv_visible_to = models.ManyToManyField('EmployerProfile', blank=True, related_name='visible_candidate_cvs', verbose_name=_("CV-ის ხილვადობა"))
@@ -281,7 +332,22 @@ class EmployerProfile(SoftDeletionModel):
     phone_number = models.CharField(max_length=50, blank=True, null=True, verbose_name=_("მობილურის ნომერი"))
     company_website = models.URLField(blank=True, verbose_name=_("კომპანიის ვებსაიტი"))
     company_description = models.TextField(blank=True, verbose_name=_("კომპანიის აღწერა"))
-    company_logo = models.ImageField(upload_to='company_logos/', blank=True, null=True, verbose_name=_("კომპანიის ლოგო"))
+    # Use PublicMediaStorage for company logos when S3 is enabled
+    if PublicMediaStorage:
+        company_logo = models.ImageField(
+            upload_to='company_logos/', 
+            storage=PublicMediaStorage(),
+            blank=True, 
+            null=True, 
+            verbose_name=_("კომპანიის ლოგო")
+        )
+    else:
+        company_logo = models.ImageField(
+            upload_to='company_logos/', 
+            blank=True, 
+            null=True, 
+            verbose_name=_("კომპანიის ლოგო")
+        )
     company_size = models.CharField(max_length=50, choices=COMPANY_SIZE_CHOICES, blank=True, verbose_name=_("კომპანიის ზომა"))
     industry = models.CharField(max_length=100, blank=True, db_index=True, verbose_name=_("ინდუსტრია"))
     location = models.CharField(max_length=100, blank=True, db_index=True, verbose_name=_("მდებარეობა"))
