@@ -5,18 +5,21 @@
 2. Make sure you have created an IAM user with S3 permissions
 3. Make sure you have the IAM user's access key and secret key
 
-## Step 1: Update your environment variables
-Edit the export_s3_env.sh script with your actual AWS credentials:
+## Step 1: Create a .env.s3 file with your AWS credentials
+Create a file named `.env.s3` with the following content:
 ```
-export AWS_ACCESS_KEY_ID=your_actual_access_key_id
-export AWS_SECRET_ACCESS_KEY=your_actual_secret_access_key
-export AWS_STORAGE_BUCKET_NAME=jobsy-media-files
-export AWS_S3_REGION_NAME=eu-north-1  # Or your actual region
-export USE_S3=True
-export DEBUG=False
+USE_S3=True
+DEBUG=False
+AWS_ACCESS_KEY_ID=your_actual_access_key_id
+AWS_SECRET_ACCESS_KEY=your_actual_secret_access_key
+AWS_STORAGE_BUCKET_NAME=jobsy-media-files
+AWS_S3_REGION_NAME=eu-north-1
 ```
 
+Make sure to add `.env.s3` to your `.gitignore` file to prevent committing secrets.
+
 ## Step 2: Run the export script
+The `export_s3_env.sh` script will read the environment variables from `.env.s3`:
 ```
 source export_s3_env.sh
 ```
