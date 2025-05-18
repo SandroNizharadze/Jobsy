@@ -1,0 +1,62 @@
+{% load i18n %}
+
+<div class="card pricing-card premium-plus-card">
+    <div class="card-body p-4">
+        <span class="pricing-tag premium-plus-tag">{% trans "ფასდაკლება" %}</span>
+        <div class="package-icon mb-4">
+            <i class="fas fa-gem"></i>
+        </div>
+        <h3 class="pricing-title premium-plus-title">{% trans "პრემიუმ+" %}</h3>
+        <div class="pricing-price">
+            <span class="original-price">120₾</span>
+            <span class="current-price premium-plus-price">60<span class="currency">₾</span></span>
+        </div>
+        <p class="package-description mb-4">{% trans "იდეალურია მაღალი კონკურენციის პოზიციებისთვის" %}</p>
+        
+        <ul class="pricing-features">
+            <li>
+                <i class="far fa-calendar-alt"></i>
+                <span class="feature-text">{% trans "პერიოდი 30 დღე" %}</span>
+            </li>
+            <li>
+                <i class="fas fa-home"></i>
+                <span class="feature-text">{% trans "მთავარი გვერდის პირველი სექცია" %}</span>
+            </li>
+            <li>
+                <i class="far fa-image"></i>
+                <span class="feature-text">{% trans "ლოგოს გამოჩენა" %}</span>
+            </li>
+            <li>
+                <i class="fas fa-share-alt"></i>
+                <span class="feature-text">{% trans "სოც. ქსელებში გაზიარება ინდივიდუალური და ჯგუფური პოსტის სახით" %}</span>
+            </li>
+            <li>
+                <i class="fas fa-award"></i>
+                <span class="feature-text">{% trans "პრემიუმ+ ნიშანი" %}</span>
+            </li>
+            <li>
+                <i class="fas fa-external-link-alt"></i>
+                <span class="feature-text">{% trans "ვაკანსიის ატვირთვა Karriera.ge-ზე" %}</span>
+            </li>
+            <li>
+                <i class="fas fa-sort-amount-up"></i>
+                <span class="feature-text">
+                    {% trans "ძიებისას პრიორიტეტულობა:" %}
+                    <span class="priority-badge priority-high">{% trans "მაღალი" %}</span>
+                </span>
+            </li>
+            <li>
+                <i class="fas fa-chart-bar"></i>
+                <span class="feature-text">{% trans "დამსაქმებლის პროფილი და სივების ანალიტიკა" %}</span>
+            </li>
+            <li>
+                <i class="fas fa-database"></i>
+                <span class="feature-text">{% trans "სივების ბაზაზე წვდომა" %}</span>
+            </li>
+        </ul>
+        
+        <a href="#" class="btn btn-outline-primary w-100 pricing-btn premium-plus-btn">
+            <i class="fas fa-check-circle me-2"></i>{% trans "აირჩიე" %}
+        </a>
+    </div>
+</div> 

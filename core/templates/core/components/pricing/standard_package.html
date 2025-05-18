@@ -1,0 +1,46 @@
+{% load i18n %}
+
+<div class="card pricing-card">
+    <div class="card-body p-4">
+        <span class="pricing-tag">{% trans "ფასდაკლება" %}</span>
+        <div class="package-icon mb-4">
+            <i class="fas fa-rocket"></i>
+        </div>
+        <h3 class="pricing-title">{% trans "სტანდარტული" %}</h3>
+        <div class="pricing-price">
+            <span class="original-price">40₾</span>
+            <span class="current-price">{% trans "უფასო" %}</span>
+        </div>
+        <p class="package-description mb-4">{% trans "იდეალურია დამწყები კომპანიებისთვის" %}</p>
+        
+        <ul class="pricing-features">
+            <li>
+                <i class="far fa-calendar-alt"></i>
+                <span class="feature-text">{% trans "პერიოდი 30 დღე" %}</span>
+            </li>
+            <li class="no-feature">
+                <i class="fas fa-home"></i>
+                <span class="feature-text">{% trans "მთავარ გვერდზე ყოფნა - არა" %}</span>
+            </li>
+            <li>
+                <i class="far fa-image"></i>
+                <span class="feature-text">{% trans "ლოგოს გამოჩენა" %}</span>
+            </li>
+            <li>
+                <i class="fas fa-chart-bar"></i>
+                <span class="feature-text">{% trans "დამსაქმებლის პროფილი და სივების ანალიტიკა" %}</span>
+            </li>
+            <li>
+                <i class="fas fa-sort-amount-up"></i>
+                <span class="feature-text">
+                    {% trans "ძიებისას პრიორიტეტულობა:" %}
+                    <span class="priority-badge priority-low">{% trans "დაბალი" %}</span>
+                </span>
+            </li>
+        </ul>
+        
+        <a href="#" class="btn btn-outline-primary w-100 pricing-btn">
+            <i class="fas fa-check-circle me-2"></i>{% trans "აირჩიე" %}
+        </a>
+    </div>
+</div> 

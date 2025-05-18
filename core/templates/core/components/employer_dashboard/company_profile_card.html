@@ -5,13 +5,15 @@
     <div class="card">
         <div class="card-body">
             <div class="text-center mb-4">
-                {% if user.userprofile.employer_profile.company_logo %}
-                    <img src="{{ user.userprofile.employer_profile.company_logo.url }}" alt="Company Logo" class="company-logo mb-3">
-                {% else %}
-                    <div class="company-logo-placeholder mb-3">
-                        <i class="fas fa-building"></i>
-                    </div>
-                {% endif %}
+                <div class="company-logo-container mb-3">
+                    {% if user.userprofile.employer_profile.company_logo %}
+                        <img src="{{ user.userprofile.employer_profile.company_logo.url }}" alt="Company Logo" class="company-logo">
+                    {% else %}
+                        <div class="company-logo-placeholder">
+                            <i class="fas fa-building"></i>
+                        </div>
+                    {% endif %}
+                </div>
                 <h3 class="h4 mb-1">{{ user.userprofile.employer_profile.company_name }}</h3>
                 <p class="text-muted mb-3">{{ user.userprofile.employer_profile.industry }}</p>
                 {% if user.userprofile.employer_profile.company_website %}
@@ -26,9 +28,14 @@
                 <p><i class="fas fa-map-marker-alt me-2"></i>{{ user.userprofile.employer_profile.location }}</p>
             </div>
             <div class="text-center mt-3">
-                <a href="{% url 'profile' %}" class="btn btn-outline-primary btn-sm">
-                    <i class="fas fa-edit me-1"></i>Edit Company Profile
-                </a>
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'profile' %}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-edit me-1"></i>{% trans "პროფილის რედაქტირება" %}
+                    </a>
+                    <a href="{% url 'pricing' %}" class="btn btn-outline-info btn-sm">
+                        <i class="fas fa-tags me-1"></i>{% trans "ჩვენი პაკეტები" %}
+                    </a>
+                </div>
             </div>
         </div>
     </div>

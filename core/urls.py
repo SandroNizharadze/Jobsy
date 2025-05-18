@@ -20,6 +20,7 @@ urlpatterns = [
     path('employer/home/', main.employer_home, name='employer_home'),
     path('employer/jobs/<int:job_id>/applications/', main.job_applications, name='job_applications'),
     path('employer/applications/<int:application_id>/update-status/', main.update_application_status, name='update_application_status'),
+    path('pricing/', main.pricing, name='pricing'),
     
     # Job routes
     path('jobs/<int:job_id>/', main.job_detail, name='job_detail'),

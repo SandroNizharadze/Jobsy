@@ -21,4 +21,8 @@ def home_redirect(request):
     return redirect('job_list')
 
 # Import required modules to support the above functions
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
+
+def pricing(request):
+    """Display the pricing packages page"""
+    return render(request, 'core/pricing.html')
