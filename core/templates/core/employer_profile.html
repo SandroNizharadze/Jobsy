@@ -1,0 +1,166 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Employer Profile" %}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2 mb-0">{% trans "Employer Profile" %}</h1>
+    <div class="d-flex gap-2">
+        <a href="{% url 'employer_dashboard' %}" class="btn btn-linkedin">
+            <i class="fas fa-building me-1"></i>{% trans "Employer Dashboard" %}
+        </a>
+        <a href="{% url 'job_list' %}" class="btn btn-outline-primary">
+            <i class="fas fa-briefcase me-1"></i>{% trans "View Jobs" %}
+        </a>
+    </div>
+</div>
+
+<div class="profile-section">
+    <form method="post" enctype="multipart/form-data" class="needs-validation" id="employer-profile-form" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="employer_form">
+        <div class="profile-header">
+            <div class="profile-picture-container">
+                <div class="profile-picture-wrapper">
+                    {% if user.userprofile.profile_picture %}
+                        <img src="{{ user.userprofile.profile_picture.url }}" alt="{% trans 'Profile Picture' %}" class="profile-picture">
+                    {% else %}
+                        <div class="profile-picture-placeholder">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    {% endif %}
+                    <div class="profile-picture-overlay">
+                        <label for="{{ profile_form.profile_picture.id_for_label }}" class="profile-picture-edit">
+                            <i class="fas fa-camera"></i>
+                            <span>{% trans "Change Photo" %}</span>
+                        </label>
+                    </div>
+                </div>
+                {{ profile_form.profile_picture }}
+                {% if profile_form.profile_picture.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ profile_form.profile_picture.errors|join:", " }}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="profile-info">
+                <h1>{{ user.get_full_name|default:user.username }}</h1>
+                <p class="text-muted">{{ user.email }}</p>
+                <span class="badge bg-primary">{% trans "Employer" %}</span>
+            </div>
+        </div>
+
+        <div class="employer-section mb-4">
+            <h3 class="h4 mb-3">{% trans "Company Information" %}</h3>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label" for="{{ employer_form.company_name.id_for_label }}">{% trans "Company Name" %}</label>
+                    {{ employer_form.company_name }}
+                    {% if employer_form.company_name.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ employer_form.company_name.errors|join:", " }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label" for="{{ employer_form.company_id.id_for_label }}">{% trans "Identification Code" %}</label>
+                    {{ employer_form.company_id }}
+                    {% if employer_form.company_id.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ employer_form.company_id.errors|join:", " }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label" for="{{ employer_form.phone_number.id_for_label }}">{% trans "Phone Number" %}</label>
+                    {{ employer_form.phone_number }}
+                    {% if employer_form.phone_number.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ employer_form.phone_number.errors|join:", " }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label" for="{{ employer_form.company_website.id_for_label }}">{% trans "Company Website" %}</label>
+                    {{ employer_form.company_website }}
+                    {% if employer_form.company_website.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ employer_form.company_website.errors|join:", " }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="{{ employer_form.company_description.id_for_label }}">{% trans "Company Description" %}</label>
+                {{ employer_form.company_description }}
+                {% if employer_form.company_description.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ employer_form.company_description.errors|join:", " }}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label" for="{{ employer_form.company_logo.id_for_label }}">{% trans "Company Logo" %}</label>
+                    <div class="company-logo-container mb-2">
+                        {% if user.userprofile.employer_profile.company_logo %}
+                            <img src="{{ user.userprofile.employer_profile.company_logo.url }}" alt="Company Logo" class="company-logo">
+                        {% else %}
+                            <div class="company-logo-placeholder">
+                                <i class="fas fa-building"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    {{ employer_form.company_logo }}
+                    {% if employer_form.company_logo.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ employer_form.company_logo.errors|join:", " }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label" for="{{ employer_form.company_size.id_for_label }}">{% trans "Company Size" %}</label>
+                    {{ employer_form.company_size }}
+                    {% if employer_form.company_size.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ employer_form.company_size.errors|join:", " }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label" for="{{ employer_form.industry.id_for_label }}">{% trans "Industry" %}</label>
+                    {{ employer_form.industry }}
+                    {% if employer_form.industry.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ employer_form.industry.errors|join:", " }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="{{ employer_form.location.id_for_label }}">{% trans "Location" %}</label>
+                {{ employer_form.location }}
+                {% if employer_form.location.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ employer_form.location.errors|join:", " }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="d-flex gap-2 justify-content-end mt-4">
+            <button type="submit" class="btn btn-linkedin">
+                <i class="fas fa-save me-1"></i>{% trans "Save Profile" %}
+            </button>
+        </div>
+    </form>
+</div>
+
+{% include 'core/components/profile/profile_styles.html' %}
+{% endblock %}
+
+{% block extra_js %}
+{% include 'core/components/profile/profile_js.html' %}
+{% endblock %} 

@@ -1,0 +1,57 @@
+{% load i18n %}
+
+<div class="comparison-section mt-5 pt-4" data-aos="fade-up">
+    <div class="text-center mb-4">
+        <h4>{% trans "პაკეტების შედარება" %}</h4>
+    </div>
+    <div class="table-responsive">
+        <table class="table comparison-table">
+            <thead>
+                <tr>
+                    <th>{% trans "ფუნქცია" %}</th>
+                    <th class="text-center">{% trans "სტანდარტული" %}</th>
+                    <th class="text-center">{% trans "პრემიუმი" %}</th>
+                    <th class="text-center">{% trans "პრემიუმ+" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{% trans "პერიოდი" %}</td>
+                    <td class="text-center">30 {% trans "დღე" %}</td>
+                    <td class="text-center">30 {% trans "დღე" %}</td>
+                    <td class="text-center">30 {% trans "დღე" %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "მთავარ გვერდზე ყოფნა" %}</td>
+                    <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                    <td class="text-center">{% trans "მეორე სექცია" %}</td>
+                    <td class="text-center">{% trans "პირველი სექცია" %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "ლოგოს გამოჩენა" %}</td>
+                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                </tr>
+                <tr>
+                    <td>{% trans "დამსაქმებლის პროფილი და სივების ანალიტიკა" %}</td>
+                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                </tr>
+                <tr>
+                    <td>{% trans "სივების ბაზაზე წვდომა" %}</td>
+                    <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                </tr>
+                <tr>
+                    <td>{% trans "ძიებისას პრიორიტეტულობა" %}</td>
+                    <td class="text-center">{% trans "დაბალი" %}</td>
+                    <td class="text-center">{% trans "საშუალო" %}</td>
+                    <td class="text-center">{% trans "მაღალი" %}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div> 

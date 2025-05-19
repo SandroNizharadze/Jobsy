@@ -16,7 +16,7 @@
         })
     })()
 
-    // Profile picture preview
+    // Profile picture preview and auto-submit
     const profilePictureInput = document.getElementById('id_profile_picture');
     if (profilePictureInput) {
         profilePictureInput.addEventListener('change', function(e) {
@@ -32,7 +32,49 @@
                                 <span>{% trans "Change Photo" %}</span>
                             </label>
                         </div>
-                    `
+                    `;
+                    
+                    // Display loading indicator
+                    const loadingIndicator = document.createElement('div');
+                    loadingIndicator.className = 'profile-loading-indicator';
+                    loadingIndicator.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    container.appendChild(loadingIndicator);
+                    
+                    // Auto-submit the form
+                    const userProfileForm = document.getElementById('profile-picture-form');
+                    const employerProfileForm = document.getElementById('employer-profile-form');
+                    const form = userProfileForm || employerProfileForm;
+                    
+                    if (form) {
+                        // Set the form type based on which form is present
+                        const formTypeInput = form.querySelector('input[name="form_type"]');
+                        if (formTypeInput) {
+                            formTypeInput.value = userProfileForm ? 'user_profile' : 'employer_form';
+                        }
+                        
+                        setTimeout(() => {
+                            form.submit();
+                        }, 500); // Small delay to show preview first
+                    }
+                }
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    }
+
+    // Company logo preview
+    const companyLogoInput = document.getElementById('id_company_logo');
+    if (companyLogoInput) {
+        companyLogoInput.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const container = document.querySelector('.company-logo-container');
+                    if (container) {
+                        container.innerHTML = `
+                            <img src="${e.target.result}" alt="Company Logo" class="company-logo">
+                        `;
+                    }
                 }
                 reader.readAsDataURL(this.files[0]);
             }

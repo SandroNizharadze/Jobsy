@@ -13,14 +13,14 @@ import traceback
 from django.conf import settings
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
-from jobsy.storage_backends import PrivateMediaStorage
+from jobsy.storage_backends import PrivateMediaStorage, PublicMediaStorage
 
 logger = logging.getLogger(__name__)
 
 @login_required
 def profile(request):
     """
-    Display and manage user profile
+    Display and manage user profile based on role
     """
     if not request.user.is_authenticated:
         return redirect('login')
@@ -35,213 +35,51 @@ def profile(request):
     # Check if it's an AJAX request for CV upload
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     
-    # Handle profile form
-    if request.method == 'POST' and ('profile_form' in request.POST or is_ajax):
-        logger.info(f"Processing profile form for user {request.user.username} (AJAX: {is_ajax})")
-        
-        # Enhanced logging for file uploads
-        logger.info(f"Request POST data: {dict(request.POST)}")
-        logger.info(f"Request FILES: {list(request.FILES.keys())}")
-        
-        # Log individual file details
-        for file_key, file_obj in request.FILES.items():
-            logger.info(f"File '{file_key}': name={file_obj.name}, size={file_obj.size}, content_type={file_obj.content_type}")
-        
-        # Special handling for direct CV upload via AJAX
-        if is_ajax and 'cv' in request.FILES:
-            logger.info(f"Processing direct CV upload via AJAX")
-            try:
-                cv_file = request.FILES['cv']
-                logger.info(f"Received CV file: {cv_file.name}, size: {cv_file.size}, type: {cv_file.content_type}")
-                
-                # First check if S3 is enabled
-                if hasattr(settings, 'USE_S3') and settings.USE_S3:
-                    logger.info(f"S3 is enabled")
-                    # Use PrivateMediaStorage for CV files
-                    storage = PrivateMediaStorage()
-                    file_path = f"cvs/{cv_file.name}"
-                    logger.info(f"Saving CV file to S3 at path: {file_path}")
-                    
-                    # Write the file to a temporary file first to ensure it's valid
-                    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-                        for chunk in cv_file.chunks():
-                            temp_file.write(chunk)
-                        temp_path = temp_file.name
-                    
-                    # Read the file back and upload to S3
-                    with open(temp_path, 'rb') as f:
-                        file_data = f.read()
-                        # Save directly to S3 using the private storage
-                        storage.save(file_path, ContentFile(file_data))
-                    
-                    # Update the user profile with the new CV path
-                    user_profile.cv.name = file_path
-                    user_profile.save(update_fields=['cv'])
-                    
-                    # Clean up the temporary file
-                    os.unlink(temp_path)
-                else:
-                    logger.info(f"S3 is not enabled, using default storage")
-                    # Write the file to a temporary file first to ensure it's valid
-                    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-                        for chunk in cv_file.chunks():
-                            temp_file.write(chunk)
-                        temp_path = temp_file.name
-                    
-                    logger.info(f"Wrote CV file to temporary path: {temp_path}")
-                    
-                    # Read the file back
-                    with open(temp_path, 'rb') as f:
-                        file_data = f.read()
-                    
-                    # Save directly to the user profile using ContentFile
-                    user_profile.cv.save(cv_file.name, ContentFile(file_data))
-                    
-                    # Clean up the temporary file
-                    os.unlink(temp_path)
-                
-                # Verify the file was saved
-                logger.info(f"CV saved. Path in database: {user_profile.cv.name}")
-                
-                # Verify the file exists in storage
-                if user_profile.cv and hasattr(user_profile.cv, 'storage'):
-                    if user_profile.cv.storage.exists(user_profile.cv.name):
-                        logger.info(f"Verified file exists at {user_profile.cv.name}")
-                        # Success!
-                        return JsonResponse({'success': True})
-                    else:
-                        logger.error(f"File does not exist in storage: {user_profile.cv.name}")
-                        return JsonResponse({'success': False, 'error': 'File was not saved to storage properly.'})
-                
-                return JsonResponse({'success': True})
-            except Exception as e:
-                logger.error(f"Error uploading CV via AJAX: {str(e)}")
-                logger.error(traceback.format_exc())
-                return JsonResponse({'success': False, 'error': f"Upload error: {str(e)}"})
-        
-        # Process the standard form
+    # Initialize form
+    form = UserProfileForm(instance=user_profile)
+    
+    # Handle profile picture upload
+    if request.method == 'POST' and request.POST.get('form_type') == 'user_profile':
         form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
         if form.is_valid():
             try:
-                # Enhanced S3 logging
-                if hasattr(settings, 'USE_S3') and settings.USE_S3:
-                    logger.info(f"S3 is enabled: {settings.USE_S3}")
-                    logger.info(f"S3 Bucket: {settings.AWS_STORAGE_BUCKET_NAME}")
-                    logger.info(f"S3 Region: {settings.AWS_S3_REGION_NAME}")
-                else:
-                    logger.info("S3 is not enabled for this request")
-                
-                # Log request.FILES content
-                logger.info(f"Request FILES: {[f for f in request.FILES]}")
-                if 'cv' in request.FILES:
-                    cv_file = request.FILES['cv']
-                    logger.info(f"CV file details - Name: {cv_file.name}, Size: {cv_file.size}, Content Type: {cv_file.content_type}")
-                
-                # Temporarily save the instance without committing
-                updated_profile = form.save(commit=False)
-                
-                # Handle file uploads specifically for S3 if needed
-                logger.info(f"Handling profile form with files: {bool(request.FILES)}")
-                
-                # Special handling for profile_picture if present
+                # Handle profile picture upload
                 if 'profile_picture' in request.FILES:
                     logger.info("Processing new profile picture")
-                    # The model field definitions for S3 in core/models.py should handle this automatically
-                    updated_profile.profile_picture = request.FILES['profile_picture']
-                
-                # Special handling for CV if present
-                if 'cv' in request.FILES and hasattr(settings, 'USE_S3') and settings.USE_S3:
-                    logger.info("Processing new CV with S3 storage")
-                    cv_file = request.FILES['cv']
                     
-                    # Use PrivateMediaStorage directly for CV files
-                    storage = PrivateMediaStorage()
-                    file_path = f"cvs/{cv_file.name}"
-                    
-                    # Save the file to S3
-                    storage.save(file_path, cv_file)
-                    
-                    # Update the model with the file path
-                    updated_profile.cv.name = file_path
-                else:
-                    # For non-S3 storage or if no new CV
-                    if 'cv' in request.FILES:
-                        logger.info("Processing new CV with standard storage")
-                        updated_profile.cv = request.FILES['cv']
+                    # Special handling for S3 storage
+                    if hasattr(settings, 'USE_S3') and settings.USE_S3:
+                        logger.info("Processing profile picture with S3 storage")
+                        profile_picture = request.FILES['profile_picture']
+                        
+                        # Use PublicMediaStorage for profile pictures
+                        storage = PublicMediaStorage()
+                        file_path = f"profile_pictures/{profile_picture.name}"
+                        
+                        # Save the file to S3
+                        storage.save(file_path, profile_picture)
+                        
+                        # Update the model with the file path
+                        user_profile.profile_picture.name = file_path
+                    else:
+                        # For non-S3 storage
+                        user_profile.profile_picture = request.FILES['profile_picture']
                 
                 # Save the updated profile
-                updated_profile.save()
-                logger.info(f"Profile saved successfully. CV path: {updated_profile.cv.name if updated_profile.cv else 'None'}")
+                user_profile.save()
                 
-                # Verify the file actually exists in storage after saving
-                if updated_profile.cv:
-                    cv_path = updated_profile.cv.name
-                    try:
-                        # For S3, use the appropriate storage
-                        if hasattr(settings, 'USE_S3') and settings.USE_S3:
-                            storage = PrivateMediaStorage()
-                            if storage.exists(cv_path):
-                                logger.info(f"Verified CV file exists at {cv_path} in S3")
-                                
-                                # Additional S3 verification
-                                import boto3
-                                s3 = boto3.client(
-                                    's3',
-                                    region_name=settings.AWS_S3_REGION_NAME,
-                                    aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-                                    aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY
-                                )
-                                s3_path = f"{storage.location}/{cv_path}"
-                                logger.info(f"S3 file path: {s3_path}")
-                                try:
-                                    s3.head_object(
-                                        Bucket=settings.AWS_STORAGE_BUCKET_NAME,
-                                        Key=s3_path
-                                    )
-                                    logger.info(f"Successfully verified file in S3 bucket at {s3_path}")
-                                except Exception as e:
-                                    logger.error(f"Error verifying file in S3: {str(e)}")
-                            else:
-                                logger.error(f"CV file not found in S3 storage after save: {cv_path}")
-                        else:
-                            # Use default storage for non-S3
-                            if default_storage.exists(cv_path):
-                                logger.info(f"Verified CV file exists at {cv_path}")
-                            else:
-                                logger.error(f"CV file not found in default storage after save: {cv_path}")
-                    except Exception as e:
-                        logger.error(f"Error verifying CV file: {str(e)}")
-                
-                # Respond to AJAX requests
-                if is_ajax:
-                    logger.info("Returning JSON success response for AJAX request")
-                    return JsonResponse({'success': True})
-                
-                # Return success for non-AJAX requests
+                # Return success message and redirect
                 messages.success(request, "Profile updated successfully!")
                 return redirect('profile')
             except Exception as e:
-                logger.error(f"Error updating profile: {str(e)}", exc_info=True)  # Include full traceback
-                if is_ajax:
-                    return JsonResponse({'success': False, 'error': str(e)})
+                logger.error(f"Error updating profile: {str(e)}")
                 messages.error(request, f"Error updating profile: {str(e)}")
-        else:
-            if is_ajax:
-                # Return form errors for AJAX requests
-                logger.error(f"Form validation errors: {form.errors}")
-                return JsonResponse({
-                    'success': False, 
-                    'error': ', '.join([f"{field}: {error}" for field, errors in form.errors.items() for error in errors])
-                })
-            else:
-                logger.warning(f"Form validation failed (non-AJAX): {form.errors}")
-    else:
-        form = UserProfileForm(instance=user_profile)
     
     # Get filter parameters
     name_filter = request.GET.get('name', '')
     status_filter = request.GET.get('status', '')
-    tab = request.GET.get('tab')
+    tab = request.GET.get('tab', 'profile')
+    template_param = request.GET.get('template', '')
     
     # Start with all user's applications
     applications_query = JobApplication.objects.filter(user=request.user)
@@ -268,28 +106,70 @@ def profile(request):
     saved_jobs = SavedJob.objects.filter(user=request.user).order_by('-saved_at')
     
     # Determine if employer profile form should be shown
-    show_employer_form = (user_profile.role == 'employer')
+    is_employer = (user_profile.role == 'employer')
     employer_form = None
     
     # Handle employer form if needed
-    if show_employer_form:
+    if is_employer:
         try:
             employer_profile = user_profile.employer_profile
         except EmployerProfile.DoesNotExist:
             employer_profile = EmployerProfile(user_profile=user_profile)
             employer_profile.save()
         
-        if request.method == 'POST' and 'employer_form' in request.POST:
+        if request.method == 'POST' and request.POST.get('form_type') == 'employer_form':
             employer_form = EmployerProfileForm(request.POST, request.FILES, instance=employer_profile)
             if employer_form.is_valid():
                 try:
                     # Temporarily save the instance without committing
                     updated_employer = employer_form.save(commit=False)
                     
+                    # Handle profile picture upload for employer
+                    if 'profile_picture' in request.FILES:
+                        logger.info("Processing new profile picture for employer")
+                        
+                        # Special handling for S3 storage
+                        if hasattr(settings, 'USE_S3') and settings.USE_S3:
+                            logger.info("Processing profile picture with S3 storage")
+                            profile_picture = request.FILES['profile_picture']
+                            
+                            # Use PublicMediaStorage for profile pictures
+                            storage = PublicMediaStorage()
+                            file_path = f"profile_pictures/{profile_picture.name}"
+                            
+                            # Save the file to S3
+                            storage.save(file_path, profile_picture)
+                            
+                            # Update the model with the file path
+                            user_profile.profile_picture.name = file_path
+                        else:
+                            # For non-S3 storage
+                            user_profile.profile_picture = request.FILES['profile_picture']
+                        
+                        # Save the user profile with the new picture
+                        user_profile.save()
+                    
                     # Handle company_logo upload specifically for S3 if needed
                     if 'company_logo' in request.FILES:
                         logger.info("Processing new company logo")
-                        updated_employer.company_logo = request.FILES['company_logo']
+                        
+                        # Special handling for S3 storage
+                        if hasattr(settings, 'USE_S3') and settings.USE_S3:
+                            logger.info("Processing company logo with S3 storage")
+                            company_logo = request.FILES['company_logo']
+                            
+                            # Use PublicMediaStorage for company logos
+                            storage = PublicMediaStorage()
+                            file_path = f"company_logos/{company_logo.name}"
+                            
+                            # Save the file to S3
+                            storage.save(file_path, company_logo)
+                            
+                            # Update the model with the file path
+                            updated_employer.company_logo.name = file_path
+                        else:
+                            # For non-S3 storage
+                            updated_employer.company_logo = request.FILES['company_logo']
                     
                     # Save the updated employer profile
                     updated_employer.save()
@@ -300,15 +180,15 @@ def profile(request):
                 except Exception as e:
                     logger.error(f"Error updating employer profile: {str(e)}")
                     messages.error(request, f"Error updating employer profile: {str(e)}")
-            else:
-                employer_form = EmployerProfileForm(instance=employer_profile)
+            # Don't reset the form on validation errors
+        else:
+            employer_form = EmployerProfileForm(instance=employer_profile)
     
     context = {
         'user_profile': user_profile,
         'profile_form': form,
         'applications': applications,
         'saved_jobs': saved_jobs,
-        'show_employer_form': show_employer_form,
         'employer_form': employer_form,
         'active_tab': tab,
         'name_filter': name_filter,
@@ -316,7 +196,17 @@ def profile(request):
         'using_s3': hasattr(settings, 'USE_S3') and settings.USE_S3,
     }
     
-    return render(request, 'core/profile.html', context)
+    # Choose template based on user role or template parameter
+    if template_param == 'employer':
+        template = 'core/employer_profile.html'
+    elif template_param == 'user':
+        template = 'core/user_profile.html'
+    elif is_employer:
+        template = 'core/employer_profile.html'
+    else:
+        template = 'core/user_profile.html'
+    
+    return render(request, template, context)
 
 @login_required
 @require_POST

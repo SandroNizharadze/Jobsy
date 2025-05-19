@@ -13,7 +13,6 @@ AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',  # 1 day cache
 }
-AWS_DEFAULT_ACL = 'public-read'  # For public files like company logos, profile pictures
 AWS_LOCATION = 'static'
 # Enable query string auth for private files while keeping it disabled for public files
 AWS_QUERYSTRING_AUTH = True  # Enable signed URLs for private files

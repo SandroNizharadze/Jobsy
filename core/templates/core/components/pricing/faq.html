@@ -1,0 +1,85 @@
+{% load i18n %}
+
+<div class="faq-section mt-5 pt-4" data-aos="fade-up">
+    <div class="text-center mb-4">
+        <h3>{% trans "ხშირად დასმული კითხვები" %}</h3>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="accordion" id="pricingFaq">
+                <div class="accordion-item" data-aos="fade-up" data-aos-delay="100">
+                    <h2 class="accordion-header" id="faqOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            {% trans "რატომ შეიქმნა Jobsy.ge?" %}
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="faqOne" data-bs-parent="#pricingFaq">
+                        <div class="accordion-body">
+                            {% trans "ჩვენი მისიაა დავეხმაროთ სამსახურის მაძიებლებსა და დამსაქმებლებს ურთიერთობების გამარტივებაში და შევამციროთ სივის გაგზავნიდან, გასაუბრებაზე დაბარება/არ დაბარებამდე საჭირო დრო და საშუალება მივცეთ კანდიდატებს ნებისმიერი პასუხის შემთხვევაში მიიღონ დამსაქმებლისგან ინდივიდუალური უკუკავშირი. დღესდღეობით დამსაქმებლების უმრავლესობას დროისა თუ სხვა ფაქტორების გამო უჭირს კანდიდატებისთვის სათითაოდ უკუკავშირის დაბრუნება თუ ეს უკუკავშირი უარყოფითია. ჩვენი სისტემა საშუალებას იძლევა, როგორც კანდიდატმა, მომენტალურად მიიღოთ დადებითი თუ უარყოფითი პასუხი დამსაქმებლისგან მას შემდეგ რაც თქვენს სივს განიხილავენ. მეორე მხრივ კი დამსაქმებლებს საშუალება აქვთ ცალკეული მეილების წერის გარეშე, უმოკლეს დროში მისცენ ინდივიდუალური უკუკავშირი კანდიდატებს." %}
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item" data-aos="fade-up" data-aos-delay="200">
+                    <h2 class="accordion-header" id="faqTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            {% trans "რა მოვიქმოქმედო თუ გასაუბრებაზე მისულს განცხადებისგან განსხვავებული სამუშაო პირობები დამხვდა?" %}
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="faqTwo" data-bs-parent="#pricingFaq">
+                        <div class="accordion-body">
+                            {% trans "ჩვენ ვცდილობთ გამოვასწოროთ სიტუაცია სამუშაო ბაზარზე. მსგავს შემთხვევაში აუცილებლად დაგვიკავშირდით Info@jobsy.ge ზე და მოვახდენთ შესაბამის რეაგირებას" %}
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item" data-aos="fade-up" data-aos-delay="300">
+                    <h2 class="accordion-header" id="faqThree">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            {% trans "როგორ შევიძინო პაკეტი?" %}
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="faqThree" data-bs-parent="#pricingFaq">
+                        <div class="accordion-body">
+                            {% trans "თუ დარეგისტრირებული არ ხართ, პირველ რიგში გაიარეთ კომპანიის რეგისტრაცია საიტზე. ამის შემდეგ აირჩიეთ სასურველი პაკეტი და შეავსეთ ვაკანსიის ინფორმაცია. ვაკანსიის განხილვის შემდეგ საიტის ადმინისტრატორი დაგიკავშირდებათ მითითებული ელფოსტის საშუალებით და გამოგიგზავნით გადახდის რეკვიზიტებს. გადახდის დადასტურების შემდეგ მოხდება თქვენი ვაკანსიის განთავსება." %}
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item" data-aos="fade-up" data-aos-delay="400">
+                    <h2 class="accordion-header" id="faqFour">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                            {% trans "შემიძლია პაკეტის შეცვლა?" %}
+                        </button>
+                    </h2>
+                    <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="faqFour" data-bs-parent="#pricingFaq">
+                        <div class="accordion-body">
+                            {% trans "უკვე ატვირთული ვაკანსიისთვის პაკეტის შეცვლა არ ხდება, გთქვენ შეგიძლიათ მომდევნო ვაკანსიის განსხვავებული პაკეტით ატვირთვა." %}
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item" data-aos="fade-up" data-aos-delay="500">
+                    <h2 class="accordion-header" id="faqFive">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                            {% trans "შემიძლია ვაკანსიის დროზე ადრე წაშლა?" %}
+                        </button>
+                    </h2>
+                    <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="faqFive" data-bs-parent="#pricingFaq">
+                        <div class="accordion-body">
+                            {% trans "დიახ, იმ შემთხვევაში თუ სასურველ თანამშრომელს დროზე ადრე იპოვით, ზედმეტი სივების მიღების თავიდან ასაცილებლად შეგიძლიათ თქვენივე პროფილიდან წაშალოთ ვაკანსია." %}
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item" data-aos="fade-up" data-aos-delay="600">
+                    <h2 class="accordion-header" id="faqSix">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                            {% trans "პლატფორმით მომსახურების პირობები" %}
+                        </button>
+                    </h2>
+                    <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="faqSix" data-bs-parent="#pricingFaq">
+                        <div class="accordion-body">
+                            {% trans "მომზადების პროცესშია" %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

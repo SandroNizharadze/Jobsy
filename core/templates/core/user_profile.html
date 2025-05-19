@@ -1,0 +1,136 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Your Profile" %}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2 mb-0">{% trans "Your Profile" %}</h1>
+    <div class="d-flex gap-2">
+        <a href="{% url 'job_list' %}" class="btn btn-outline-primary">
+            <i class="fas fa-briefcase me-1"></i>{% trans "View Jobs" %}
+        </a>
+    </div>
+</div>
+
+<!-- Section Navigation Tabs -->
+<ul class="nav nav-pills profile-nav-pills mb-4">
+    <li class="nav-item">
+        <button class="nav-link active" id="profile-tab" data-bs-toggle="pill" data-bs-target="#profile-section" type="button">
+            <i class="fas fa-user me-1"></i>{% trans "Profile & CV" %}
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" id="job-activity-tab" data-bs-toggle="pill" data-bs-target="#job-activity-section" type="button">
+            <i class="fas fa-briefcase me-1"></i>{% trans "Your Job Activity" %}
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <!-- Profile & CV Section -->
+    <div class="tab-pane fade show active" id="profile-section">
+        <div class="profile-section">
+            <form method="post" enctype="multipart/form-data" class="needs-validation" id="profile-picture-form" novalidate>
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="user_profile">
+                <div class="profile-header">
+                    <div class="profile-picture-container">
+                        <div class="profile-picture-wrapper">
+                            {% if user.userprofile.profile_picture %}
+                                <img src="{{ user.userprofile.profile_picture.url }}" alt="{% trans 'Profile Picture' %}" class="profile-picture">
+                            {% else %}
+                                <div class="profile-picture-placeholder">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            {% endif %}
+                            <div class="profile-picture-overlay">
+                                <label for="{{ profile_form.profile_picture.id_for_label }}" class="profile-picture-edit">
+                                    <i class="fas fa-camera"></i>
+                                    <span>{% trans "Change Photo" %}</span>
+                                </label>
+                            </div>
+                        </div>
+                        {{ profile_form.profile_picture }}
+                        {% if profile_form.profile_picture.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ profile_form.profile_picture.errors|join:", " }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="profile-info">
+                        <h1>{{ user.get_full_name|default:user.username }}</h1>
+                        <p class="text-muted">{{ user.email }}</p>
+                        <span class="badge bg-success">{% trans "Job Seeker" %}</span>
+                    </div>
+                </div>
+            </form>
+
+            <div class="cv-card">
+                <h3 class="cv-title">{% trans "Your CV" %}</h3>
+                
+                {% if user.userprofile.cv %}
+                <div class="cv-actions" id="cv-actions">
+                    <a href="{% url 'view_cv' %}" target="_blank" class="btn btn-cv-view">
+                        <i class="fas fa-file-alt me-1"></i>{% trans "View Current CV" %}
+                    </a>
+                    <form action="{% url 'remove_cv' %}" method="post" id="cv-remove-form" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-cv-remove" id="remove-cv-btn" aria-label="{% trans 'Remove CV' %}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </form>
+                </div>
+                {% else %}
+                <!-- For users without CV, show only the Add/Upload button initially -->
+                <div id="cv-initial-btn" style="display: {% if profile_form.cv.errors %}none{% else %}block{% endif %};">
+                    <button id="show-cv-form-btn" type="button" class="btn btn-cv-upload">
+                        <i class="fas fa-upload me-1"></i>{% trans "Add/Upload CV" %}
+                    </button>
+                </div>
+                
+                <!-- Upload form (initially hidden unless there are errors) -->
+                <div id="cv-upload-form" class="cv-upload-form" style="display: {% if profile_form.cv.errors %}block{% else %}none{% endif %};">
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" id="cv-upload-form-element" novalidate>
+                        {% csrf_token %}
+                        <input type="hidden" name="form_type" value="user_profile">
+                        
+                        <!-- Explicitly include form fields to ensure proper uploads -->
+                        <div class="mb-3">
+                            <label class="form-label" for="{{ profile_form.cv.id_for_label }}">{% trans "Upload CV" %}</label>
+                            <!-- Use explicit file input instead of Django form field -->
+                            <input type="file" name="cv" id="{{ profile_form.cv.id_for_label }}" class="form-control" 
+                                accept=".pdf,.doc,.docx" required>
+                            <div class="form-text">{% trans "Upload your CV (PDF, DOC, DOCX)." %}</div>
+                            {% if profile_form.cv.errors %}
+                                <div class="invalid-feedback d-block">{{ profile_form.cv.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        <div id="cv-form-error" class="invalid-feedback d-block" style="display: none;"></div>
+                        <div class="d-flex gap-2 justify-content-end">
+                            <button type="submit" class="btn btn-linkedin">
+                                <i class="fas fa-save me-1"></i>{% trans "Save" %}
+                            </button>
+                            <button type="button" id="cancel-cv-form-btn" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i>{% trans "Cancel" %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Job Activity Section -->
+    <div class="tab-pane fade" id="job-activity-section">
+        {% include 'core/components/profile/applications_section.html' %}
+    </div>
+</div>
+
+{% include 'core/components/profile/profile_styles.html' %}
+{% endblock %}
+
+{% block extra_js %}
+{% include 'core/components/profile/profile_js.html' %}
+{% endblock %} 

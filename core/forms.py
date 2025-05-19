@@ -125,12 +125,20 @@ class UserProfileForm(forms.ModelForm):
 class EmployerProfileForm(forms.ModelForm):
     class Meta:
         model = EmployerProfile
-        fields = ('company_name', 'company_website', 'company_description', 'company_logo',
+        fields = ('company_name', 'company_id', 'phone_number', 'company_website', 'company_description', 'company_logo',
                  'company_size', 'industry', 'location')
         widgets = {
             'company_name': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Enter your company name'
+            }),
+            'company_id': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': _('Enter identification code')
+            }),
+            'phone_number': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': _('Enter phone number')
             }),
             'company_website': forms.URLInput(attrs={
                 'class': 'form-control',

@@ -8,5 +8,21 @@ document.addEventListener('DOMContentLoaded', function() {
             modal.show();
         });
     }
+    
+    // Fix for modal backdrop not disappearing when closed
+    const applyModal = document.getElementById('applyModal');
+    if (applyModal) {
+        applyModal.addEventListener('hidden.bs.modal', function() {
+            // Remove any lingering backdrop
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) {
+                backdrop.remove();
+            }
+            // Ensure body doesn't have modal-open class
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+        });
+    }
 });
 </script> 

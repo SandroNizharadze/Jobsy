@@ -306,7 +306,7 @@ def update_application_status(request, application_id):
         messages.error(request, "Invalid status value provided.")
     
     # Redirect back to the applications page
-    return redirect('job_applications', job_id=application.job.id)
+    return redirect('job_applications', job_id=application.job.id) 
 
 @login_required
 @user_passes_test(is_employer)
