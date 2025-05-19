@@ -127,6 +127,10 @@ def post_job(request):
             job.employer = employer_profile
             job.company = employer_profile.company_name
             
+            # Ensure georgian_language_only is set
+            if job.georgian_language_only is None:
+                job.georgian_language_only = False
+            
             # Save to DB
             job.save()
             
@@ -165,6 +169,10 @@ def edit_job(request, job_id):
             if job.status == 'approved':
                 updated_job.status = 'pending_review'
                 messages.info(request, "Your job has been updated and is pending review again.")
+            
+            # Ensure georgian_language_only is set
+            if updated_job.georgian_language_only is None:
+                updated_job.georgian_language_only = False
             
             # Save changes
             updated_job.save()

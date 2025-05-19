@@ -157,6 +157,8 @@
                                     {{ form.georgian_language_only.errors }}
                                 </div>
                                 {% endif %}
+                                <!-- Add a hidden field as fallback -->
+                                <input type="hidden" name="georgian_language_only" value="False">
                             </div>
 
                             <!-- Premium Level -->

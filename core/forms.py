@@ -170,14 +170,16 @@ class JobListingForm(forms.ModelForm):
     # Add georgian_language_only as a form field (not a model field)
     georgian_language_only = forms.BooleanField(
         required=False,
-        widget=forms.RadioSelect(choices=[(True, 'კი'), (False, 'არა')], attrs={'class': 'btn-check'})
+        initial=False,
+        widget=forms.RadioSelect(choices=[(True, 'კი'), (False, 'არა')]),
     )
     
     class Meta:
         model = JobListing
         fields = (
             'title', 'description', 'location', 'salary_min', 'salary_max', 'salary_type',
-            'category', 'experience', 'job_preferences', 'considers_students', 'premium_level'
+            'category', 'experience', 'job_preferences', 'considers_students', 'premium_level',
+            'georgian_language_only'
         )
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Job Title'}),
@@ -192,3 +194,19 @@ class JobListingForm(forms.ModelForm):
             'considers_students': forms.RadioSelect(attrs={'class': 'btn-check'}),
             'premium_level': forms.Select(attrs={'class': 'form-control'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Initialize the georgian_language_only field with the model instance value if editing
+        if self.instance and self.instance.pk:
+            self.fields['georgian_language_only'].initial = self.instance.georgian_language_only
+        
+        # Add btn-check class to the radio buttons
+        self.fields['georgian_language_only'].widget.attrs.update({'class': 'btn-check'})
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        # Ensure georgian_language_only is never None/NULL
+        if 'georgian_language_only' not in cleaned_data or cleaned_data['georgian_language_only'] is None:
+            cleaned_data['georgian_language_only'] = False
+        return cleaned_data

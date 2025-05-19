@@ -156,6 +156,7 @@ class JobListing(SoftDeletionModel):
         ('premium_plus', _('Premium +')),
     ]
     premium_level = models.CharField(max_length=20, choices=PREMIUM_LEVEL_CHOICES, default='standard', db_index=True, verbose_name=_("პრემიუმ დონე"))
+    georgian_language_only = models.BooleanField(choices=[(True, 'კი'), (False, 'არა')], default=False, verbose_name=_("პოზიციაზე მოთხოვნილია მხოლოდ ქართული ენის ცოდნა"))
 
     def __str__(self):
         return f"{self.title} at {self.company}"
