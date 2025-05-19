@@ -126,7 +126,7 @@
         
         {% if user.userprofile.cv %}
         <div class="cv-actions" id="cv-actions">
-            <a href="{{ user.userprofile.cv.url }}" target="_blank" class="btn btn-cv-view">
+            <a href="{% url 'view_cv' %}" target="_blank" class="btn btn-cv-view">
                 <i class="fas fa-file-alt me-1"></i>{% trans "View Current CV" %}
             </a>
             <form action="{% url 'remove_cv' %}" method="post" id="cv-remove-form" class="d-inline">

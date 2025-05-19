@@ -51,7 +51,9 @@
                             <strong>{% if app.user %}{{ app.user.get_full_name|default:app.user.username }}{% else %}{{ app.guest_name }}{% endif %}</strong> <br>
                             <small class="text-muted">{% if app.user %}{{ app.user.email }}{% else %}{{ app.guest_email }}{% endif %}</small><br>
                             <small>{% trans "for" %} <b>{{ app.job.title }}</b></small>
-                            {% if app.resume %}
+                            {% if app.user and app.user.userprofile.cv %}
+                                <br><a href="{% url 'view_user_cv' app.user.id %}" target="_blank" class="btn btn-sm btn-outline-primary mt-1"><i class="fas fa-file-alt me-1"></i>View CV</a>
+                            {% elif app.resume %}
                                 <br><a href="{{ app.resume.url }}" target="_blank" class="btn btn-sm btn-outline-primary mt-1"><i class="fas fa-file-alt me-1"></i>View CV</a>
                             {% endif %}
                             {% if app.cover_letter %}

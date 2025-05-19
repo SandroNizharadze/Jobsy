@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import main
 from .views.job_views import save_job, unsave_job
+from .views.file_views import serve_cv_file
 
 urlpatterns = [
     path('', main.home_redirect, name='home_redirect'),
@@ -10,6 +11,8 @@ urlpatterns = [
     path('register/', main.register, name='register'),
     path('profile/', main.profile, name='profile'),
     path('profile/remove-cv/', main.remove_cv, name='remove_cv'),
+    path('cv/view/', serve_cv_file, name='view_cv'),
+    path('cv/view/<int:user_id>/', serve_cv_file, name='view_user_cv'),
     path('create-admin/<str:secret_key>/', main.create_admin, name='create_admin'),
     
     # Employer routes

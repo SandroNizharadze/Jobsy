@@ -15,11 +15,9 @@ AWS_S3_OBJECT_PARAMETERS = {
 }
 AWS_DEFAULT_ACL = 'public-read'  # For public files like company logos, profile pictures
 AWS_LOCATION = 'static'
-AWS_QUERYSTRING_AUTH = False  # Don't add complex authentication-related query parameters to URLs
-
-# Static files configuration
-STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
+# Enable query string auth for private files while keeping it disabled for public files
+AWS_QUERYSTRING_AUTH = True  # Enable signed URLs for private files
+AWS_QUERYSTRING_EXPIRE = 3600  # Set URL expiration to 1 hour (optional)
 
 # Media files configuration
 # Use PrivateMediaStorage for all media files by default
@@ -36,16 +34,21 @@ print(f"AWS_ACCESS_KEY_ID: {'*' * 8 if AWS_ACCESS_KEY_ID else 'NOT SET'}")
 print(f"AWS_SECRET_ACCESS_KEY: {'*' * 8 if AWS_SECRET_ACCESS_KEY else 'NOT SET'}")
 print(f"AWS_STORAGE_BUCKET_NAME: {AWS_STORAGE_BUCKET_NAME}")
 print(f"AWS_S3_REGION_NAME: {AWS_S3_REGION_NAME}")
-print(f"STATIC_URL: {STATIC_URL}")
 
-# Keep local static files for development
-if os.environ.get('DEBUG', 'True') == 'True':
-    print("Debug mode detected, using local storage for static files")
+# Use S3 for static files only if explicitly configured
+USE_S3_FOR_STATIC = os.environ.get('USE_S3_FOR_STATIC', 'False') == 'True'
+
+if USE_S3_FOR_STATIC:
+    # Static files configuration for S3
+    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
+    print(f"Using S3 for static files: {STATIC_URL}")
+else:
+    # Keep local static files by default (especially important for admin CSS)
     STATIC_URL = '/static/'
     STATIC_ROOT = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'staticfiles')
     STATICFILES_DIRS = [
         os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static'),
     ]
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-else:
-    print("Production mode detected, using S3 for all storage") 
+    print(f"Using local storage for static files: {STATIC_URL}") 

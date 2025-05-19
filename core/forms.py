@@ -167,11 +167,17 @@ class EmployerProfileForm(forms.ModelForm):
         return company_logo
 
 class JobListingForm(forms.ModelForm):
+    # Add georgian_language_only as a form field (not a model field)
+    georgian_language_only = forms.BooleanField(
+        required=False,
+        widget=forms.RadioSelect(choices=[(True, 'კი'), (False, 'არა')], attrs={'class': 'btn-check'})
+    )
+    
     class Meta:
         model = JobListing
         fields = (
             'title', 'description', 'location', 'salary_min', 'salary_max', 'salary_type',
-            'category', 'experience', 'job_preferences', 'considers_students', 'georgian_language_only', 'premium_level'
+            'category', 'experience', 'job_preferences', 'considers_students', 'premium_level'
         )
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Job Title'}),
@@ -184,6 +190,5 @@ class JobListingForm(forms.ModelForm):
             'experience': forms.Select(attrs={'class': 'form-control'}),
             'job_preferences': forms.Select(attrs={'class': 'form-control'}),
             'considers_students': forms.RadioSelect(attrs={'class': 'btn-check'}),
-            'georgian_language_only': forms.RadioSelect(attrs={'class': 'btn-check'}),
             'premium_level': forms.Select(attrs={'class': 'form-control'}),
         }

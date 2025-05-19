@@ -50,12 +50,21 @@
                             <small class="text-muted">{{ application.applied_at|time:"H:i" }}</small>
                         </td>
                         <td>
+                            {% if application.user %}
+                            <a href="{% url 'view_user_cv' application.user.id %}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                <i class="fas fa-file-pdf me-1"></i>{% trans "ნახვა" %}
+                            </a>
+                            <a href="{% url 'view_user_cv' application.user.id %}" class="btn btn-sm btn-outline-primary" download>
+                                <i class="fas fa-download"></i>
+                            </a>
+                            {% else %}
                             <a href="{{ application.resume.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
                                 <i class="fas fa-file-pdf me-1"></i>{% trans "ნახვა" %}
                             </a>
                             <a href="{{ application.resume.url }}" class="btn btn-sm btn-outline-primary" download>
                                 <i class="fas fa-download"></i>
                             </a>
+                            {% endif %}
                         </td>
                         <td>
                             <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#coverLetterModal{{ application.id }}">

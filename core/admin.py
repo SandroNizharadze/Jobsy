@@ -61,7 +61,7 @@ class JobListingResource(resources.ModelResource):
         model = JobListing
         fields = ('id', 'title', 'company', 'description', 'salary_min', 'salary_max', 
                   'salary_type', 'category', 'location', 'posted_at', 'experience',
-                  'job_preferences', 'considers_students', 'georgian_language_only', 'status', 'premium_level',
+                  'job_preferences', 'considers_students', 'status', 'premium_level',
                   'deleted_at')
 
 class EmployerProfileResource(resources.ModelResource):
@@ -174,9 +174,11 @@ class EmployerProfileAdmin(SoftDeletionAdmin):
 class JobListingAdmin(SoftDeletionAdmin):
     resource_class = JobListingResource
     list_display = ('title', 'company', 'get_employer', 'salary_range', 'location', 
-                   'category', 'get_considers_students', 'get_georgian_only', 'premium_level', 'posted_at', 'get_deleted_state')
+                   'get_category', 'get_experience', 'get_job_preferences', 'get_students_status',
+                   'premium_level', 'posted_at', 'get_deleted_state')
     list_filter = (('posted_at', DateRangeFilter), ('deleted_at', admin.EmptyFieldListFilter), 
-                  'employer__company_name', 'location', 'premium_level', 'status', 'category', 'considers_students', 'georgian_language_only')
+                  'employer__company_name', 'location', 'category', 'experience', 
+                  'job_preferences', 'considers_students', 'premium_level', 'status')
     search_fields = ('title', 'company', 'description', 'location')
     date_hierarchy = 'posted_at'
     actions = ['restore_selected']
@@ -197,13 +199,60 @@ class JobListingAdmin(SoftDeletionAdmin):
         return '-'
     get_employer.short_description = 'Posted by'
     
-    def get_considers_students(self, obj):
-        return _('კი') if obj.considers_students else _('არა')
-    get_considers_students.short_description = _('სტუდენტური')
+    def get_students_status(self, obj):
+        if obj.considers_students:
+            return format_html('<span style="color: green; font-weight: bold;">✓ {}</span>', _('კი'))
+        else:
+            return format_html('<span style="color: #666;">✗ {}</span>', _('არა'))
+    get_students_status.short_description = _('სტუდენტური')
     
-    def get_georgian_only(self, obj):
-        return _('კი') if obj.georgian_language_only else _('არა')
-    get_georgian_only.short_description = _('მხოლოდ ქართული')
+    def get_category(self, obj):
+        categories = {
+            'მენეჯმენტი/ადმინისტრირება': '#4a6da7',  # Blue
+            'მარკეტინგი': '#a74a4a',  # Red
+            'ფინანსები': '#4aa74a',  # Green
+            'გაყიდვები/მომხმარებელთან ურთიერთობა': '#a7a74a',  # Yellow
+            'IT/პროგრამირება': '#a74aa7',  # Purple
+            'დიზაინი': '#4aa7a7',  # Teal
+            'ჰორეკა/კვება': '#7d623c',  # Brown
+            'დაცვა': '#484848',  # Dark Gray
+            'სილამაზე/მოდა': '#a2518a',  # Pink
+            'მშენებლობა': '#3c7d78',  # Dark Teal
+            'მედიცინა': '#7d3c3c',  # Dark Red
+            'განათლება': '#3c5c7d',  # Dark Blue
+            'სამართალი': '#7d3c5c',  # Dark Purple
+            'ტურიზმი': '#3c7d5c',  # Dark Green
+            'ლოჯისტიკა/დისტრიბუცია': '#5c3c7d',  # Indigo
+            'საბანკო საქმე': '#7d5c3c',  # Brown
+            'აზარტული': '#aaaa55',  # Olive
+        }
+        color = categories.get(obj.category, '#333333')
+        return format_html('<span style="color: {}; font-weight: bold;">{}</span>', color, obj.category)
+    get_category.short_description = _('კატეგორია')
+    get_category.admin_order_field = 'category'
+    
+    def get_experience(self, obj):
+        experience_colors = {
+            'გამოცდილების გარეშე': '#999999',  # Gray
+            'დამწყები': '#5cb85c',  # Green
+            'საშუალო დონე': '#f0ad4e',  # Orange
+            'პროფესიონალი': '#d9534f',  # Red
+        }
+        color = experience_colors.get(obj.experience, '#333333')
+        return format_html('<span style="color: {}; font-weight: bold;">{}</span>', color, obj.experience)
+    get_experience.short_description = _('გამოცდილება')
+    get_experience.admin_order_field = 'experience'
+    
+    def get_job_preferences(self, obj):
+        preference_icons = {
+            'სრული განაკვეთი': '⏱️',  # Clock emoji
+            'ნახევარი განაკვეთი': '⌛',  # Hourglass emoji
+            'ცვლები': '🔄',  # Cycle emoji
+        }
+        icon = preference_icons.get(obj.job_preferences, '')
+        return format_html('{} {}', icon, obj.job_preferences)
+    get_job_preferences.short_description = _('სამუშაო გრაფიკი')
+    get_job_preferences.admin_order_field = 'job_preferences'
 
 @admin.register(JobApplication)
 class JobApplicationAdmin(ImportExportModelAdmin):

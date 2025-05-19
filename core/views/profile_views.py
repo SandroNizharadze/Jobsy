@@ -217,6 +217,7 @@ def profile(request):
                     logger.info("Returning JSON success response for AJAX request")
                     return JsonResponse({'success': True})
                 
+                # Return success for non-AJAX requests
                 messages.success(request, "Profile updated successfully!")
                 return redirect('profile')
             except Exception as e:
@@ -293,13 +294,14 @@ def profile(request):
                     # Save the updated employer profile
                     updated_employer.save()
                     
+                    # Return success message and redirect
                     messages.success(request, "Employer profile updated successfully!")
                     return redirect('profile')
                 except Exception as e:
                     logger.error(f"Error updating employer profile: {str(e)}")
                     messages.error(request, f"Error updating employer profile: {str(e)}")
-        else:
-            employer_form = EmployerProfileForm(instance=employer_profile)
+            else:
+                employer_form = EmployerProfileForm(instance=employer_profile)
     
     context = {
         'user_profile': user_profile,
