@@ -120,6 +120,11 @@ class JobListing(SoftDeletionModel):
         (False, _('არა')),
     ]
     
+    GEORGIAN_LANGUAGE_ONLY_CHOICES = [
+        (True, _('კი')),
+        (False, _('არა')),
+    ]
+    
     SALARY_TYPE_CHOICES = [
         ('თვეში', _('თვეში')),
         ('კვირაში', _('კვირაში')),
@@ -143,6 +148,7 @@ class JobListing(SoftDeletionModel):
     experience = models.CharField(max_length=100, choices=EXPERIENCE_CHOICES, db_index=True, verbose_name=_("გამოცდილება"))
     job_preferences = models.CharField(max_length=255, choices=JOB_PREFERENCE_CHOICES, verbose_name=_("სამუშაო გრაფიკი"))
     considers_students = models.BooleanField(default=False, choices=CONSIDERS_STUDENTS_CHOICES, verbose_name=_("განიხილავს სტუდენტებს"))
+    georgian_language_only = models.BooleanField(default=False, choices=GEORGIAN_LANGUAGE_ONLY_CHOICES, verbose_name=_("პოზიციაზე მოთხოვნილია მხოლოდ ქართული ენის ცოდნა"))
     STATUS_CHOICES = [
         ('pending_review', _('Pending Review')),
         ('approved', _('Approved')),

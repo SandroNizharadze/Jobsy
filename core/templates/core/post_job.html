@@ -139,6 +139,26 @@
                                 {% endif %}
                             </div>
 
+                            <!-- Georgian Language Only -->
+                            <div class="col-md-6">
+                                <label class="form-label">{% trans "პოზიციაზე მოთხოვნილია მხოლოდ ქართული ენის ცოდნა" %}</label>
+                                <div class="mt-2">
+                                    {% for radio in form.georgian_language_only %}
+                                    <div class="form-check form-check-inline">
+                                        {{ radio.tag }}
+                                        <label class="btn btn-outline-primary" for="{{ radio.id_for_label }}">
+                                            {{ radio.choice_label }}
+                                        </label>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% if form.georgian_language_only.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.georgian_language_only.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+
                             <!-- Premium Level -->
                             <div class="col-md-6">
                                 <label for="{{ form.premium_level.id_for_label }}" class="form-label">{% trans "პრემიუმ ტიპი" %}</label>

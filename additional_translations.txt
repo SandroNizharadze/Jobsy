@@ -1,0 +1,131 @@
+msgid "ჩვენი ვაკანსიები დაგეხმარება!"
+msgstr "Our job listings will help you!"
+
+msgid "საუკეთესო სამსახურის მოძიებაში ჯობსის ვაკანსიები დაგეხმარება"
+msgstr "Jobsy's job listings will help you find the best job"
+
+msgid "რეგისტრაცია"
+msgstr "Registration"
+
+msgid "ვაკანსიები"
+msgstr "Jobs"
+
+msgid "პაკეტები"
+msgstr "Packages"
+
+msgid "პრემიუმ+ ვაკანსიები"
+msgstr "Premium+ Jobs"
+
+msgid "პრემიუმ განცხადებები"
+msgstr "Premium Listings"
+
+msgid "ჩვენი პაკეტები"
+msgstr "Our Packages"
+
+msgid "აირჩიეთ თქვენთვის შესაფერისი პაკეტი"
+msgstr "Choose the package that suits you"
+
+msgid "ვაკანსიის გამოქვეყნება Jobsy-ზე არის მარტივი და ეფექტური გზა კარგი კანდიდატების მოსაზიდად"
+msgstr "Posting a job on Jobsy is a simple and effective way to attract good candidates"
+
+msgid "ფასდაკლება"
+msgstr "Discount"
+
+msgid "სტანდარტული"
+msgstr "Standard"
+
+msgid "უფასო"
+msgstr "Free"
+
+msgid "იდეალურია დამწყები კომპანიებისთვის"
+msgstr "Ideal for startup companies"
+
+msgid "პერიოდი 30 დღე"
+msgstr "30-day period"
+
+msgid "მთავარ გვერდზე ყოფნა - არა"
+msgstr "Featured on home page - No"
+
+msgid "ლოგოს გამოჩენა"
+msgstr "Logo display"
+
+msgid "დამსაქმებლის პროფილი და სივების ანალიტიკა"
+msgstr "Employer profile and CV analytics"
+
+msgid "ძიებისას პრიორიტეტულობა: დაბალი"
+msgstr "Search priority: Low"
+
+msgid "პოპულარული"
+msgstr "Popular"
+
+msgid "პრემიუმი"
+msgstr "Premium"
+
+msgid "იდეალურია აქტიური დამსაქმებლებისთვის"
+msgstr "Ideal for active employers"
+
+msgid "მთავარი გვერდის მეორე სექცია"
+msgstr "Second section of the main page"
+
+msgid "სოც. ქსელებში გაზიარება ჯგუფური პოსტის სახით"
+msgstr "Sharing on social networks as a group post"
+
+msgid "პრემიუმის ნიშანი"
+msgstr "Premium badge"
+
+msgid "ვაკანსიის ატვირთვა Karriera.ge-ზე"
+msgstr "Upload job to Karriera.ge"
+
+msgid "ძიებისას პრიორიტეტულობა: საშუალო"
+msgstr "Search priority: Medium"
+
+msgid "სივების ბაზაზე წვდომა"
+msgstr "Access to CV database"
+
+msgid "პრემიუმ+"
+msgstr "Premium+"
+
+msgid "იდეალურია მაღალი კონკურენციის პოზიციებისთვის"
+msgstr "Ideal for high-competition positions"
+
+msgid "მთავარი გვერდის პირველი სექცია"
+msgstr "First section of the main page"
+
+msgid "სოც. ქსელებში გაზიარება ინდივიდუალური და ჯგუფური პოსტის სახით"
+msgstr "Sharing on social networks as individual and group posts"
+
+msgid "პრემიუმ+ ნიშანი"
+msgstr "Premium+ badge"
+
+msgid "ძიებისას პრიორიტეტულობა: მაღალი"
+msgstr "Search priority: High"
+
+msgid "პაკეტების შედარება"
+msgstr "Package Comparison"
+
+msgid "ფუნქცია"
+msgstr "Feature"
+
+msgid "პირველი სექცია"
+msgstr "First section"
+
+msgid "ჯგუფური პოსტი"
+msgstr "Group post"
+
+msgid "ინდივიდუალური და ჯგუფური პოსტი"
+msgstr "Individual and group post"
+
+msgid "გაქვთ კითხვები?"
+msgstr "Do you have questions?"
+
+msgid "დაგვიკავშირდით და ჩვენი გუნდი დაგეხმარებათ შესაფერისი პაკეტის შერჩევაში"
+msgstr "Contact us and our team will help you choose the right package"
+
+msgid "გაქვთ შეკითხვები? დაგვიკავშირდით info@jobsy.ge"
+msgstr "Have questions? Contact us at info@jobsy.ge"
+
+msgid "პოზიციაზე მოთხოვნილია მხოლოდ ქართული ენის ცოდნა"
+msgstr "Position requires only Georgian language knowledge"
+
+msgid "მხოლოდ ქართული"
+msgstr "Georgian only" 

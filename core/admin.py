@@ -61,7 +61,7 @@ class JobListingResource(resources.ModelResource):
         model = JobListing
         fields = ('id', 'title', 'company', 'description', 'salary_min', 'salary_max', 
                   'salary_type', 'category', 'location', 'posted_at', 'experience',
-                  'job_preferences', 'considers_students', 'status', 'premium_level',
+                  'job_preferences', 'considers_students', 'georgian_language_only', 'status', 'premium_level',
                   'deleted_at')
 
 class EmployerProfileResource(resources.ModelResource):
@@ -174,9 +174,9 @@ class EmployerProfileAdmin(SoftDeletionAdmin):
 class JobListingAdmin(SoftDeletionAdmin):
     resource_class = JobListingResource
     list_display = ('title', 'company', 'get_employer', 'salary_range', 'location', 
-                   'category', 'get_considers_students', 'premium_level', 'posted_at', 'get_deleted_state')
+                   'category', 'get_considers_students', 'get_georgian_only', 'premium_level', 'posted_at', 'get_deleted_state')
     list_filter = (('posted_at', DateRangeFilter), ('deleted_at', admin.EmptyFieldListFilter), 
-                  'employer__company_name', 'location', 'premium_level', 'status', 'category', 'considers_students')
+                  'employer__company_name', 'location', 'premium_level', 'status', 'category', 'considers_students', 'georgian_language_only')
     search_fields = ('title', 'company', 'description', 'location')
     date_hierarchy = 'posted_at'
     actions = ['restore_selected']
@@ -200,6 +200,10 @@ class JobListingAdmin(SoftDeletionAdmin):
     def get_considers_students(self, obj):
         return _('კი') if obj.considers_students else _('არა')
     get_considers_students.short_description = _('სტუდენტური')
+    
+    def get_georgian_only(self, obj):
+        return _('კი') if obj.georgian_language_only else _('არა')
+    get_georgian_only.short_description = _('მხოლოდ ქართული')
 
 @admin.register(JobApplication)
 class JobApplicationAdmin(ImportExportModelAdmin):

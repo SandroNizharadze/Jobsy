@@ -68,6 +68,21 @@
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
+                            <label class="form-label">{% trans "პოზიციაზე მოთხოვნილია მხოლოდ ქართული ენის ცოდნა" %}</label>
+                            <div class="mt-2">
+                                {% for radio in form.georgian_language_only %}
+                                <div class="form-check form-check-inline">
+                                    {{ radio.tag }}
+                                    <label class="btn btn-outline-primary" for="{{ radio.id_for_label }}">
+                                        {{ radio.choice_label }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-12 mb-3">
                             <label for="id_premium_level" class="form-label">Premium Level</label>
                             {{ form.premium_level }}
                         </div>
