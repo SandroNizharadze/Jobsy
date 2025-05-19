@@ -8,7 +8,8 @@ from .job_views import job_list, job_detail, apply_job, remove_from_query_string
 from .employer_views import (
     employer_home, employer_dashboard,
     post_job, edit_job, delete_job,
-    job_applications, update_application_status
+    job_applications, update_application_status,
+    get_job_details
 )
 from .profile_views import profile, remove_cv
 from .admin_views import create_admin, assign_employer, is_admin

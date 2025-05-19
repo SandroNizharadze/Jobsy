@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="container py-5">
-    <h1 class="mb-4">{% blocktrans %}Welcome, {{ employer_profile.company_name|default:employer_profile.user_profile.user.username }}{% endblocktrans %}</h1>
+    <h1 class="mb-4">{% blocktrans %}Welcome, {{ employer_profile.company_name|default:employer_profile.user_profile.user.first_name }}{% endblocktrans %}</h1>
     <div class="row mb-4">
         <div class="col-md-3">
             <div class="card text-center shadow-sm">
@@ -25,7 +25,14 @@
         <div class="col-md-3">
             <div class="card text-center shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title">{% trans "Total Applicants" %}</h5>
+                    <div class="position-relative">
+                        <h5 class="card-title">{% trans "Total Applicants" %}</h5>
+                        {% if unread_applicants > 0 %}
+                        <span class="position-absolute badge rounded-pill bg-danger" style="font-size: 0.7rem; right: -6px; top: 0;">
+                            {{ unread_applicants }} New
+                        </span>
+                        {% endif %}
+                    </div>
                     <p class="display-5 fw-bold">{{ total_applicants }}</p>
                 </div>
             </div>
@@ -59,7 +66,7 @@
                             {% if app.cover_letter %}
                                 <div class="mt-2">
                                     <span style="font-weight:600;">{% trans "Cover Message:" %}</span>
-                                    {% if app.cover_letter|length > 120 %}
+                                    {% if app.cover_letter|length > 100 %}
                                         <span class="cover-preview" id="cover-preview-{{ app.id }}">{{ app.cover_letter|slice:":120" }}...</span>
                                         <span class="cover-full d-none" id="cover-full-{{ app.id }}">{{ app.cover_letter }}</span>
                                         <a href="#" class="ms-2" onclick="toggleCover({{ app.id }}); return false;" id="cover-toggle-{{ app.id }}">Show more</a>
@@ -80,35 +87,42 @@
         <div class="col-md-6 mb-4">
             <div class="card h-100">
                 <div class="card-header bg-warning text-dark">{% trans "All Jobs" %}</div>
-                <ul class="list-group list-group-flush">
+                <ul class="list-group list-group-flush flex-grow-1">
                     {% for job in all_jobs %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <a href="{% url 'job_applications' job.id %}" class="text-decoration-none text-dark d-flex align-items-center" style="flex: 1;">
                             <span>{{ job.title }}</span>
-                            {% if job.status == 'approved' %}
-                                <span class="badge bg-success ms-2">{% trans "Approved" %}</span>
-                            {% elif job.status == 'rejected' %}
-                                <span class="badge bg-danger ms-2">{% trans "Rejected" %}</span>
-                            {% elif job.status == 'pending_review' %}
-                                <span class="badge bg-warning text-dark ms-2">{% trans "In Review" %}</span>
-                            {% else %}
-                                <span class="badge bg-secondary ms-2">{{ job.status }}</span>
-                            {% endif %}
                         </a>
-                        <span class="badge bg-light text-dark">{{ job.posted_at|date:"M d" }}</span>
+                        <div class="d-flex align-items-center">
+                            {% if job.unread_applications_count > 0 %}
+                            <span class="badge bg-danger me-2">{{ job.unread_applications_count }} New</span>
+                            {% endif %}
+                            {% if job.status == 'approved' %}
+                                <span class="badge bg-success me-2">{% trans "Approved" %}</span>
+                            {% elif job.status == 'rejected' %}
+                                <span class="badge bg-danger me-2">{% trans "Rejected" %}</span>
+                            {% elif job.status == 'pending_review' %}
+                                <span class="badge bg-warning text-dark me-2">{% trans "In Review" %}</span>
+                            {% else %}
+                                <span class="badge bg-secondary me-2">{{ job.status }}</span>
+                            {% endif %}
+                            <span class="badge bg-light text-dark">{{ job.posted_at|date:"M d" }}</span>
+                        </div>
                     </li>
                     {% empty %}
                     <li class="list-group-item">{% trans "No jobs available." %}</li>
                     {% endfor %}
                 </ul>
+                <div class="mt-auto text-end p-3">
+                    <a href="{% url 'employer_dashboard' %}" class="btn btn-primary">{% trans "Manage Jobs" %}</a>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="mt-4 text-end">
-        <a href="{% url 'employer_dashboard' %}" class="btn btn-primary">{% trans "Manage Jobs" %}</a>
         <a href="{% url 'profile' %}" class="btn btn-outline-secondary">{% trans "Edit Company Profile" %}</a>
-        <a href="{% url 'post_job' %}" class="btn btn-success">{% trans "Post New Job" %}</a>
+        <a href="{% url 'pricing' %}" class="btn btn-success">{% trans "Post New Job" %}</a>
     </div>
 </div>
 

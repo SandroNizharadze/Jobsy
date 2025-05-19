@@ -15,8 +15,6 @@
                 {% if user.is_authenticated %}
                     {% if user.userprofile.role == 'employer' %}
                         <li class="nav-item"><a class="btn btn-primary px-3 py-1" style="border-radius:18px; font-weight:600; background:var(--jobsy-blue); border:none;" href="{% url 'post_job' %}">{% trans "გამოქვეყნება" %}</a></li>
-                    {% else %}
-                        <li class="nav-item"><a class="nav-link" href="#">{% trans "დამატება CV" %}</a></li>
                     {% endif %}
                 {% endif %}
                 <li class="nav-item d-none d-lg-block"><a href="#" class="facebook-icon"><i class="fab fa-facebook-square"></i></a></li>

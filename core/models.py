@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 import logging
 from django.db import transaction
+from datetime import timedelta
 
 # Import storage backends if S3 is enabled
 if hasattr(settings, 'USE_S3') and settings.USE_S3:
@@ -138,6 +139,7 @@ class JobListing(SoftDeletionModel):
     employer = models.ForeignKey('EmployerProfile', on_delete=models.CASCADE, related_name='job_listings', verbose_name=_("დამსაქმებელი"))
     posted_at = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name=_("გამოქვეყნების თარიღი"))
     updated_at = models.DateTimeField(auto_now=True, verbose_name=_("განახლების თარიღი"))
+    expires_at = models.DateTimeField(null=True, blank=True, db_index=True, verbose_name=_("ვადის გასვლის თარიღი"))
     interests = models.CharField(max_length=255, blank=True, verbose_name=_("ინტერესები"))
     fields = models.CharField(max_length=255, blank=True, verbose_name=_("სფეროები"))
     experience = models.CharField(max_length=100, choices=EXPERIENCE_CHOICES, db_index=True, verbose_name=_("გამოცდილება"))
@@ -161,12 +163,19 @@ class JobListing(SoftDeletionModel):
     def __str__(self):
         return f"{self.title} at {self.company}"
 
+    def is_expired(self):
+        """Check if the job posting has expired"""
+        if not self.expires_at:
+            return False
+        return timezone.now() >= self.expires_at
+
     class Meta:
         ordering = ['-posted_at']
         indexes = [
             models.Index(fields=['status', 'category']),
             models.Index(fields=['status', 'location']),
             models.Index(fields=['employer', 'status']),
+            models.Index(fields=['expires_at']),
         ]
         verbose_name = _("ვაკანსია")
         verbose_name_plural = _("ვაკანსიები")
@@ -207,6 +216,7 @@ class JobApplication(models.Model):
     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default='განხილვის_პროცესში', db_index=True, verbose_name=_("სტატუსი"))
     applied_at = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name=_("აპლიკაციის თარიღი"))
     updated_at = models.DateTimeField(auto_now=True, verbose_name=_("განახლების თარიღი"))
+    is_read = models.BooleanField(default=False, db_index=True, verbose_name=_("წაკითხულია"))
     
     def save(self, *args, **kwargs):
         if self.job and (not self.job_title or not self.job_company):
@@ -450,3 +460,15 @@ def ensure_employer_profile(sender, instance, created, **kwargs):
                 logger.info(f"Created EmployerProfile with ID {employer_profile.id}")
         except Exception as e:
             logger.error(f"Error in ensure_employer_profile: {str(e)}")
+
+@receiver(post_save, sender=JobListing)
+def set_job_expiration(sender, instance, **kwargs):
+    """
+    Set the job expiration date to 30 days after approval.
+    This is triggered when a job's status changes to 'approved'.
+    """
+    if instance.status == 'approved' and not instance.expires_at:
+        # Set expiration to 30 days from now
+        instance.expires_at = timezone.now() + timedelta(days=30)
+        # Save without triggering this signal again
+        JobListing.objects.filter(pk=instance.pk).update(expires_at=instance.expires_at)

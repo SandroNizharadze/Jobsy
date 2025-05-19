@@ -1,7 +1,7 @@
 {% extends 'core/base.html' %}
 {% load i18n %}
 
-{% block title %}Post New Job{% endblock %}
+{% block title %}Edit Job - {{ job.title }}{% endblock %}
 
 {% block content %}
 <div class="container py-4">
@@ -9,7 +9,7 @@
         <div class="col-lg-8">
             <div class="card shadow-sm">
                 <div class="card-header bg-white">
-                    <h2 class="h4 mb-0">{% trans "ვაკანსიის გამოქვეყნება" %}</h2>
+                    <h2 class="h4 mb-0">{% trans "ვაკანსიის რედაქტირება" %}</h2>
                 </div>
                 <div class="card-body">
                     <form method="post" class="needs-validation" novalidate>
@@ -165,7 +165,11 @@
                             <div class="col-md-6">
                                 <label for="{{ form.premium_level.id_for_label }}" class="form-label">{% trans "პრემიუმ ტიპი" %}</label>
                                 {{ form.premium_level }}
-                                
+                                <small class="form-text text-muted">
+                                    {% trans "სტანდარტული: გამოჩნდება მხოლოდ ფილტრირებულ ძებნებში" %}<br>
+                                    {% trans "პრემიუმ: გამოჩნდება მთავარ გვერდზე სტანდარტული სტილით" %}<br>
+                                    {% trans "პრემიუმ+: გამოჩნდება მთავარ გვერდზე გამომწვევი სტილით" %}
+                                </small>
                                 {% if form.premium_level.errors %}
                                 <div class="invalid-feedback d-block">
                                     {{ form.premium_level.errors }}
@@ -175,7 +179,7 @@
                         </div>
 
                         <div class="mt-4">
-                            <button type="submit" class="btn btn-primary">{% trans "ვაკანსიის გამოქვეყნება" %}</button>
+                            <button type="submit" class="btn btn-primary">{% trans "შენახვა" %}</button>
                             <a href="{% url 'employer_dashboard' %}" class="btn btn-outline-secondary ms-2">{% trans "გაუქმება" %}</a>
                         </div>
                     </form>

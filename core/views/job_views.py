@@ -7,6 +7,7 @@ from ..forms import JobListingForm
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 import logging
+from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +30,10 @@ def job_list(request):
         # Since it's in reverse alphabetical order: standard < premium < premium_plus
         '-premium_level', '-posted_at'
     )
+    
+    # Filter out expired jobs
+    # Only show jobs that either don't have an expiration date yet or where the expiration date is in the future
+    jobs = jobs.filter(Q(expires_at__isnull=True) | Q(expires_at__gt=timezone.now()))
     
     # Initialize filtering context variables
     filtered = False
@@ -104,6 +109,13 @@ def job_list(request):
         active_filters['სამუშაოს ტიპი'] = ', '.join(preferences)
         filter_remove_urls['სამუშაოს ტიპი'] = remove_from_query_string(request.GET, 'job_preferences')
     
+    # Include expired jobs only if explicitly requested
+    if 'show_expired' in request.GET and request.GET['show_expired'] == '1':
+        jobs = JobListing.objects.filter(status='approved').select_related('employer')
+        filtered = True
+        active_filters['Show Expired'] = 'Yes'
+        filter_remove_urls['Show Expired'] = remove_from_query_string(request.GET, 'show_expired')
+    
     # After all filters are applied, ensure premium ordering is preserved
     # This guarantees premium jobs always appear at the top even after filtering
     jobs = jobs.order_by('-premium_level', '-posted_at')
@@ -176,10 +188,14 @@ def job_detail(request, job_id):
     if request.user.is_authenticated:
         is_saved = SavedJob.objects.filter(user=request.user, job=job).exists()
     
+    # Check if job is expired
+    is_expired = job.is_expired()
+    
     context = {
         'job': job,
         'similar_jobs': similar_jobs,
         'is_saved': is_saved,
+        'is_expired': is_expired,
     }
     return render(request, 'core/job_detail.html', context)
 
@@ -189,6 +205,11 @@ def apply_job(request, job_id):
     """
     # Use select_related to fetch employer in the same query
     job = get_object_or_404(JobListing.objects.select_related('employer'), id=job_id, status='approved')
+    
+    # Check if job is expired
+    if job.is_expired():
+        messages.error(request, "This job posting has expired and is no longer accepting applications.")
+        return redirect('job_detail', job_id=job.id)
     
     if request.method == 'POST':
         # Check if user is authenticated

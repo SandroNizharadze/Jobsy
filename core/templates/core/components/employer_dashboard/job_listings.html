@@ -15,9 +15,11 @@
                             <i class="fas fa-filter me-1"></i>Filter
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#" data-filter="all">All Jobs</a></li>
+                            <li><a class="dropdown-item active" href="#" data-filter="all">All Jobs</a></li>
                             <li><a class="dropdown-item" href="#" data-filter="active">Active</a></li>
-                            <li><a class="dropdown-item" href="#" data-filter="expired">Expired</a></li>
+                            <li><a class="dropdown-item" href="#" data-filter="in-review">In Review</a></li>
+                            <li><a class="dropdown-item" href="#" data-filter="rejected">Rejected</a></li>
+                            <li><a class="dropdown-item" href="#" data-filter="expired-soon">Expired/Expires Soon</a></li>
                         </ul>
                     </div>
                 </div>
@@ -25,7 +27,10 @@
         </div>
         <div class="card-body p-0">
             {% for job in jobs %}
-                <div class="job-card {% if not forloop.last %}border-bottom{% endif %}">
+                <div class="job-card {% if not forloop.last %}border-bottom{% endif %}" 
+                     data-status="{{ job.status }}" 
+                     data-expired="{% if job.is_expired %}true{% else %}false{% endif %}"
+                     data-expires-soon="{% if job.expires_at and job.expires_at|date:'U'|add:'604800'|add:'-'|date:'U'|add:'-'|date:'U' <= 0 and not job.is_expired %}true{% else %}false{% endif %}">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
                             <div class="job-title">{{ job.title }}</div>
@@ -45,12 +50,26 @@
                                     <span class="badge bg-warning text-dark">In Review</span>
                                 {% elif job.status == 'approved' %}
                                     <span class="badge bg-success">Approved</span>
+                                    {% if job.expires_at %}
+                                        {% if job.is_expired %}
+                                            <span class="badge bg-danger ms-2">Expired</span>
+                                        {% else %}
+                                            {% if job.expires_at|date:'U'|add:'604800'|add:'-'|date:'U'|add:'-'|date:'U' <= 0 %}
+                                                <span class="badge bg-warning text-dark ms-2">Expires Soon ({{ job.expires_at|date:"F j, Y" }})</span>
+                                            {% else %}
+                                                <span class="badge bg-info ms-2">Expires {{ job.expires_at|date:"F j, Y" }}</span>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endif %}
                                 {% elif job.status == 'rejected' %}
                                     <span class="badge bg-danger">Rejected</span>
                                 {% endif %}
                                 {% if job.status == 'rejected' and job.admin_feedback %}
                                     <div class="text-danger small mt-1"><i class="fas fa-info-circle me-1"></i>{{ job.admin_feedback }}</div>
                                 {% endif %}
+                                <span class="badge bg-primary ms-2">
+                                    <i class="fas fa-users me-1"></i>{{ job.applications_count }} Applicant{{ job.applications_count|pluralize }}
+                                </span>
                             </div>
                         </div>
                         <div class="dropdown">
@@ -64,9 +83,9 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <button class="dropdown-item" onclick="editJob({{ job.id }})">
+                                    <a href="{% url 'edit_job' job.id %}" class="dropdown-item">
                                         <i class="fas fa-edit me-1"></i>Edit
-                                    </button>
+                                    </a>
                                 </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>

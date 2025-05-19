@@ -8,7 +8,7 @@ from ..forms import JobListingForm, EmployerProfileForm
 import logging
 from django.utils import timezone
 from datetime import timedelta
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, JsonResponse
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +37,7 @@ def employer_home(request):
     total_jobs = jobs.count()
     active_jobs = jobs.filter(status='approved').count()
     total_applicants = JobApplication.objects.filter(job__employer=employer_profile).count()
+    unread_applicants = JobApplication.objects.filter(job__employer=employer_profile, is_read=False).count()
     avg_applicants = round(total_applicants / total_jobs, 2) if total_jobs > 0 else 0
     # Jobs expiring soon (example: jobs expiring in next 7 days)
     soon = timezone.now() + timedelta(days=7)
@@ -53,6 +54,10 @@ def employer_home(request):
             When(status='rejected', then=Value(3)),
             default=Value(4),
             output_field=IntegerField(),
+        ),
+        unread_applications_count=Count(
+            'applications',
+            filter=Q(applications__is_read=False)
         )
     ).order_by('status_order', '-posted_at')
     
@@ -66,6 +71,7 @@ def employer_home(request):
         'total_jobs': total_jobs,
         'active_jobs': active_jobs,
         'total_applicants': total_applicants,
+        'unread_applicants': unread_applicants,
         'avg_applicants': avg_applicants,
         'jobs_expiring_soon': jobs_expiring_soon,
         'all_jobs': all_jobs,
@@ -81,8 +87,10 @@ def employer_dashboard(request):
     """
     employer_profile = request.user.userprofile.employer_profile
 
-    # All jobs for this employer
-    jobs = JobListing.objects.filter(employer=employer_profile)
+    # All jobs for this employer with application counts
+    jobs = JobListing.objects.filter(employer=employer_profile).annotate(
+        applications_count=Count('applications')
+    )
 
     # Metrics
     active_jobs = jobs.filter(status='approved').count()
@@ -116,6 +124,13 @@ def post_job(request):
     """
     Handle job posting form submission
     """
+    # Get premium level from URL parameter if available
+    premium_level = request.GET.get('premium_level', 'standard')
+    
+    # Validate premium level value
+    if premium_level not in ['standard', 'premium', 'premium_plus']:
+        premium_level = 'standard'
+    
     if request.method == 'POST':
         form = JobListingForm(request.POST)
         if form.is_valid():
@@ -137,10 +152,12 @@ def post_job(request):
             messages.success(request, "Job posting submitted for review!")
             return redirect('employer_dashboard')
     else:
-        form = JobListingForm()
+        # Initialize form with premium level from URL
+        form = JobListingForm(initial={'premium_level': premium_level})
     
     context = {
         'form': form,
+        'selected_premium_level': premium_level,
     }
     
     return render(request, 'core/post_job.html', context)
@@ -252,6 +269,11 @@ def job_applications(request, job_id):
         )
     ).order_by('status_order', '-applied_at')
     
+    # Mark all applications as read
+    unread_applications = applications.filter(is_read=False)
+    if unread_applications.exists():
+        unread_applications.update(is_read=True)
+    
     context = {
         'job': job,
         'applications': applications,
@@ -284,4 +306,35 @@ def update_application_status(request, application_id):
         messages.error(request, "Invalid status value provided.")
     
     # Redirect back to the applications page
-    return redirect('job_applications', job_id=application.job.id) 
+    return redirect('job_applications', job_id=application.job.id)
+
+@login_required
+@user_passes_test(is_employer)
+def get_job_details(request, job_id):
+    """
+    API endpoint to return job details in JSON format
+    """
+    # Get the job and verify ownership
+    job = get_object_or_404(JobListing, id=job_id)
+    employer_profile = request.user.userprofile.employer_profile
+    
+    if job.employer != employer_profile:
+        return JsonResponse({"error": "You don't have permission to edit this job."}, status=403)
+    
+    # Return job details as JSON
+    job_data = {
+        'title': job.title,
+        'description': job.description,
+        'location': job.location,
+        'category': job.category,
+        'salary_min': job.salary_min,
+        'salary_max': job.salary_max,
+        'salary_type': job.salary_type,
+        'experience': job.experience,
+        'job_preferences': job.job_preferences,
+        'considers_students': job.considers_students,
+        'georgian_language_only': job.georgian_language_only,
+        'premium_level': job.premium_level,
+    }
+    
+    return JsonResponse(job_data) 

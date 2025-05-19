@@ -19,6 +19,7 @@ urlpatterns = [
     path('employer/dashboard/', main.employer_dashboard, name='employer_dashboard'),
     path('employer/jobs/post/', main.post_job, name='post_job'),
     path('employer/jobs/<int:job_id>/edit/', main.edit_job, name='edit_job'),
+    path('employer/jobs/<int:job_id>/details/', main.get_job_details, name='get_job_details'),
     path('employer/jobs/<int:job_id>/delete/', main.delete_job, name='delete_job'),
     path('employer/home/', main.employer_home, name='employer_home'),
     path('employer/jobs/<int:job_id>/applications/', main.job_applications, name='job_applications'),
