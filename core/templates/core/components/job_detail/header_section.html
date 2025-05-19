@@ -2,45 +2,50 @@
 
 <div class="job-detail-header">
     <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h1 style="font-size:2.2rem; font-weight:700; margin-bottom:15px;">{{ job.title }}</h1>
-                <div class="d-flex align-items-center mb-2">
-                    <span style="font-size:1.2rem; font-weight:600; opacity:0.9;">{{ job.company }}</span>
-                    <span class="mx-2 text-white">•</span>
-                    <span style="opacity:0.9;">{% trans job.location|default:_("თბილისი") %}</span>
+        <!-- Job details card with rectangular background that includes everything -->
+        <div class="job-details-card shadow-sm p-4 mb-3" style="border-radius: 12px; background-color:var(--jobsy-blue);">
+            <div class="row">
+                <div class="col-md-9">
+                    <h1 style="font-size:2rem; font-weight:700; margin-bottom:15px; color:white;">{{ job.title }}</h1>
+                    <div class="d-flex align-items-center mb-2">
+                        <span style="font-size:1.2rem; font-weight:600; color:var(--jobsy-yellow);">{{ job.company }}</span>
+                        <span class="mx-2" style="color:white;">•</span>
+                        <span style="color:white;">{% trans job.location|default:_("თბილისი") %}</span>
+                    </div>
+                    <div class="d-flex gap-2 mb-2">
+                        <span class="badge rounded-pill" style="background-color:var(--jobsy-yellow); color:var(--jobsy-blue); font-weight:500; padding:0.5em 1em;">
+                            {% trans job.category|default:_("IT / კომპიუტერები") %}
+                        </span>
+                        <span class="badge rounded-pill" style="background-color:white; color:var(--jobsy-blue); font-weight:500; padding:0.5em 1em;">
+                            {% trans job.get_experience_display|default:_("სრული განაკვეთი") %}
+                        </span>
+                    </div>
+                    <div class="d-flex align-items-center mt-3">
+                        {% if job.premium_level == 'premium_plus' %}
+                        <span class="badge rounded-pill me-2" style="background-color:var(--jobsy-purple); color:white; font-weight:500; padding:0.5em 1em;">
+                            {% trans "Premium+" %}
+                        </span>
+                        {% elif job.premium_level == 'premium' %}
+                        <span class="badge rounded-pill me-2" style="background-color:white; color:var(--jobsy-blue); font-weight:500; padding:0.5em 1em;">
+                            {% trans "Premium" %}
+                        </span>
+                        {% endif %}
+                        <span style="color:white; font-size: 0.9rem; font-weight: 500;">
+                            <i class="far fa-clock me-1"></i>
+                            {% trans "გამოქვეყნებულია" %} {{ job.posted_at|date:"d/m/Y" }}
+                        </span>
+                    </div>
                 </div>
-                <div class="d-flex gap-2 mb-1">
-                    {% if job.premium_level == 'premium_plus' %}
-                    <span class="badge rounded-pill" style="background-color:#a64dff; color:white; font-weight:500; padding:0.5em 1em;">
-                        {% trans "Premium+" %}
-                    </span>
-                    {% elif job.premium_level == 'premium' %}
-                    <span class="badge rounded-pill" style="background-color:#4d7bff; color:white; font-weight:500; padding:0.5em 1em;">
-                        {% trans "Premium" %}
-                    </span>
+                <div class="col-md-3 text-center text-md-end d-flex align-items-center justify-content-end">
+                    {% if job.employer and job.employer.company_logo %}
+                    <div class="company-badge">
+                        <img src="{{ job.employer.company_logo.url }}" alt="{{ job.company }}" style="width:60px; height:60px; object-fit:contain;">
+                    </div>
+                    {% else %}
+                    <div class="company-badge">
+                        <span style="font-size:2rem; color:var(--jobsy-blue); font-weight:700;">{{ job.company|slice:":1" }}</span>
+                    </div>
                     {% endif %}
-                    <span class="badge rounded-pill" style="background-color:var(--jobsy-yellow); color:var(--jobsy-blue); font-weight:500; padding:0.5em 1em;">
-                        {% trans job.category|default:_("IT / კომპიუტერები") %}
-                    </span>
-                    <span class="badge rounded-pill" style="background-color:white; color:var(--jobsy-blue); font-weight:500; padding:0.5em 1em;">
-                        {% trans job.get_experience_display|default:_("სრული განაკვეთი") %}
-                    </span>
-                </div>
-            </div>
-            <div class="col-md-4 text-center text-md-end">
-                {% if job.employer and job.employer.company_logo %}
-                <div class="company-badge ms-auto me-0">
-                    <img src="{{ job.employer.company_logo.url }}" alt="{{ job.company }}" style="width:60px; height:60px; object-fit:contain;">
-                </div>
-                {% else %}
-                <div class="company-badge ms-auto me-0">
-                    <span style="font-size:2rem; color:var(--jobsy-blue); font-weight:700;">{{ job.company|slice:":1" }}</span>
-                </div>
-                {% endif %}
-                <div class="text-white">
-                    <i class="far fa-clock me-1"></i>
-                    {% trans "გამოქვეყნებულია" %} {{ job.posted_at|date:"d/m/Y" }}
                 </div>
             </div>
         </div>

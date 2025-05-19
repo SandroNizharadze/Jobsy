@@ -20,6 +20,23 @@
         margin-bottom: 30px;
     }
     
+    /* Job details card styling */
+    .job-details-card {
+        background-color: var(--jobsy-blue);
+        border-radius: 12px !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
+        transition: all 0.3s ease;
+        max-width: 100%;
+        margin: 0 auto;
+        color: white;
+    }
+    
+    .job-details-card h1 {
+        color: white;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+    
     .company-badge {
         width: 80px;
         height: 80px;
@@ -28,7 +45,25 @@
         justify-content: center;
         background-color: white;
         border-radius: 50%;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        margin-bottom: 20px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        margin-left: auto;
+    }
+    
+    @media (max-width: 768px) {
+        .company-badge {
+            margin: 0 auto 20px;
+        }
+        
+        .job-details-card .col-md-3 {
+            margin-top: 20px;
+            justify-content: center !important;
+        }
+    }
+    
+    /* Define text color variable if not already defined */
+    :root {
+        --jobsy-text: #333333;
+        --jobsy-card: #fffbe6;
+        --jobsy-soft-blue: #eef5ff;
     }
 </style> 
