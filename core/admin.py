@@ -11,6 +11,7 @@ from django.urls import path
 from django.template.response import TemplateResponse
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils.decorators import method_decorator
+from django.utils.translation import gettext_lazy as _
 
 # Add a historical data view to the admin site
 @staff_member_required
@@ -173,9 +174,9 @@ class EmployerProfileAdmin(SoftDeletionAdmin):
 class JobListingAdmin(SoftDeletionAdmin):
     resource_class = JobListingResource
     list_display = ('title', 'company', 'get_employer', 'salary_range', 'location', 
-                   'premium_level', 'posted_at', 'get_deleted_state')
+                   'category', 'get_considers_students', 'premium_level', 'posted_at', 'get_deleted_state')
     list_filter = (('posted_at', DateRangeFilter), ('deleted_at', admin.EmptyFieldListFilter), 
-                  'employer__company_name', 'location', 'premium_level', 'status')
+                  'employer__company_name', 'location', 'premium_level', 'status', 'category', 'considers_students')
     search_fields = ('title', 'company', 'description', 'location')
     date_hierarchy = 'posted_at'
     actions = ['restore_selected']
@@ -195,6 +196,10 @@ class JobListingAdmin(SoftDeletionAdmin):
             return obj.employer.user_profile.user.email
         return '-'
     get_employer.short_description = 'Posted by'
+    
+    def get_considers_students(self, obj):
+        return _('კი') if obj.considers_students else _('არა')
+    get_considers_students.short_description = _('სტუდენტური')
 
 @admin.register(JobApplication)
 class JobApplicationAdmin(ImportExportModelAdmin):
