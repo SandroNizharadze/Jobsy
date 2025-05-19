@@ -19,5 +19,6 @@ urlpatterns += i18n_patterns(
     prefix_default_language=False,
 )
 
-if settings.DEBUG:
+# Only serve media files locally if S3 is disabled and we're in debug mode
+if settings.DEBUG and not getattr(settings, 'USE_S3', False):
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) 

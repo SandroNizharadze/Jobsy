@@ -139,18 +139,19 @@ STATICFILES_DIRS = [
 ]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Media files
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
 # S3 Settings - Apply when USE_S3 is True
 print(f"USE_S3 value from environment: {os.environ.get('USE_S3', 'NOT SET')}")
-if os.environ.get('USE_S3', 'False') == 'True':
-    print("Importing S3 settings...")
-    from .s3_settings import *
-    print("S3 settings imported successfully")
+USE_S3 = os.environ.get('USE_S3', 'False') == 'True'
+
+# Media files - Only use local storage if S3 is disabled
+if not USE_S3:
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
+    print("Using LOCAL media storage")
 else:
-    print("S3 settings not imported - condition not met")
+    # Import S3 settings but don't set MEDIA_URL or MEDIA_ROOT as they'll come from s3_settings.py
+    print("S3 settings are being imported")
+    from .s3_settings import *
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

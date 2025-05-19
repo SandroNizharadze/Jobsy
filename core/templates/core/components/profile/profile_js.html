@@ -17,23 +17,27 @@
     })()
 
     // Profile picture preview
-    document.getElementById('id_profile_picture').addEventListener('change', function(e) {
-        if (this.files && this.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const container = document.querySelector('.profile-picture-wrapper');
-                container.innerHTML = `
-                    <img src="${e.target.result}" alt="Profile Picture" class="profile-picture">
-                    <div class="profile-picture-overlay">
-                        <label for="id_profile_picture" class="profile-picture-edit">
-                            <i class="fas fa-camera"></i>
-                            <span>{% trans "Change Photo" %}</span>
-                        </label>
-                    </div>
-                `
+    const profilePictureInput = document.getElementById('id_profile_picture');
+    if (profilePictureInput) {
+        profilePictureInput.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const container = document.querySelector('.profile-picture-wrapper');
+                    container.innerHTML = `
+                        <img src="${e.target.result}" alt="Profile Picture" class="profile-picture">
+                        <div class="profile-picture-overlay">
+                            <label for="id_profile_picture" class="profile-picture-edit">
+                                <i class="fas fa-camera"></i>
+                                <span>{% trans "Change Photo" %}</span>
+                            </label>
+                        </div>
+                    `
+                }
+                reader.readAsDataURL(this.files[0]);
             }
-        }
-    })
+        });
+    }
 
     document.addEventListener('DOMContentLoaded', function() {
         // Check URL parameters to show correct tabs
@@ -50,78 +54,186 @@
         
         // Show CV upload form
         const showCvFormBtn = document.getElementById('show-cv-form-btn');
+        const cvInitialBtn = document.getElementById('cv-initial-btn');
         const cvUploadForm = document.getElementById('cv-upload-form');
         const cancelCvFormBtn = document.getElementById('cancel-cv-form-btn');
         const cvUploadFormElement = document.getElementById('cv-upload-form-element');
-        const removeCvBtn = document.getElementById('remove-cv-btn');
+        const cvRemoveForm = document.getElementById('cv-remove-form');
 
+        // Show the upload form when the Add/Upload CV button is clicked
         if (showCvFormBtn) {
-            showCvFormBtn.addEventListener('click', function() {
-                cvUploadForm.style.display = 'block';
-                showCvFormBtn.style.display = 'none';
+            showCvFormBtn.addEventListener('click', function(e) {
+                console.log("Show CV form button clicked");
+                // Hide the button container
+                if (cvInitialBtn) {
+                    cvInitialBtn.style.display = 'none';
+                }
+                // Show the form
+                if (cvUploadForm) {
+                    cvUploadForm.style.display = 'block';
+                }
             });
         }
 
+        // Handle cancel button to hide form and show the Add/Upload button again
         if (cancelCvFormBtn) {
             cancelCvFormBtn.addEventListener('click', function() {
-                cvUploadForm.style.display = 'none';
-                if (showCvFormBtn) {
-                    showCvFormBtn.style.display = 'block';
+                // Hide the form
+                if (cvUploadForm) {
+                    cvUploadForm.style.display = 'none';
+                }
+                
+                // Show the button container again
+                if (cvInitialBtn) {
+                    cvInitialBtn.style.display = 'block';
                 }
             });
         }
 
         // Handle CV upload form submission
         if (cvUploadFormElement) {
+            console.log("CV Upload form found, attaching submit event listener");
             cvUploadFormElement.addEventListener('submit', function(e) {
                 e.preventDefault();
-                const formData = new FormData(this);
-
+                console.log("CV Upload form submitted");
+                
+                // Show a loading indicator
+                const submitBtn = this.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>{% trans "Uploading..." %}';
+                }
+                
+                // Clear previous errors
+                const errorDiv = document.getElementById('cv-form-error');
+                errorDiv.textContent = '';
+                errorDiv.style.display = 'none';
+                
+                // Get the file input
+                const fileInput = document.querySelector('input[name="cv"]');
+                if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+                    console.error("No file selected");
+                    errorDiv.textContent = 'Please select a file to upload.';
+                    errorDiv.style.display = 'block';
+                    
+                    // Reset button
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-save me-1"></i>{% trans "Save" %}';
+                    }
+                    return;
+                }
+                
+                const file = fileInput.files[0];
+                console.log("Selected file:", file.name, "Size:", file.size, "Type:", file.type);
+                
+                // Create a FormData object and append the file
+                const formData = new FormData();
+                
+                // Explicitly add the necessary fields
+                formData.append('cv', file);
+                formData.append('profile_form', '1');
+                
+                // Add CSRF token
+                const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+                formData.append('csrfmiddlewaretoken', csrfToken);
+                
+                // Log all form data for debugging
+                console.log("Form data entries:");
+                for (let [key, value] of formData.entries()) {
+                    console.log(key, ':', typeof value === 'object' ? `${value.name} (${value.size} bytes)` : value);
+                }
+                
+                console.log("Sending CV upload request...");
                 fetch(window.location.href, {
                     method: 'POST',
                     body: formData,
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
-                    }
+                    },
+                    credentials: 'same-origin'
                 })
-                .then(response => response.json())
+                .then(response => {
+                    console.log("Upload response status:", response.status);
+                    return response.json().catch(error => {
+                        console.error("Error parsing JSON response:", error);
+                        throw new Error("Invalid server response");
+                    });
+                })
                 .then(data => {
+                    console.log("Upload response data:", data);
                     if (data.success) {
-                        window.location.reload();
+                        console.log("CV uploaded successfully, reloading page");
+                        // Show success message before reloading
+                        errorDiv.textContent = 'CV uploaded successfully!';
+                        errorDiv.style.display = 'block';
+                        errorDiv.classList.remove('invalid-feedback');
+                        errorDiv.classList.add('text-success');
+                        
+                        // Reload after a short delay to show the success message
+                        setTimeout(() => window.location.reload(), 1000);
                     } else {
-                        const errorDiv = document.getElementById('cv-form-error');
+                        console.error("Error uploading CV:", data.error);
                         errorDiv.textContent = data.error || 'An error occurred while uploading the CV.';
                         errorDiv.style.display = 'block';
+                        
+                        // Reset button
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = '<i class="fas fa-save me-1"></i>{% trans "Save" %}';
+                        }
                     }
                 })
                 .catch(error => {
-                    const errorDiv = document.getElementById('cv-form-error');
-                    errorDiv.textContent = 'An error occurred while uploading the CV.';
+                    console.error("Exception during CV upload:", error);
+                    errorDiv.textContent = error.message || 'An error occurred while uploading the CV.';
                     errorDiv.style.display = 'block';
+                    
+                    // Reset button
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-save me-1"></i>{% trans "Save" %}';
+                    }
                 });
             });
         }
 
         // Handle CV removal
-        if (removeCvBtn) {
-            removeCvBtn.addEventListener('click', function() {
+        if (cvRemoveForm) {
+            console.log("CV Remove form found, attaching event listener");
+            cvRemoveForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                console.log("CV Remove form submitted");
+                
                 if (confirm('{% trans "Are you sure you want to remove your CV?" %}')) {
-                    fetch('{% url "remove_cv" %}', {
+                    console.log("Removal confirmed, sending request");
+                    
+                    const formData = new FormData(this);
+                    
+                    fetch(this.action, {
                         method: 'POST',
+                        body: formData,
                         headers: {
-                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
                             'X-Requested-With': 'XMLHttpRequest'
-                        }
+                        },
+                        credentials: 'same-origin'
                     })
-                    .then(response => response.json())
+                    .then(response => {
+                        console.log("Response received:", response.status);
+                        return response.json();
+                    })
                     .then(data => {
+                        console.log("Response data:", data);
                         if (data.success) {
+                            console.log("CV removed successfully, reloading page");
                             window.location.reload();
                         } else {
-                            alert('{% trans "An error occurred while removing the CV." %}');
+                            console.error("Error removing CV:", data.error);
+                            alert('{% trans "An error occurred while removing the CV." %}' + (data.error ? ': ' + data.error : ''));
                         }
                     })
                     .catch(error => {
+                        console.error("Exception during CV removal:", error);
                         alert('{% trans "An error occurred while removing the CV." %}');
                     });
                 }

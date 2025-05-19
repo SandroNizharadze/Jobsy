@@ -15,16 +15,16 @@
                         </div>
                     {% endif %}
                     <div class="profile-picture-overlay">
-                        <label for="{{ user_form.profile_picture.id_for_label }}" class="profile-picture-edit">
+                        <label for="{{ profile_form.profile_picture.id_for_label }}" class="profile-picture-edit">
                             <i class="fas fa-camera"></i>
                             <span>{% trans "Change Photo" %}</span>
                         </label>
                     </div>
                 </div>
-                {{ user_form.profile_picture }}
-                {% if user_form.profile_picture.errors %}
+                {{ profile_form.profile_picture }}
+                {% if profile_form.profile_picture.errors %}
                     <div class="invalid-feedback d-block">
-                        {{ user_form.profile_picture.errors|join:", " }}
+                        {{ profile_form.profile_picture.errors|join:", " }}
                     </div>
                 {% endif %}
             </div>
@@ -123,27 +123,42 @@
     {% if user.userprofile.role == 'candidate' %}
     <div class="cv-card">
         <h3 class="cv-title">{% trans "Your CV" %}</h3>
+        
+        {% if user.userprofile.cv %}
         <div class="cv-actions" id="cv-actions">
-            {% if user.userprofile.cv %}
-                <a href="{{ user.userprofile.cv.url }}" target="_blank" class="btn btn-cv-view">
-                    <i class="fas fa-file-alt me-1"></i>{% trans "View Current CV" %}
-                </a>
-                <button type="button" class="btn-cv-remove" id="remove-cv-btn" aria-label="{% trans 'Remove CV' %}">
-                        <i class="fas fa-times"></i>
-                    </button>
-            {% endif %}
+            <a href="{{ user.userprofile.cv.url }}" target="_blank" class="btn btn-cv-view">
+                <i class="fas fa-file-alt me-1"></i>{% trans "View Current CV" %}
+            </a>
+            <form action="{% url 'remove_cv' %}" method="post" id="cv-remove-form" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn-cv-remove" id="remove-cv-btn" aria-label="{% trans 'Remove CV' %}">
+                    <i class="fas fa-times"></i>
+                </button>
+            </form>
         </div>
-
-        <div id="cv-upload-form" class="cv-upload-form" style="display: {% if user_form.cv.errors or user_form.cv_consent.errors or user_form.cv_share_with_employers.errors %}block{% else %}none{% endif %};">
+        {% else %}
+        <!-- For users without CV, show only the Add/Upload button initially -->
+        <div id="cv-initial-btn" style="display: {% if profile_form.cv.errors %}none{% else %}block{% endif %};">
+            <button id="show-cv-form-btn" type="button" class="btn btn-cv-upload">
+                <i class="fas fa-upload me-1"></i>{% trans "Add/Upload CV" %}
+            </button>
+        </div>
+        
+        <!-- Upload form (initially hidden unless there are errors) -->
+        <div id="cv-upload-form" class="cv-upload-form" style="display: {% if profile_form.cv.errors %}block{% else %}none{% endif %};">
             <form method="post" enctype="multipart/form-data" class="needs-validation" id="cv-upload-form-element" novalidate>
                 {% csrf_token %}
-                <input type="hidden" name="form_type" value="user_profile">
+                <input type="hidden" name="profile_form" value="1">
+                
+                <!-- Explicitly include form fields to ensure proper uploads -->
                 <div class="mb-3">
-                    <label class="form-label" for="{{ user_form.cv.id_for_label }}">{% trans "Upload CV" %}</label>
-                    {{ user_form.cv }}
-                    {% if user_form.cv.help_text %}<div class="form-text">{% trans user_form.cv.help_text %}</div>{% endif %}
-                    {% if user_form.cv.errors %}
-                        <div class="invalid-feedback d-block">{{ user_form.cv.errors|join:", " }}</div>
+                    <label class="form-label" for="{{ profile_form.cv.id_for_label }}">{% trans "Upload CV" %}</label>
+                    <!-- Use explicit file input instead of Django form field -->
+                    <input type="file" name="cv" id="{{ profile_form.cv.id_for_label }}" class="form-control" 
+                           accept=".pdf,.doc,.docx" required>
+                    <div class="form-text">{% trans "Upload your CV (PDF, DOC, DOCX)." %}</div>
+                    {% if profile_form.cv.errors %}
+                        <div class="invalid-feedback d-block">{{ profile_form.cv.errors|join:", " }}</div>
                     {% endif %}
                 </div>
                 <div id="cv-form-error" class="invalid-feedback d-block" style="display: none;"></div>
@@ -157,10 +172,6 @@
                 </div>
             </form>
         </div>
-        {% if not user.userprofile.cv %}
-            <button id="show-cv-form-btn" type="button" class="btn btn-cv-upload">
-                <i class="fas fa-upload me-1"></i>{% trans "Add/Upload CV" %}
-            </button>
         {% endif %}
     </div>
     {% endif %}

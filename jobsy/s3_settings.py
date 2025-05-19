@@ -22,7 +22,14 @@ STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
 
 # Media files configuration
-DEFAULT_FILE_STORAGE = 'jobsy.storage_backends.PublicMediaStorage'
+# Use PrivateMediaStorage for all media files by default
+# This ensures CV uploads go to the private storage
+DEFAULT_FILE_STORAGE = 'jobsy.storage_backends.PrivateMediaStorage'
+
+# When S3 is enabled, override local media settings
+# This ensures that Django doesn't try to write files locally
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+MEDIA_ROOT = None  # Don't use local media directory when S3 is enabled
 
 # Print S3 settings for debugging
 print(f"AWS_ACCESS_KEY_ID: {'*' * 8 if AWS_ACCESS_KEY_ID else 'NOT SET'}")
