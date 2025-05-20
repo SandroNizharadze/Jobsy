@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.http import require_POST
@@ -258,3 +258,22 @@ def remove_cv(request):
     except Exception as e:
         logger.error(f"Error removing CV: {str(e)}")
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+@login_required
+def get_application_rejection_reasons(request, application_id):
+    """API endpoint to get rejection reasons for an application"""
+    # Get the application and verify ownership
+    application = get_object_or_404(JobApplication, id=application_id)
+    
+    # Check if the application belongs to the current user
+    if application.user != request.user:
+        return JsonResponse({'error': 'You do not have permission to view this application'}, status=403)
+    
+    # Get rejection reasons
+    reasons = [reason.name for reason in application.rejection_reasons.all()]
+    
+    # Return as JSON
+    return JsonResponse({
+        'reasons': reasons,
+        'feedback': application.feedback
+    })

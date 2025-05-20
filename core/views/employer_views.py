@@ -3,12 +3,13 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.db.models import Count, Prefetch, Q, Case, When, Value, IntegerField
-from ..models import JobListing, EmployerProfile, JobApplication, UserProfile
+from ..models import JobListing, EmployerProfile, JobApplication, UserProfile, RejectionReason
 from ..forms import JobListingForm, EmployerProfileForm
 import logging
 from django.utils import timezone
 from datetime import timedelta
 from django.http import HttpResponseForbidden, JsonResponse
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -300,13 +301,51 @@ def update_application_status(request, application_id):
     new_status = request.POST.get('status')
     if new_status in dict(JobApplication.STATUS_CHOICES):
         application.status = new_status
+        
+        # If status is changed to "რეზერვი" (reserve) and no rejection reasons are provided yet,
+        # return JSON response to request rejection reasons
+        if new_status == 'რეზერვი' and 'rejection_reasons' not in request.POST:
+            # Save the status change
+            application.save()
+            
+            # Get all available rejection reasons
+            reasons = RejectionReason.objects.all().values('id', 'name')
+            
+            return JsonResponse({
+                'status': 'need_rejection_reasons',
+                'application_id': application_id,
+                'reasons': list(reasons)
+            })
+        
+        # If rejection reasons are provided, save them
+        if new_status == 'რეზერვი' and 'rejection_reasons' in request.POST:
+            # Clear existing reasons
+            application.rejection_reasons.clear()
+            
+            # Add new reasons
+            reason_ids = request.POST.getlist('rejection_reasons')
+            for reason_id in reason_ids:
+                try:
+                    reason = RejectionReason.objects.get(id=reason_id)
+                    application.rejection_reasons.add(reason)
+                except RejectionReason.DoesNotExist:
+                    pass
+            
+            # Save feedback if provided
+            if 'feedback' in request.POST:
+                application.feedback = request.POST.get('feedback')
+        
         application.save()
         messages.success(request, "Application status updated successfully.")
     else:
         messages.error(request, "Invalid status value provided.")
     
+    # Check if this is an AJAX request
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({'status': 'success'})
+    
     # Redirect back to the applications page
-    return redirect('job_applications', job_id=application.job.id) 
+    return redirect('job_applications', job_id=application.job.id)
 
 @login_required
 @user_passes_test(is_employer)

@@ -2,6 +2,7 @@ from django.urls import path
 from .views import main
 from .views.job_views import save_job, unsave_job
 from .views.file_views import serve_cv_file
+from .views.profile_views import get_application_rejection_reasons
 
 urlpatterns = [
     path('', main.home_redirect, name='home_redirect'),
@@ -31,6 +32,9 @@ urlpatterns = [
     path('jobs/<int:job_id>/apply/', main.apply_job, name='apply_job'),
     path('jobs/<int:job_id>/save/', save_job, name='save_job'),
     path('jobs/<int:job_id>/unsave/', unsave_job, name='unsave_job'),
+    
+    # API routes
+    path('api/applications/<int:application_id>/rejection-reasons/', get_application_rejection_reasons, name='get_application_rejection_reasons'),
     
     # Admin routes
     path('admin/assign-employer/<int:user_id>/', main.assign_employer, name='assign_employer'),

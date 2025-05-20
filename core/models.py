@@ -180,6 +180,17 @@ class JobListing(SoftDeletionModel):
         verbose_name = _("ვაკანსია")
         verbose_name_plural = _("ვაკანსიები")
 
+class RejectionReason(models.Model):
+    """Model for predefined rejection reasons"""
+    name = models.CharField(max_length=100, unique=True, verbose_name=_("მიზეზი"))
+    
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name = _("უარის მიზეზი")
+        verbose_name_plural = _("უარის მიზეზები")
+
 class JobApplication(models.Model):
     STATUS_CHOICES = [
         ('განხილვის_პროცესში', _('განხილვის პროცესში')),
@@ -217,6 +228,8 @@ class JobApplication(models.Model):
     applied_at = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name=_("აპლიკაციის თარიღი"))
     updated_at = models.DateTimeField(auto_now=True, verbose_name=_("განახლების თარიღი"))
     is_read = models.BooleanField(default=False, db_index=True, verbose_name=_("წაკითხულია"))
+    rejection_reasons = models.ManyToManyField(RejectionReason, blank=True, related_name='applications', verbose_name=_("უარის მიზეზები"))
+    feedback = models.TextField(blank=True, verbose_name=_("უკუკავშირი"))
     
     def save(self, *args, **kwargs):
         if self.job and (not self.job_title or not self.job_company):

@@ -2,54 +2,208 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Create the rejection reasons modal
+    createRejectionReasonsModal();
+    
     // Auto-submit status form on change
     const statusSelects = document.querySelectorAll('.status-select');
     statusSelects.forEach(select => {
         select.addEventListener('change', function() {
             const formId = this.dataset.formId;
+            const form = document.getElementById(formId);
+            const selectedValue = this.value;
             
             // Update select appearance immediately based on new status
-            const selectedValue = this.value;
             this.className = 'form-select form-select-sm status-select';
             
             if (selectedValue === 'გასაუბრება') {
                 this.classList.add('status-interview-select');
                 this.closest('tr').className = 'table-success';
+                form.submit();
             } else if (selectedValue === 'რეზერვი') {
                 this.classList.add('status-reserve-select');
                 this.closest('tr').className = 'table-warning';
+                
+                // For "რეზერვი" (reserve) status, show the rejection reasons modal
+                showRejectionReasonsModal(form);
             } else if (selectedValue === 'განხილვის_პროცესში') {
                 this.classList.add('status-review-select');
                 this.closest('tr').className = '';
+                form.submit();
             }
-            
-            document.getElementById(formId).submit();
         });
     });
     
     // Handle search form submission
     const searchInput = document.querySelector('input[name="search"]');
-    const searchButton = searchInput.nextElementSibling;
-    
-    searchButton.addEventListener('click', function() {
-        const currentUrl = new URL(window.location.href);
-        const searchValue = searchInput.value.trim();
+    if (searchInput) {
+        const searchButton = searchInput.nextElementSibling;
         
-        if (searchValue) {
-            currentUrl.searchParams.set('search', searchValue);
-        } else {
-            currentUrl.searchParams.delete('search');
-        }
+        searchButton.addEventListener('click', function() {
+            const currentUrl = new URL(window.location.href);
+            const searchValue = searchInput.value.trim();
+            
+            if (searchValue) {
+                currentUrl.searchParams.set('search', searchValue);
+            } else {
+                currentUrl.searchParams.delete('search');
+            }
+            
+            window.location.href = currentUrl.toString();
+        });
         
-        window.location.href = currentUrl.toString();
-    });
+        // Also submit on Enter key
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                searchButton.click();
+            }
+        });
+    }
     
-    // Also submit on Enter key
-    searchInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            searchButton.click();
-        }
-    });
+    // Function to create the rejection reasons modal
+    function createRejectionReasonsModal() {
+        // Create modal HTML
+        const modalHtml = `
+            <div class="modal fade" id="rejectionReasonsModal" tabindex="-1" aria-labelledby="rejectionReasonsModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="rejectionReasonsModalLabel">{% trans "უარის მიზეზები" %}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>{% trans "აირჩიეთ მიზეზები, თუ რატომ გადაიყვანეთ აპლიკანტი რეზერვში" %}</p>
+                            <div id="rejectionReasonsCheckboxes" class="mb-3">
+                                <!-- Checkboxes will be inserted here dynamically -->
+                            </div>
+                            <div class="mb-3">
+                                <label for="rejectionFeedback" class="form-label">{% trans "დამატებითი უკუკავშირი" %}</label>
+                                <textarea class="form-control" id="rejectionFeedback" rows="3" placeholder="{% trans "დაამატეთ უფრო დეტალური უკუკავშირი კანდიდატისთვის (არასავალდებულო)" %}"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "გაუქმება" %}</button>
+                            <button type="button" class="btn btn-primary" id="saveRejectionReasons">{% trans "შენახვა" %}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Add the modal to the document
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        
+        // Initialize the Bootstrap modal
+        const rejectionModal = new bootstrap.Modal(document.getElementById('rejectionReasonsModal'));
+        
+        // Add event listener for the save button
+        document.getElementById('saveRejectionReasons').addEventListener('click', function() {
+            submitRejectionReasons();
+        });
+    }
+    
+    // Function to show the rejection reasons modal
+    function showRejectionReasonsModal(form) {
+        // Get the form data
+        const formData = new FormData(form);
+        const applicationId = form.action.split('/').slice(-2)[0];
+        
+        // Send AJAX request to get rejection reasons
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'need_rejection_reasons') {
+                // Store the application ID for later use
+                document.getElementById('rejectionReasonsModal').dataset.applicationId = data.application_id;
+                
+                // Clear previous checkboxes
+                const checkboxesContainer = document.getElementById('rejectionReasonsCheckboxes');
+                checkboxesContainer.innerHTML = '';
+                
+                // Add checkboxes for each reason
+                data.reasons.forEach(reason => {
+                    const checkboxHtml = `
+                        <div class="form-check">
+                            <input class="form-check-input rejection-reason-checkbox" type="checkbox" value="${reason.id}" id="reason${reason.id}">
+                            <label class="form-check-label" for="reason${reason.id}">
+                                ${reason.name}
+                            </label>
+                        </div>
+                    `;
+                    checkboxesContainer.insertAdjacentHTML('beforeend', checkboxHtml);
+                });
+                
+                // Clear the feedback textarea
+                document.getElementById('rejectionFeedback').value = '';
+                
+                // Show the modal
+                const rejectionModal = new bootstrap.Modal(document.getElementById('rejectionReasonsModal'));
+                rejectionModal.show();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Submit the form anyway in case of error
+            form.submit();
+        });
+    }
+    
+    // Function to submit the rejection reasons
+    function submitRejectionReasons() {
+        // Get the application ID
+        const applicationId = document.getElementById('rejectionReasonsModal').dataset.applicationId;
+        
+        // Get the selected reasons
+        const selectedReasons = [];
+        document.querySelectorAll('.rejection-reason-checkbox:checked').forEach(checkbox => {
+            selectedReasons.push(checkbox.value);
+        });
+        
+        // Get the feedback
+        const feedback = document.getElementById('rejectionFeedback').value;
+        
+        // Create form data
+        const formData = new FormData();
+        formData.append('status', 'რეზერვი');
+        selectedReasons.forEach(reasonId => {
+            formData.append('rejection_reasons', reasonId);
+        });
+        formData.append('feedback', feedback);
+        
+        // Add CSRF token
+        const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+        formData.append('csrfmiddlewaretoken', csrfToken);
+        
+        // Submit the form via AJAX
+        fetch(`/employer/applications/${applicationId}/update-status/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Hide the modal
+            const rejectionModal = bootstrap.Modal.getInstance(document.getElementById('rejectionReasonsModal'));
+            rejectionModal.hide();
+            
+            // Show success message
+            if (data.status === 'success') {
+                // You can add a toast notification here if desired
+                console.log('Status updated successfully');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
 });
 </script> 

@@ -94,6 +94,19 @@
             }
         }
         
+        // Initialize Bootstrap modals
+        const rejectionModal = document.getElementById('rejectionReasonsViewModal');
+        if (rejectionModal) {
+            // Make sure Bootstrap's Modal is available
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                // Initialize the modal
+                new bootstrap.Modal(rejectionModal);
+                console.log('Rejection reasons modal initialized');
+            } else {
+                console.warn('Bootstrap Modal JS is not loaded');
+            }
+        }
+        
         // Show CV upload form
         const showCvFormBtn = document.getElementById('show-cv-form-btn');
         const cvInitialBtn = document.getElementById('cv-initial-btn');

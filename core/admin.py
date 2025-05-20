@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
-from .models import JobListing, UserProfile, EmployerProfile, JobApplication, SavedJob
+from .models import JobListing, UserProfile, EmployerProfile, JobApplication, SavedJob, RejectionReason
 from import_export.admin import ImportExportModelAdmin, ImportExportActionModelAdmin
 from import_export import resources
 from rangefilter.filters import DateRangeFilter
@@ -209,22 +209,22 @@ class JobListingAdmin(SoftDeletionAdmin):
     def get_category(self, obj):
         categories = {
             'მენეჯმენტი/ადმინისტრირება': '#4a6da7',  # Blue
-            'მარკეტინგი': '#a74a4a',  # Red
-            'ფინანსები': '#4aa74a',  # Green
-            'გაყიდვები/მომხმარებელთან ურთიერთობა': '#a7a74a',  # Yellow
-            'IT/პროგრამირება': '#a74aa7',  # Purple
-            'დიზაინი': '#4aa7a7',  # Teal
-            'ჰორეკა/კვება': '#7d623c',  # Brown
-            'დაცვა': '#484848',  # Dark Gray
-            'სილამაზე/მოდა': '#a2518a',  # Pink
-            'მშენებლობა': '#3c7d78',  # Dark Teal
-            'მედიცინა': '#7d3c3c',  # Dark Red
-            'განათლება': '#3c5c7d',  # Dark Blue
-            'სამართალი': '#7d3c5c',  # Dark Purple
-            'ტურიზმი': '#3c7d5c',  # Dark Green
-            'ლოჯისტიკა/დისტრიბუცია': '#5c3c7d',  # Indigo
-            'საბანკო საქმე': '#7d5c3c',  # Brown
-            'აზარტული': '#aaaa55',  # Olive
+            'მარკეტინგი': '#4a6da7',  
+            'ფინანსები': '#4a6da7',  
+            'გაყიდვები/მომხმარებელთან ურთიერთობა': '#4a6da7',  
+            'IT/პროგრამირება': '#4a6da7',  
+            'დიზაინი': '#4a6da7',  
+            'ჰორეკა/კვება': '#4a6da7',  
+            'დაცვა': '#4a6da7',  
+            'სილამაზე/მოდა': '#4a6da7',  
+            'მშენებლობა': '#4a6da7',  
+            'მედიცინა': '#4a6da7',  
+            'განათლება': '#4a6da7',  
+            'სამართალი': '#4a6da7',  
+            'ტურიზმი': '#4a6da7',  
+            'ლოჯისტიკა/დისტრიბუცია': '#4a6da7',  
+            'საბანკო საქმე': '#4a6da7',  
+            'აზარტული': '#4a6da7',  
         }
         color = categories.get(obj.category, '#333333')
         return format_html('<span style="color: {}; font-weight: bold;">{}</span>', color, obj.category)
@@ -257,10 +257,11 @@ class JobListingAdmin(SoftDeletionAdmin):
 @admin.register(JobApplication)
 class JobApplicationAdmin(ImportExportModelAdmin):
     resource_class = JobApplicationResource
-    list_display = ('get_job_title', 'get_company', 'get_applicant', 'status', 'applied_at')
-    list_filter = (('applied_at', DateRangeFilter), 'status')
+    list_display = ('get_job_title', 'get_company', 'get_applicant', 'status', 'applied_at', 'get_rejection_reasons')
+    list_filter = (('applied_at', DateRangeFilter), 'status', 'rejection_reasons')
     search_fields = ('job_title', 'job_company', 'job__title', 'job__company', 'user__email', 'guest_name', 'guest_email')
     date_hierarchy = 'applied_at'
+    filter_horizontal = ('rejection_reasons',)
     
     def get_job_title(self, obj):
         if obj.job:
@@ -279,6 +280,13 @@ class JobApplicationAdmin(ImportExportModelAdmin):
             return obj.user.email
         return f"{obj.guest_name} ({obj.guest_email})"
     get_applicant.short_description = 'Applicant'
+    
+    def get_rejection_reasons(self, obj):
+        if obj.status == 'რეზერვი' and obj.rejection_reasons.exists():
+            reasons = ", ".join([reason.name for reason in obj.rejection_reasons.all()])
+            return format_html('<span style="color: #d9534f;">{}</span>', reasons)
+        return "-"
+    get_rejection_reasons.short_description = 'Rejection Reasons'
 
 @admin.register(SavedJob)
 class SavedJobAdmin(ImportExportModelAdmin):
@@ -302,3 +310,9 @@ class SavedJobAdmin(ImportExportModelAdmin):
             return obj.job.company
         return obj.job_company or "Deleted Company"
     get_company.short_description = 'Company'
+
+class RejectionReasonAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name',)
+
+admin.site.register(RejectionReason, RejectionReasonAdmin)

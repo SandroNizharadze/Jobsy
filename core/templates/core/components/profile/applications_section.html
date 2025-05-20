@@ -116,13 +116,19 @@
                                         {% endif %}
                                     </td>
                                     <td class="text-center">
-                                        {% if application.job %}
                                         <div class="btn-group">
-                                            <a href="{% url 'job_detail' application.job.id %}" class="btn btn-sm btn-outline-primary me-2" title="{% trans 'View Job' %}">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
+                                            {% if application.job %}
+                                                <a href="{% url 'job_detail' application.job.id %}" class="btn btn-sm btn-outline-primary me-2" title="{% trans 'View Job' %}">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            {% endif %}
+                                            
+                                            {% if application.status == 'რეზერვი' and application.rejection_reasons.exists %}
+                                                <button type="button" class="btn btn-sm btn-outline-warning" onclick="showRejectionReasons({{ application.id }})" title="{% trans 'უარის მიზეზები' %}">
+                                                    <i class="fas fa-info-circle"></i>
+                                                </button>
+                                            {% endif %}
                                         </div>
-                                        {% endif %}
                                     </td>
                                 </tr>
                                 {% endfor %}
