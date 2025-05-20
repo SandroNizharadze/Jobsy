@@ -42,8 +42,10 @@
             {% endif %}
         </div>
         
-        <a href="#" class="btn w-100" style="background-color:var(--jobsy-card); color:var(--jobsy-blue); border-radius:12px; font-weight:600; padding:0.8rem;">
+        {% if job.employer %}
+        <a href="{% url 'company_profile' employer_id=job.employer.id %}" class="btn w-100" style="background-color:var(--jobsy-card); color:var(--jobsy-blue); border-radius:12px; font-weight:600; padding:0.8rem;">
             <i class="fas fa-building me-2"></i> {% trans "კომპანიის პროფილი" %}
         </a>
+        {% endif %}
     </div>
 </div> 

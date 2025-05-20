@@ -269,8 +269,8 @@ def get_application_rejection_reasons(request, application_id):
     if application.user != request.user:
         return JsonResponse({'error': 'You do not have permission to view this application'}, status=403)
     
-    # Get rejection reasons
-    reasons = [reason.name for reason in application.rejection_reasons.all()]
+    # Get rejection reasons with their display names
+    reasons = [reason.get_name_display() for reason in application.rejection_reasons.all()]
     
     # Return as JSON
     return JsonResponse({

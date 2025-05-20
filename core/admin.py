@@ -283,7 +283,7 @@ class JobApplicationAdmin(ImportExportModelAdmin):
     
     def get_rejection_reasons(self, obj):
         if obj.status == 'რეზერვი' and obj.rejection_reasons.exists():
-            reasons = ", ".join([reason.name for reason in obj.rejection_reasons.all()])
+            reasons = ", ".join([reason.get_name_display() for reason in obj.rejection_reasons.all()])
             return format_html('<span style="color: #d9534f;">{}</span>', reasons)
         return "-"
     get_rejection_reasons.short_description = 'Rejection Reasons'

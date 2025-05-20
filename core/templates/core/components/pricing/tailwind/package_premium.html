@@ -1,0 +1,97 @@
+{% load i18n %}
+
+<div class="relative flex flex-col bg-white rounded-2xl shadow-xl border-2 border-blue-500 transform scale-[1.02] z-10 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 overflow-hidden">
+  <!-- Popular Badge -->
+  <div class="absolute top-0 right-0">
+    <div class="bg-blue-500 text-white text-xs font-bold uppercase py-1 px-4 rotate-45 transform translate-x-[30%] translate-y-[30%] shadow-sm">
+      {% trans "პოპულარული" %}
+    </div>
+  </div>
+  
+  <div class="p-6 pb-0">
+    <div class="flex items-center justify-between mb-4">
+      <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+      </div>
+      <div class="bg-blue-100 text-blue-600 text-xs font-bold uppercase px-3 py-1 rounded-full">{% trans "ფასდაკლება" %}</div>
+    </div>
+    <h3 class="text-2xl font-bold text-gray-900 mb-2">{% trans "პრემიუმი" %}</h3>
+    <div class="flex items-baseline mb-2">
+      <span class="line-through text-gray-500 text-lg mr-2">95₾</span>
+      <span class="text-3xl font-bold text-gray-900">50<span class="text-xl">₾</span></span>
+    </div>
+    <p class="text-gray-600 mb-6">{% trans "იდეალურია აქტიური დამსაქმებლებისთვის" %}</p>
+  </div>
+  
+  <div class="flex-grow p-6 pt-0">
+    <ul class="space-y-3 mb-6">
+      <li class="flex items-start">
+        <svg class="h-5 w-5 text-green-500 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <span class="text-gray-700">{% trans "1 განცხადება - პერიოდი 30 დღე" %}</span>
+      </li>
+      <li class="flex items-start">
+        <svg class="h-5 w-5 text-green-500 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <span class="text-gray-700">{% trans "მთავარი გვერდის მეორე სექცია" %}</span>
+      </li>
+      <li class="flex items-start">
+        <svg class="h-5 w-5 text-green-500 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <span class="text-gray-700">{% trans "ლოგოს გამოჩენა" %}</span>
+      </li>
+      <li class="flex items-start">
+        <svg class="h-5 w-5 text-green-500 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <span class="text-gray-700">{% trans "სოც. ქსელებში გაზიარება ჯგუფური პოსტის სახით" %}</span>
+      </li>
+      <li class="flex items-start">
+        <svg class="h-5 w-5 text-green-500 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <span class="text-gray-700">{% trans "პრემიუმის ნიშანი" %}</span>
+      </li>
+      <li class="flex items-start">
+        <svg class="h-5 w-5 text-green-500 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <span class="text-gray-700">{% trans "ვაკანსიის ატვირთვა Karriera.ge-ზე" %}</span>
+      </li>
+      <li class="flex items-start">
+        <svg class="h-5 w-5 text-green-500 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <div>
+          <span class="text-gray-700">{% trans "ძიებისას პრიორიტეტულობა:" %}</span>
+          <span class="ml-1 inline-block px-2 py-0.5 text-xs bg-yellow-200 text-yellow-800 rounded">{% trans "საშუალო" %}</span>
+        </div>
+      </li>
+      <li class="flex items-start">
+        <svg class="h-5 w-5 text-green-500 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <span class="text-gray-700">{% trans "დამსაქმებლის პროფილი და სივების ანალიტიკა" %}</span>
+      </li>
+      <li class="flex items-start">
+        <svg class="h-5 w-5 text-green-500 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <span class="text-gray-700">{% trans "სივების ბაზაზე წვდომა" %}</span>
+      </li>
+    </ul>
+  </div>
+  
+  <div class="px-6 pb-6">
+    <a href="{% url 'post_job' %}?premium_level=premium" 
+       class="block w-full py-3 px-6 text-center font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-200 package-select-btn" 
+       data-package="premium">
+      {% trans "აირჩიე" %}
+    </a>
+  </div>
+</div> 

@@ -1,0 +1,104 @@
+{% load i18n %}
+
+<div class="max-w-4xl mx-auto">
+  <!-- FAQ Item 1 -->
+  <div class="mb-6">
+    <button class="faq-toggle flex justify-between items-center w-full text-left p-5 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200" data-target="faq-1">
+      <h3 class="text-lg font-medium text-gray-900">{% trans "როგორ შევქმნა ვაკანსია Jobsy-ზე?" %}</h3>
+      <svg class="faq-arrow h-5 w-5 text-gray-500 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+      </svg>
+    </button>
+    <div id="faq-1" class="faq-content hidden mt-2 p-5 bg-gray-50 rounded-lg">
+      <p class="text-gray-700">{% trans "ვაკანსიის შესაქმნელად საჭიროა დარეგისტრირდეთ როგორც დამსაქმებელი, აირჩიოთ სასურველი პაკეტი და შეავსოთ ვაკანსიის ფორმა. ვაკანსია გამოქვეყნდება ადმინისტრაციის მიერ დადასტურების შემდეგ." %}</p>
+    </div>
+  </div>
+  
+  <!-- FAQ Item 2 -->
+  <div class="mb-6">
+    <button class="faq-toggle flex justify-between items-center w-full text-left p-5 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200" data-target="faq-2">
+      <h3 class="text-lg font-medium text-gray-900">{% trans "რა განსხვავებაა პაკეტებს შორის?" %}</h3>
+      <svg class="faq-arrow h-5 w-5 text-gray-500 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+      </svg>
+    </button>
+    <div id="faq-2" class="faq-content hidden mt-2 p-5 bg-gray-50 rounded-lg">
+      <p class="text-gray-700">{% trans "პაკეტები განსხვავდება ვაკანსიის გამოჩენის პრიორიტეტულობით, მთავარ გვერდზე განთავსებით და დამატებითი სერვისებით. პრემიუმ და პრემიუმ+ პაკეტები უზრუნველყოფენ უფრო მეტ ხილვადობას და მეტ კანდიდატს." %}</p>
+    </div>
+  </div>
+  
+  <!-- FAQ Item 3 -->
+  <div class="mb-6">
+    <button class="faq-toggle flex justify-between items-center w-full text-left p-5 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200" data-target="faq-3">
+      <h3 class="text-lg font-medium text-gray-900">{% trans "რამდენ ხანს რჩება ვაკანსია აქტიური?" %}</h3>
+      <svg class="faq-arrow h-5 w-5 text-gray-500 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+      </svg>
+    </button>
+    <div id="faq-3" class="faq-content hidden mt-2 p-5 bg-gray-50 rounded-lg">
+      <p class="text-gray-700">{% trans "ყველა პაკეტის შემთხვევაში ვაკანსია რჩება აქტიური 30 დღის განმავლობაში. ამ პერიოდის გასვლის შემდეგ, შეგიძლიათ განაახლოთ ვაკანსია ან შექმნათ ახალი." %}</p>
+    </div>
+  </div>
+  
+  <!-- FAQ Item 4 -->
+  <div class="mb-6">
+    <button class="faq-toggle flex justify-between items-center w-full text-left p-5 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200" data-target="faq-4">
+      <h3 class="text-lg font-medium text-gray-900">{% trans "შემიძლია თუ არა ვაკანსიის რედაქტირება გამოქვეყნების შემდეგ?" %}</h3>
+      <svg class="faq-arrow h-5 w-5 text-gray-500 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+      </svg>
+    </button>
+    <div id="faq-4" class="faq-content hidden mt-2 p-5 bg-gray-50 rounded-lg">
+      <p class="text-gray-700">{% trans "დიახ, შეგიძლიათ ნებისმიერ დროს შეცვალოთ ვაკანსიის დეტალები თქვენი დამსაქმებლის პროფილიდან. თუმცა, მნიშვნელოვანი ცვლილებების შემთხვევაში, ვაკანსიას შეიძლება დასჭირდეს ხელახალი დადასტურება ადმინისტრაციის მხრიდან." %}</p>
+    </div>
+  </div>
+  
+  <!-- FAQ Item 5 -->
+  <div class="mb-6">
+    <button class="faq-toggle flex justify-between items-center w-full text-left p-5 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200" data-target="faq-5">
+      <h3 class="text-lg font-medium text-gray-900">{% trans "როგორ ვნახო აპლიკანტების სივები?" %}</h3>
+      <svg class="faq-arrow h-5 w-5 text-gray-500 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+      </svg>
+    </button>
+    <div id="faq-5" class="faq-content hidden mt-2 p-5 bg-gray-50 rounded-lg">
+      <p class="text-gray-700">{% trans "პრემიუმ და პრემიუმ+ პაკეტების მომხმარებლებს აქვთ წვდომა სივების ბაზაზე. თქვენს დამსაქმებლის პროფილში შეგიძლიათ ნახოთ როგორც თქვენს ვაკანსიაზე შემოსული აპლიკაციები, ასევე მოიძიოთ კანდიდატები სივების ბაზაში." %}</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const faqToggles = document.querySelectorAll('.faq-toggle');
+    
+    faqToggles.forEach(toggle => {
+      toggle.addEventListener('click', function() {
+        const targetId = this.getAttribute('data-target');
+        const contentElement = document.getElementById(targetId);
+        const arrowIcon = this.querySelector('.faq-arrow');
+        
+        // Toggle content visibility
+        contentElement.classList.toggle('hidden');
+        
+        // Toggle arrow rotation
+        if (contentElement.classList.contains('hidden')) {
+          arrowIcon.classList.remove('rotate-180');
+        } else {
+          arrowIcon.classList.add('rotate-180');
+        }
+        
+        // Close other FAQs
+        faqToggles.forEach(otherToggle => {
+          if (otherToggle !== toggle) {
+            const otherId = otherToggle.getAttribute('data-target');
+            const otherContent = document.getElementById(otherId);
+            const otherArrow = otherToggle.querySelector('.faq-arrow');
+            
+            otherContent.classList.add('hidden');
+            otherArrow.classList.remove('rotate-180');
+          }
+        });
+      });
+    });
+  });
+</script> 

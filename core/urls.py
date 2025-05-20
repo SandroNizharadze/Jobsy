@@ -3,6 +3,7 @@ from .views import main
 from .views.job_views import save_job, unsave_job
 from .views.file_views import serve_cv_file
 from .views.profile_views import get_application_rejection_reasons
+from .views.employer_views import company_profile
 
 urlpatterns = [
     path('', main.home_redirect, name='home_redirect'),
@@ -25,6 +26,7 @@ urlpatterns = [
     path('employer/home/', main.employer_home, name='employer_home'),
     path('employer/jobs/<int:job_id>/applications/', main.job_applications, name='job_applications'),
     path('employer/applications/<int:application_id>/update-status/', main.update_application_status, name='update_application_status'),
+    path('company/<int:employer_id>/', company_profile, name='company_profile'),
     path('pricing/', main.pricing, name='pricing'),
     
     # Job routes

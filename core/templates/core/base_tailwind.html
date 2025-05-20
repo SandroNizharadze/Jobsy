@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+{% load static %}
+{% load i18n %}
+
+<head>
+    <title>{% block title %}Jobsy{% endblock %}</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body class="bg-gray-50">
+    {% include 'core/components/base/navbar_tailwind.html' %}
+    
+    {% block hero_section %}{% endblock %}
+    
+    <div class="min-h-screen">
+        {% include 'core/components/base/alerts_tailwind.html' %}
+        {% block content %}{% endblock %}
+    </div>
+    
+    {% block bottom_section %}{% endblock %}
+    
+    {% include 'core/components/base/footer_tailwind.html' %}
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

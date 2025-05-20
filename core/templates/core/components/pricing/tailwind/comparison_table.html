@@ -1,0 +1,210 @@
+{% load i18n %}
+
+<div id="comparison" class="py-16 scroll-mt-24">
+  <div class="text-center mb-12">
+    <h2 class="text-3xl font-bold text-gray-900 mb-4">{% trans "პაკეტების შედარება" %}</h2>
+    <p class="text-lg text-gray-600 max-w-3xl mx-auto">{% trans "დეტალური შედარება, რომ აირჩიოთ თქვენი ბიზნესისთვის შესაფერისი პაკეტი" %}</p>
+  </div>
+  
+  <div class="overflow-x-auto">
+    <table class="w-full border-collapse">
+      <thead>
+        <tr>
+          <th class="py-4 px-6 bg-gray-50 text-left text-gray-600 font-medium border-b"></th>
+          <th class="py-4 px-6 bg-gray-50 text-center border-b">
+            <span class="block text-lg font-bold text-gray-900">{% trans "სტანდარტული" %}</span>
+            <span class="block text-2xl font-bold text-gray-900 mt-1">{% trans "უფასო" %}</span>
+          </th>
+          <th class="py-4 px-6 bg-blue-50 text-center border-b relative">
+            <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+              <span class="bg-blue-500 text-white text-xs px-3 py-1 rounded-full font-medium">{% trans "პოპულარული" %}</span>
+            </div>
+            <span class="block text-lg font-bold text-gray-900">{% trans "პრემიუმი" %}</span>
+            <span class="block text-2xl font-bold text-gray-900 mt-1">50₾</span>
+          </th>
+          <th class="py-4 px-6 bg-purple-50 text-center border-b">
+            <span class="block text-lg font-bold text-gray-900">{% trans "პრემიუმ+" %}</span>
+            <span class="block text-2xl font-bold text-gray-900 mt-1">60₾</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Row 1 -->
+        <tr class="border-b hover:bg-gray-50">
+          <td class="py-4 px-6 text-gray-800 font-medium">{% trans "განცხადების რაოდენობა" %}</td>
+          <td class="py-4 px-6 text-center">1</td>
+          <td class="py-4 px-6 text-center bg-blue-50">1</td>
+          <td class="py-4 px-6 text-center bg-purple-50">1</td>
+        </tr>
+        
+        <!-- Row 2 -->
+        <tr class="border-b hover:bg-gray-50">
+          <td class="py-4 px-6 text-gray-800 font-medium">{% trans "პერიოდი" %}</td>
+          <td class="py-4 px-6 text-center">30 {% trans "დღე" %}</td>
+          <td class="py-4 px-6 text-center bg-blue-50">30 {% trans "დღე" %}</td>
+          <td class="py-4 px-6 text-center bg-purple-50">30 {% trans "დღე" %}</td>
+        </tr>
+        
+        <!-- Row 3 -->
+        <tr class="border-b hover:bg-gray-50">
+          <td class="py-4 px-6 text-gray-800 font-medium">{% trans "მთავარ გვერდზე გამოჩენა" %}</td>
+          <td class="py-4 px-6 text-center">
+            <svg class="h-5 w-5 text-red-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </td>
+          <td class="py-4 px-6 text-center bg-blue-50">{% trans "მეორე სექცია" %}</td>
+          <td class="py-4 px-6 text-center bg-purple-50">{% trans "პირველი სექცია" %}</td>
+        </tr>
+        
+        <!-- Row 4 -->
+        <tr class="border-b hover:bg-gray-50">
+          <td class="py-4 px-6 text-gray-800 font-medium">{% trans "ლოგოს გამოჩენა" %}</td>
+          <td class="py-4 px-6 text-center">
+            <svg class="h-5 w-5 text-green-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </td>
+          <td class="py-4 px-6 text-center bg-blue-50">
+            <svg class="h-5 w-5 text-green-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </td>
+          <td class="py-4 px-6 text-center bg-purple-50">
+            <svg class="h-5 w-5 text-green-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </td>
+        </tr>
+        
+        <!-- Row 5 -->
+        <tr class="border-b hover:bg-gray-50">
+          <td class="py-4 px-6 text-gray-800 font-medium">{% trans "სოც. ქსელებში გაზიარება" %}</td>
+          <td class="py-4 px-6 text-center">
+            <svg class="h-5 w-5 text-red-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </td>
+          <td class="py-4 px-6 text-center bg-blue-50">{% trans "ჯგუფური პოსტი" %}</td>
+          <td class="py-4 px-6 text-center bg-purple-50">{% trans "ინდივიდუალური და ჯგუფური პოსტი" %}</td>
+        </tr>
+        
+        <!-- Row 6 -->
+        <tr class="border-b hover:bg-gray-50">
+          <td class="py-4 px-6 text-gray-800 font-medium">{% trans "პრემიუმის ნიშანი" %}</td>
+          <td class="py-4 px-6 text-center">
+            <svg class="h-5 w-5 text-red-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </td>
+          <td class="py-4 px-6 text-center bg-blue-50">
+            <span class="inline-block px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium">{% trans "პრემიუმი" %}</span>
+          </td>
+          <td class="py-4 px-6 text-center bg-purple-50">
+            <span class="inline-block px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs font-medium">{% trans "პრემიუმ+" %}</span>
+          </td>
+        </tr>
+        
+        <!-- Row 7 -->
+        <tr class="border-b hover:bg-gray-50">
+          <td class="py-4 px-6 text-gray-800 font-medium">{% trans "ვაკანსიის ატვირთვა Karriera.ge-ზე" %}</td>
+          <td class="py-4 px-6 text-center">
+            <svg class="h-5 w-5 text-red-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </td>
+          <td class="py-4 px-6 text-center bg-blue-50">
+            <svg class="h-5 w-5 text-green-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </td>
+          <td class="py-4 px-6 text-center bg-purple-50">
+            <svg class="h-5 w-5 text-green-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </td>
+        </tr>
+        
+        <!-- Row 8 -->
+        <tr class="border-b hover:bg-gray-50">
+          <td class="py-4 px-6 text-gray-800 font-medium">{% trans "ძიებისას პრიორიტეტულობა" %}</td>
+          <td class="py-4 px-6 text-center">
+            <span class="inline-block px-2 py-1 bg-gray-200 text-gray-700 rounded text-xs font-medium">{% trans "დაბალი" %}</span>
+          </td>
+          <td class="py-4 px-6 text-center bg-blue-50">
+            <span class="inline-block px-2 py-1 bg-yellow-200 text-yellow-800 rounded text-xs font-medium">{% trans "საშუალო" %}</span>
+          </td>
+          <td class="py-4 px-6 text-center bg-purple-50">
+            <span class="inline-block px-2 py-1 bg-red-200 text-red-800 rounded text-xs font-medium">{% trans "მაღალი" %}</span>
+          </td>
+        </tr>
+        
+        <!-- Row 9 -->
+        <tr class="border-b hover:bg-gray-50">
+          <td class="py-4 px-6 text-gray-800 font-medium">{% trans "დამსაქმებლის პროფილი და სივების ანალიტიკა" %}</td>
+          <td class="py-4 px-6 text-center">
+            <svg class="h-5 w-5 text-green-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </td>
+          <td class="py-4 px-6 text-center bg-blue-50">
+            <svg class="h-5 w-5 text-green-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </td>
+          <td class="py-4 px-6 text-center bg-purple-50">
+            <svg class="h-5 w-5 text-green-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </td>
+        </tr>
+        
+        <!-- Row 10 -->
+        <tr class="border-b hover:bg-gray-50">
+          <td class="py-4 px-6 text-gray-800 font-medium">{% trans "სივების ბაზაზე წვდომა" %}</td>
+          <td class="py-4 px-6 text-center">
+            <svg class="h-5 w-5 text-red-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </td>
+          <td class="py-4 px-6 text-center bg-blue-50">
+            <svg class="h-5 w-5 text-green-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </td>
+          <td class="py-4 px-6 text-center bg-purple-50">
+            <svg class="h-5 w-5 text-green-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </td>
+        </tr>
+        
+        <!-- Action Row -->
+        <tr>
+          <td class="py-6 px-6"></td>
+          <td class="py-6 px-6 text-center">
+            <a href="{% url 'post_job' %}?premium_level=standard" 
+               class="inline-block w-full py-3 px-6 text-center font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors duration-200 package-select-btn" 
+               data-package="standard">
+              {% trans "აირჩიე" %}
+            </a>
+          </td>
+          <td class="py-6 px-6 text-center bg-blue-50">
+            <a href="{% url 'post_job' %}?premium_level=premium" 
+               class="inline-block w-full py-3 px-6 text-center font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-200 package-select-btn" 
+               data-package="premium">
+              {% trans "აირჩიე" %}
+            </a>
+          </td>
+          <td class="py-6 px-6 text-center bg-purple-50">
+            <a href="{% url 'post_job' %}?premium_level=premium_plus" 
+               class="inline-block w-full py-3 px-6 text-center font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors duration-200 package-select-btn" 
+               data-package="premium-plus">
+              {% trans "აირჩიე" %}
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div> 

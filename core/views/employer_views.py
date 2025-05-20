@@ -78,7 +78,7 @@ def employer_home(request):
         'all_jobs': all_jobs,
         'recent_applicants': recent_applicants,
     }
-    return render(request, 'core/employer_home.html', context)
+    return render(request, 'core/employer_dashboard_tailwind.html', context)
 
 @login_required
 @user_passes_test(is_employer)
@@ -117,7 +117,7 @@ def employer_dashboard(request):
         'jobs_expiring_soon': jobs_expiring_soon,
         'recent_applicants': recent_applicants,
     }
-    return render(request, 'core/employer_dashboard.html', context)
+    return render(request, 'core/employer_dashboard_tailwind.html', context)
 
 @login_required
 @user_passes_test(is_employer)
@@ -161,7 +161,7 @@ def post_job(request):
         'selected_premium_level': premium_level,
     }
     
-    return render(request, 'core/post_job.html', context)
+    return render(request, 'core/post_job_tailwind.html', context)
 
 @login_required
 @user_passes_test(is_employer)
@@ -204,7 +204,7 @@ def edit_job(request, job_id):
         'job': job,
     }
     
-    return render(request, 'core/edit_job.html', context)
+    return render(request, 'core/edit_job_tailwind.html', context)
 
 @login_required
 @user_passes_test(is_employer)
@@ -309,12 +309,12 @@ def update_application_status(request, application_id):
             application.save()
             
             # Get all available rejection reasons
-            reasons = RejectionReason.objects.all().values('id', 'name')
+            reasons = [{'id': key, 'name': value} for key, value in dict(RejectionReason.REASON_CHOICES).items()]
             
             return JsonResponse({
                 'status': 'need_rejection_reasons',
                 'application_id': application_id,
-                'reasons': list(reasons)
+                'reasons': reasons
             })
         
         # If rejection reasons are provided, save them
@@ -326,9 +326,10 @@ def update_application_status(request, application_id):
             reason_ids = request.POST.getlist('rejection_reasons')
             for reason_id in reason_ids:
                 try:
-                    reason = RejectionReason.objects.get(id=reason_id)
+                    # Create or get the reason by its choice key
+                    reason, created = RejectionReason.objects.get_or_create(name=reason_id)
                     application.rejection_reasons.add(reason)
-                except RejectionReason.DoesNotExist:
+                except Exception:
                     pass
             
             # Save feedback if provided
@@ -376,4 +377,25 @@ def get_job_details(request, job_id):
         'premium_level': job.premium_level,
     }
     
-    return JsonResponse(job_data) 
+    return JsonResponse(job_data)
+
+def company_profile(request, employer_id):
+    """
+    Display the public company profile page for an employer
+    """
+    # Get the employer profile
+    employer = get_object_or_404(EmployerProfile, id=employer_id)
+    
+    # Get active job listings for this employer
+    jobs = JobListing.objects.filter(employer=employer, status='approved').order_by('-posted_at')
+    
+    # Count of open jobs
+    open_jobs_count = jobs.count()
+    
+    context = {
+        'company': employer,
+        'jobs': jobs,
+        'open_jobs_count': open_jobs_count,
+    }
+    
+    return render(request, 'core/employer_profile_public_tailwind.html', context) 

@@ -26,4 +26,4 @@ from django.shortcuts import redirect, render
 
 def pricing(request):
     """Display the pricing packages page"""
-    return render(request, 'core/pricing.html')
+    return render(request, 'core/pricing_tailwind.html')

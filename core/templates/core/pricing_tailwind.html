@@ -1,0 +1,127 @@
+{% extends 'core/base_tailwind.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Jobsy - სატარიფო პაკეტები" %}{% endblock %}
+
+{% block content %}
+<section class="py-16 bg-gradient-to-b from-gray-50 to-white">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+    <!-- Section Header -->
+    <div class="text-center mb-16">
+      <span class="inline-block px-3 py-1 text-sm font-medium text-blue-800 bg-blue-100 rounded-full mb-4">{% trans "ჩვენი პაკეტები" %}</span>
+      <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">{% trans "აირჩიეთ თქვენთვის შესაფერისი პაკეტი" %}</h1>
+      <p class="max-w-3xl mx-auto text-xl text-gray-600">{% trans "ვაკანსიის გამოქვეყნება Jobsy-ზე არის მარტივი და ეფექტური გზა კარგი კანდიდატების მოსაზიდად" %}</p>
+    </div>
+
+    <!-- Pricing Cards Container -->
+    <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      
+      <!-- Standard Plan -->
+      <div class="pricing-card-container">
+        {% include 'core/components/pricing/tailwind/package_standard.html' %}
+      </div>
+      
+      <!-- Premium Plan (Popular) -->
+      <div class="pricing-card-container">
+        {% include 'core/components/pricing/tailwind/package_premium.html' %}
+      </div>
+      
+      <!-- Premium Plus Plan -->
+      <div class="pricing-card-container">
+        {% include 'core/components/pricing/tailwind/package_premium_plus.html' %}
+      </div>
+    </div>
+
+    <!-- Feature Comparison -->
+    <div class="mt-16 text-center">
+      <a href="#comparison" class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
+        {% trans "შეადარე პაკეტები სრულად" %}
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Comparison Table Section -->
+<section class="bg-white">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+    {% include 'core/components/pricing/tailwind/comparison_table.html' %}
+  </div>
+</section>
+
+<!-- FAQ Section -->
+<section id="faq" class="py-16 bg-gray-50">
+  <div class="container mx-auto px-4 max-w-6xl">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-bold text-gray-900 mb-4">{% trans "ხშირად დასმული კითხვები" %}</h2>
+      <p class="text-lg text-gray-600">{% trans "გაეცანით პასუხებს ხშირად დასმულ კითხვებზე" %}</p>
+    </div>
+    
+    {% include 'core/components/pricing/tailwind/faq.html' %}
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-16 bg-blue-600">
+  <div class="container mx-auto px-4 text-center">
+    <h2 class="text-3xl font-bold text-white mb-6">{% trans "მზად ხართ დაიწყოთ?" %}</h2>
+    <p class="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">{% trans "გამოაქვეყნეთ თქვენი პირველი ვაკანსია Jobsy-ზე და იპოვეთ საუკეთესო კანდიდატები თქვენი გუნდისთვის" %}</p>
+    <a href="{% url 'post_job' %}" class="inline-block py-3 px-8 bg-white text-blue-600 font-bold rounded-lg shadow-lg hover:bg-blue-50 transition-colors duration-200">
+      {% trans "გამოაქვეყნე ვაკანსია" %}
+    </a>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Handle package selection based on user authentication
+    const packageButtons = document.querySelectorAll('.package-select-btn');
+    
+    packageButtons.forEach(button => {
+      button.addEventListener('click', function(e) {
+        {% if not user.is_authenticated %}
+          e.preventDefault();
+          window.location.href = "{% url 'register' %}?user_type=employer";
+        {% elif not user.userprofile.role == 'employer' %}
+          e.preventDefault();
+          alert("{% trans 'ვაკანსიის გამოსაქვეყნებლად საჭიროა იყოთ დარეგისტრირებული, როგორც დამსაქმებელი' %}");
+          window.location.href = "{% url 'register' %}?user_type=employer";
+        {% endif %}
+      });
+    });
+    
+    // Add hover animation effects
+    const pricingCards = document.querySelectorAll('.pricing-card-container > div');
+    
+    pricingCards.forEach(card => {
+      card.addEventListener('mouseenter', function() {
+        if (!this.classList.contains('border-blue-500')) {
+          this.classList.add('transform', 'scale-[1.01]', 'z-10', 'shadow-xl');
+        }
+      });
+      
+      card.addEventListener('mouseleave', function() {
+        if (!this.classList.contains('border-blue-500')) {
+          this.classList.remove('transform', 'scale-[1.01]', 'z-10', 'shadow-xl');
+        }
+      });
+    });
+    
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+          behavior: 'smooth'
+        });
+      });
+    });
+  });
+</script>
+{% endblock %} 
