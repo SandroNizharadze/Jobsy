@@ -121,8 +121,8 @@ def job_list(request):
     jobs = jobs.order_by('-premium_level', '-posted_at')
     
     # Get unique categories and locations for filter dropdowns - use distinct() with values_list for optimization
-    all_categories = JobListing.objects.filter(status='approved').values_list('category', flat=True).distinct()
-    all_locations = JobListing.objects.filter(status='approved').values_list('location', flat=True).distinct()
+    all_categories = JobListing.objects.filter(status='approved').values_list('category', flat=True).distinct().order_by('category')
+    all_locations = JobListing.objects.filter(status='approved').values_list('location', flat=True).distinct().order_by('location')
     
     # Get job preferences for checkboxes
     job_preferences = []
@@ -163,11 +163,10 @@ def job_list(request):
         'show_filters': show_filters,
     }
     
-    # If this is an AJAX request, only render the job listings partial
-    if request.GET.get('ajax') == '1':
-        return render(request, 'core/job_list.html', context)
-    else:
-        return render(request, 'core/job_list.html', context)
+    # Return the appropriate template based on the request type
+    template = 'core/job_list.html'
+    
+    return render(request, template, context)
 
 def job_detail(request, job_id):
     """

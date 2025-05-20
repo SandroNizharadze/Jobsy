@@ -1,9 +1,10 @@
 {% load i18n %}
+{% load core_extras %}
 
 <!-- Filtering Section -->
 <div id="filters" class="card mb-4 shadow-sm {% if not request.GET.show_filters %}d-none{% endif %}" style="width: 100%; border-radius:18px; background-color:var(--jobsy-yellow); border:none; scroll-margin-top: 100px;">
     <div class="card-body p-4">
-        <form method="get" action="{% url 'job_list' %}" id="filter-form" onsubmit="return false;">
+        <form method="get" action="{% url 'job_list' %}" id="filter-form">
             <input type="hidden" name="show_filters" value="1">
             <div class="row g-3">
                 <div class="col-12">
@@ -78,9 +79,9 @@
             </div>
             
             <div class="d-flex justify-content-end mt-4">
-                <a href="{% url 'job_list' %}?show_filters=1" class="btn btn-outline-secondary" style="border-radius:12px; padding:10px 20px;">
+                <button type="button" id="reset-filters" class="btn btn-outline-secondary" style="border-radius:12px; padding:10px 20px;">
                     <i class="fas fa-redo me-2"></i>{% trans "გასუფთავება" %}
-                </a>
+                </button>
             </div>
         </form>
     </div>
@@ -104,7 +105,7 @@
         {% for filter_name, filter_value in active_filters.items %}
             <div class="badge bg-light text-dark p-2">
                 {{ filter_name }}: {{ filter_value }}
-                <a href="{% url 'job_list' %}?show_filters=1" class="ms-1 text-danger"><i class="fas fa-times"></i></a>
+                <a href="{{ filter_remove_urls|get_item:filter_name }}" class="ms-1 text-danger filter-remove-link" data-filter="{{ filter_name }}"><i class="fas fa-times"></i></a>
             </div>
         {% endfor %}
     </div>
