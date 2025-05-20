@@ -4,7 +4,7 @@ from botocore.exceptions import ClientError
 from django.http import HttpResponseRedirect, HttpResponseNotFound, HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from ..models import UserProfile
+from ..models import UserProfile, JobApplication
 
 logger = logging.getLogger(__name__)
 
@@ -13,8 +13,7 @@ def serve_cv_file(request, user_id=None):
     """
     Serve a CV file securely by generating a temporary signed URL and redirecting to it.
     If user_id is None, serves the current user's CV.
-    If user_id is provided, only employers can access other users' CVs, and only if
-    they have the permission to view them.
+    If user_id is provided, only employers who have received the CV through a job application can access it.
     """
     try:
         # Determine which CV to serve
@@ -26,7 +25,7 @@ def serve_cv_file(request, user_id=None):
                 logger.error(f"User {request.user.username} has no profile")
                 return HttpResponseNotFound("Profile not found")
         else:
-            # User wants to see someone else's CV - must be an employer with permission
+            # User wants to see someone else's CV - must be an employer with a job application
             try:
                 # Check if the requesting user is an employer
                 if not hasattr(request.user, 'userprofile') or request.user.userprofile.role != 'employer':
@@ -36,15 +35,15 @@ def serve_cv_file(request, user_id=None):
                 # Get the target user's profile
                 target_profile = UserProfile.objects.get(user_id=user_id)
                 
-                # Check if the target user has allowed CV sharing with employers
-                if not target_profile.cv_consent or not target_profile.cv_share_with_employers:
-                    logger.warning(f"User {user_id} has not consented to share their CV")
-                    return HttpResponseForbidden("This user has not consented to share their CV")
+                # Check if this employer has any job applications from this user
+                employer_profile = request.user.userprofile.employer_profile
+                has_application = JobApplication.objects.filter(
+                    user_id=user_id,
+                    job__employer=employer_profile
+                ).exists()
                 
-                # Check if this specific employer has permission to view this CV
-                employer_profile = request.user.userprofile.employerprofile
-                if employer_profile not in target_profile.cv_visible_to.all():
-                    logger.warning(f"Employer {request.user.username} is not authorized to view CV for user {user_id}")
+                if not has_application:
+                    logger.warning(f"Employer {request.user.username} attempted to access CV for user {user_id} without an application")
                     return HttpResponseForbidden("You don't have permission to access this CV")
                 
                 user_profile = target_profile

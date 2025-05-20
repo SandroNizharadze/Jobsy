@@ -10,13 +10,7 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-center">
                 <li class="nav-item"><a class="nav-link" href="{% url 'job_list' %}">{% trans "მთავარი" %}</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'job_list' %}?show_filters=1#filters">{% trans "ვაკანსიები" %}</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'pricing' %}">{% trans "პაკეტები" %}</a></li>
-                
-                {% if user.is_authenticated %}
-                    {% if user.userprofile.role == 'employer' %}
-                        <li class="nav-item"><a class="btn btn-primary px-3 py-1" style="border-radius:18px; font-weight:600; background:var(--jobsy-blue); border:none;" href="{% url 'post_job' %}">{% trans "გამოქვეყნება" %}</a></li>
-                    {% endif %}
-                {% endif %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'pricing' %}">{% trans "გამოქვეყნება" %}</a></li>
             </ul>
             
             <div class="language-switcher me-3">

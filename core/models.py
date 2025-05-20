@@ -283,10 +283,6 @@ class UserProfile(models.Model):
             null=True, 
             verbose_name=_("CV")
         )
-    
-    cv_consent = models.BooleanField(default=False, verbose_name=_("CV-ის გაზიარების თანხმობა"))
-    cv_share_with_employers = models.BooleanField(default=False, verbose_name=_("CV-ის გაზიარება დამსაქმებლებთან"))
-    cv_visible_to = models.ManyToManyField('EmployerProfile', blank=True, related_name='visible_candidate_cvs', verbose_name=_("CV-ის ხილვადობა"))
 
     def __str__(self):
         return self.user.username

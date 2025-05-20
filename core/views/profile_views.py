@@ -231,36 +231,8 @@ def remove_cv(request):
                     
                     # Use the same storage backend as used for upload
                     storage = PrivateMediaStorage()
-                    
-                    # Check if file exists in S3
-                    if storage.exists(file_name):
-                        storage.delete(file_name)
-                        logger.info(f"Successfully deleted file from S3: {file_name}")
-                        
-                        # Also check and delete with the full path if needed
-                        if hasattr(storage, 'location'):
-                            s3_path = f"{storage.location}/{file_name}"
-                            logger.info(f"Also checking for file at full path: {s3_path}")
-                            
-                            # Use boto3 to verify deletion
-                            import boto3
-                            s3 = boto3.client(
-                                's3',
-                                region_name=settings.AWS_S3_REGION_NAME,
-                                aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-                                aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY
-                            )
-                            try:
-                                # Try to delete using the full path as well, just in case
-                                s3.delete_object(
-                                    Bucket=settings.AWS_STORAGE_BUCKET_NAME,
-                                    Key=s3_path
-                                )
-                                logger.info(f"Also deleted file using full S3 path if it existed")
-                            except Exception as s3_err:
-                                logger.warning(f"Note: Additional deletion attempt failed (this is expected if the file was already properly deleted): {str(s3_err)}")
-                    else:
-                        logger.warning(f"File does not exist in S3 storage: {file_name}")
+                    storage.delete(file_name)
+                    logger.info("Successfully deleted file from S3")
                 except Exception as e:
                     logger.error(f"Error deleting file from S3: {str(e)}")
                     # Continue with the profile update even if the file deletion fails
@@ -279,9 +251,7 @@ def remove_cv(request):
         
         # Update the profile fields regardless of delete success
         user_profile.cv = None
-        user_profile.cv_consent = False
-        user_profile.cv_share_with_employers = False
-        user_profile.save(update_fields=['cv', 'cv_consent', 'cv_share_with_employers'])
+        user_profile.save(update_fields=['cv'])
         
         logger.info(f"CV successfully removed for user {request.user.username}")
         return JsonResponse({'success': True})
