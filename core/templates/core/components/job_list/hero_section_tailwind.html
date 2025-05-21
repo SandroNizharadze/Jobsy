@@ -1,7 +1,7 @@
 {% load static %}
 {% load i18n %}
 
-<section class="relative">
+<section class="relative overflow-hidden">
     <div class="container mx-auto px-4">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center min-h-[400px]">
             <div>
@@ -14,10 +14,10 @@
                     </a>
                 </div>
             </div>
-            <div class="hidden lg:block relative min-h-[400px]">
+            <div class="hidden lg:flex justify-end items-end relative min-h-[400px]">
                 <img src="{% static 'images/hero_woman.png' %}" 
                      alt="Hero" 
-                     class="absolute bottom-[-33px] right-0 max-h-[128%] z-10">
+                     class="absolute bottom-0 right-0 h-auto max-h-[500px] object-contain z-10">
             </div>
         </div>
     </div>

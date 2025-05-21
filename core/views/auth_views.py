@@ -60,7 +60,7 @@ def login_view(request):
     else:
         form = AuthenticationForm()
     
-    return render(request, 'core/login.html', {'form': form})
+    return render(request, 'core/login_tailwind.html', {'form': form})
 
 def logout_view(request):
     """Handle user logout"""
@@ -153,7 +153,7 @@ def register(request):
                 except Exception as e:
                     logger.error(f"Error during employer registration: {str(e)}", exc_info=True)
                     messages.error(request, f"Registration error: {str(e)}")
-                    return render(request, 'core/register.html', {
+                    return render(request, 'core/register_tailwind.html', {
                         'form': form,
                         'employer_form': employer_form
                     })
@@ -204,7 +204,7 @@ def register(request):
                 except Exception as e:
                     logger.error(f"Error during candidate registration: {str(e)}", exc_info=True)
                     messages.error(request, f"Registration error: {str(e)}")
-                    return render(request, 'core/register.html', {
+                    return render(request, 'core/register_tailwind.html', {
                         'form': form,
                         'employer_form': None
                     })
@@ -217,15 +217,11 @@ def register(request):
                 for field, errors in form.errors.items():
                     for error in errors:
                         messages.error(request, f"{error}")
-            
-            # Initialize empty employer form for initial rendering
-            employer_form = None
     else:
-        # Initial form rendering
         form = RegistrationForm()
         employer_form = EmployerRegistrationForm()
     
-    return render(request, 'core/register.html', {
+    return render(request, 'core/register_tailwind.html', {
         'form': form,
         'employer_form': employer_form
     }) 

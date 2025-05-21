@@ -37,8 +37,8 @@
 2. **Applications Table** - `applications_table.html`
 
 ### Templates
-1. **Login Page** - `login.html`
-2. **Register Page** - `register.html`
+1. **Login Page** - `login_tailwind.html` ✅ Completed
+2. **Register Page** - `register_tailwind.html` ✅ Completed
 3. **Edit Job Page** - `edit_job.html`
 4. **Employer Dashboard** - `employer_home.html`
 5. **User Profile** - `user_profile.html`
