@@ -1,0 +1,125 @@
+{% load i18n %}
+
+<div id="companyPhotoCarousel" class="relative w-full overflow-hidden rounded-lg">
+    <!-- Carousel container -->
+    <div class="relative">
+        <!-- Carousel slides -->
+        <div id="carousel-slides" class="relative flex transition-transform duration-500 ease-in-out">
+            {% if company.photos.all %}
+                {% for photo in company.photos.all %}
+                <div class="min-w-full">
+                    <img src="{{ photo.image.url }}" alt="{{ company.company_name }} - {% trans 'Photo' %} {{ forloop.counter }}" 
+                         class="w-full h-64 object-cover">
+                    {% if photo.caption %}
+                    <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-3">
+                        <p>{{ photo.caption }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <!-- Default slides if no photos -->
+                <div class="min-w-full">
+                    <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
+                        <p class="text-gray-500">{% trans "ფოტო 1" %}</p>
+                    </div>
+                </div>
+                <div class="min-w-full">
+                    <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
+                        <p class="text-gray-500">{% trans "ფოტო 2" %}</p>
+                    </div>
+                </div>
+                <div class="min-w-full">
+                    <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
+                        <p class="text-gray-500">{% trans "ფოტო 3" %}</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Carousel controls -->
+        <button class="absolute top-1/2 left-2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-75 text-white rounded-full p-2 focus:outline-none" id="carousel-prev">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+        </button>
+        <button class="absolute top-1/2 right-2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-75 text-white rounded-full p-2 focus:outline-none" id="carousel-next">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </button>
+    </div>
+    
+    <!-- Carousel indicators -->
+    <div class="absolute bottom-2 left-0 right-0">
+        <div class="flex justify-center space-x-2">
+            {% if company.photos.all %}
+                {% for photo in company.photos.all %}
+                <button class="carousel-indicator w-3 h-3 rounded-full bg-white bg-opacity-50 hover:bg-opacity-100 focus:outline-none" 
+                        data-slide-index="{{ forloop.counter0 }}"></button>
+                {% endfor %}
+            {% else %}
+                <button class="carousel-indicator w-3 h-3 rounded-full bg-white bg-opacity-50 hover:bg-opacity-100 focus:outline-none" data-slide-index="0"></button>
+                <button class="carousel-indicator w-3 h-3 rounded-full bg-white bg-opacity-50 hover:bg-opacity-100 focus:outline-none" data-slide-index="1"></button>
+                <button class="carousel-indicator w-3 h-3 rounded-full bg-white bg-opacity-50 hover:bg-opacity-100 focus:outline-none" data-slide-index="2"></button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const carousel = document.getElementById('companyPhotoCarousel');
+    const slides = document.getElementById('carousel-slides');
+    const prevButton = document.getElementById('carousel-prev');
+    const nextButton = document.getElementById('carousel-next');
+    const indicators = document.querySelectorAll('.carousel-indicator');
+    
+    let currentSlide = 0;
+    const slideCount = indicators.length;
+    
+    // Set first indicator as active
+    if (indicators.length > 0) {
+        indicators[0].classList.add('bg-opacity-100');
+    }
+    
+    function goToSlide(index) {
+        if (index < 0) index = slideCount - 1;
+        if (index >= slideCount) index = 0;
+        
+        slides.style.transform = `translateX(-${index * 100}%)`;
+        currentSlide = index;
+        
+        // Update indicators
+        indicators.forEach((indicator, i) => {
+            if (i === currentSlide) {
+                indicator.classList.add('bg-opacity-100');
+            } else {
+                indicator.classList.remove('bg-opacity-100');
+            }
+        });
+    }
+    
+    // Previous slide
+    prevButton.addEventListener('click', () => {
+        goToSlide(currentSlide - 1);
+    });
+    
+    // Next slide
+    nextButton.addEventListener('click', () => {
+        goToSlide(currentSlide + 1);
+    });
+    
+    // Indicator clicks
+    indicators.forEach((indicator, index) => {
+        indicator.addEventListener('click', () => {
+            goToSlide(index);
+        });
+    });
+    
+    // Auto-advance slides every 5 seconds
+    setInterval(() => {
+        goToSlide(currentSlide + 1);
+    }, 5000);
+});
+</script> 

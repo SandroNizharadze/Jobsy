@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE }}">
 {% load static %}
 {% load i18n %}
 
@@ -25,24 +23,4 @@
         }
     </style>
     {% block extra_head %}{% endblock %}
-</head>
-
-<body class="bg-gray-50">
-    {% include 'core/components/base/navbar_tailwind.html' %}
-    
-    {% block hero_section %}{% endblock %}
-    
-    <div class="min-h-screen">
-        {% include 'core/components/base/alerts_tailwind.html' %}
-        {% block content %}{% endblock %}
-    </div>
-    
-    {% block bottom_section %}{% endblock %}
-    
-    {% include 'core/components/base/footer_tailwind.html' %}
-    
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    {% include 'core/components/base/scripts_tailwind.html' %}
-    {% block extra_js %}{% endblock %}
-</body>
-</html> 
+</head> 

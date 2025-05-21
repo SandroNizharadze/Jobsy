@@ -1,25 +1,27 @@
 {% load static %}
 {% load i18n %}
 
-<section class="mt-16">
-  <div class="container mx-auto relative">
-    <div class="flex flex-col lg:flex-row items-center min-h-[300px] bg-jobsy-yellow rounded-3xl p-6 lg:p-8">
-      <div class="w-full lg:w-7/12">
-        <h2 class="text-2xl font-bold mb-3">{% trans "გჭირდებათ თანამშრომელი?" %}</h2>
-        <div class="mb-6 text-base">
-          <p>{% trans "გამოაქვეყნეთ ვაკანსია ჯობსიზე და იპოვეთ საუკეთესო კანდიდატები თქვენი კომპანიისთვის." %}</p>
-          <p>{% trans "ათასობით პროფესიონალი ეძებს ახალ შესაძლებლობებს ყოველდღე." %}</p>
+<section class="mt-12">
+    <div class="container mx-auto px-4">
+        <div class="bg-amber-300 rounded-2xl p-6 md:p-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 items-center">
+                <div class="lg:col-span-7">
+                    <h2 class="text-2xl md:text-3xl font-bold mb-3">{% trans "გჭირდებათ თანამშრომელი?" %}</h2>
+                    <div class="mb-6 text-gray-800">
+                        <p>{% trans "გამოაქვეყნეთ ვაკანსია ჯობსიზე და იპოვეთ საუკეთესო კანდიდატები თქვენი კომპანიისთვის." %}</p>
+                        <p>{% trans "ათასობით პროფესიონალი ეძებს ახალ შესაძლებლობებს ყოველდღე." %}</p>
+                    </div>
+                    <a href="{% url 'pricing' %}" 
+                       class="inline-block bg-gray-900 hover:bg-gray-800 text-white font-medium px-6 py-3 rounded-xl transition-colors">
+                        {% trans "შეიტყვეთ მეტი" %}
+                    </a>
+                </div>
+                <div class="hidden lg:block lg:col-span-5 relative h-[250px]">
+                    <img src="{% static 'employer_cta.png' %}" 
+                         alt="Employer CTA" 
+                         class="absolute bottom-0 right-0 max-h-full">
+                </div>
+            </div>
         </div>
-        <a href="{% url 'pricing' %}" 
-           class="inline-block bg-gray-900 text-white py-2.5 px-6 rounded-xl hover:bg-opacity-90 transition-colors">
-          {% trans "შეიტყვეთ მეტი" %}
-        </a>
-      </div>
-      <div class="hidden lg:block w-5/12 relative h-[250px]">
-        <img src="{% static 'employer_cta.png' %}" 
-             alt="Employer CTA" 
-             class="absolute bottom-0 right-0 max-h-full">
-      </div>
     </div>
-  </div>
 </section> 

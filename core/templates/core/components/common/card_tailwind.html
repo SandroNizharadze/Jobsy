@@ -1,0 +1,35 @@
+{% comment %}
+This is a reusable card component using Tailwind CSS.
+Usage:
+{% include 'core/components/common/card_tailwind.html' with 
+    card_title="Title" 
+    card_header_class="bg-blue-600 text-white" (optional)
+    card_body_class="" (optional)
+    card_footer_class="" (optional)
+    card_class="h-full" (optional)
+    show_header=True (optional, default: False)
+    show_footer=True (optional, default: False)
+%}
+    Card content goes here
+{% endcomment %}
+
+<div class="bg-white rounded-lg shadow-sm overflow-hidden {% if card_class %}{{ card_class }}{% endif %}">
+    {% if show_header|default:False %}
+    <div class="px-4 py-3 border-b border-gray-200 {% if card_header_class %}{{ card_header_class }}{% endif %}">
+        {% if card_title %}<h3 class="text-lg font-medium">{{ card_title }}</h3>{% endif %}
+        {% block card_header %}{% endblock %}
+    </div>
+    {% endif %}
+    
+    <div class="p-4 {% if card_body_class %}{{ card_body_class }}{% endif %}">
+        {% block card_body %}
+            {{ card_content|safe }}
+        {% endblock %}
+    </div>
+    
+    {% if show_footer|default:False %}
+    <div class="px-4 py-3 border-t border-gray-200 {% if card_footer_class %}{{ card_footer_class }}{% endif %}">
+        {% block card_footer %}{% endblock %}
+    </div>
+    {% endif %}
+</div> 

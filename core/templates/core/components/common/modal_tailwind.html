@@ -1,0 +1,128 @@
+{% comment %}
+This is a reusable modal component using Tailwind CSS.
+Usage:
+{% include 'core/components/common/modal_tailwind.html' with 
+    modal_id="uniqueModalId" (required)
+    modal_title="Modal Title" 
+    modal_size="md" (options: sm, md, lg, xl, default: md)
+    modal_content_class="" (optional, additional classes for modal content)
+    modal_header_class="" (optional, additional classes for modal header)
+    modal_body_class="" (optional, additional classes for modal body)
+    modal_footer_class="" (optional, additional classes for modal footer)
+    show_close_button=True (optional, default: True)
+    show_footer=True (optional, default: True)
+    static_backdrop=True (optional, default: False) - if true, clicking outside won't close the modal
+%}
+    Modal body content goes here
+    
+    {% block modal_footer %}
+        Footer content goes here (if show_footer is True)
+    {% endblock %}
+{% endcomment %}
+
+<div id="{{ modal_id }}" 
+     class="fixed inset-0 z-50 overflow-y-auto hidden"
+     aria-labelledby="{{ modal_id }}_label" 
+     aria-hidden="true"
+     role="dialog">
+    <div class="flex items-center justify-center min-h-screen p-4 text-center sm:block sm:p-0">
+        <!-- Backdrop -->
+        <div id="{{ modal_id }}_backdrop" 
+             class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+             {% if not static_backdrop|default:False %}data-modal-close="{{ modal_id }}"{% endif %}></div>
+        
+        <!-- Modal panel -->
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle
+                    {% if modal_size == 'sm' %}sm:max-w-sm sm:w-full
+                    {% elif modal_size == 'lg' %}sm:max-w-lg sm:w-full
+                    {% elif modal_size == 'xl' %}sm:max-w-xl sm:w-full
+                    {% elif modal_size == '2xl' %}sm:max-w-2xl sm:w-full
+                    {% elif modal_size == '3xl' %}sm:max-w-3xl sm:w-full
+                    {% elif modal_size == '4xl' %}sm:max-w-4xl sm:w-full
+                    {% elif modal_size == '5xl' %}sm:max-w-5xl sm:w-full
+                    {% elif modal_size == 'full' %}sm:max-w-full sm:w-full
+                    {% else %}sm:max-w-md sm:w-full{% endif %}
+                    {{ modal_content_class|default:'' }}">
+            
+            <!-- Header -->
+            <div class="bg-white px-4 py-3 border-b border-gray-200 {{ modal_header_class|default:'' }}">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-medium leading-6 text-gray-900" id="{{ modal_id }}_label">
+                        {{ modal_title }}
+                    </h3>
+                    {% if show_close_button|default:True %}
+                    <button type="button" 
+                            class="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none" 
+                            data-modal-close="{{ modal_id }}"
+                            aria-label="Close">
+                        <span class="sr-only">Close</span>
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Body -->
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 {{ modal_body_class|default:'' }}">
+                {{ modal_content|safe }}
+            </div>
+            
+            <!-- Footer -->
+            {% if show_footer|default:True %}
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse {{ modal_footer_class|default:'' }}">
+                {% block modal_footer %}{% endblock %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get all elements that can close the modal
+    const closeElements = document.querySelectorAll('[data-modal-close="{{ modal_id }}"]');
+    
+    // Add click event to all close elements
+    closeElements.forEach(element => {
+        element.addEventListener('click', function() {
+            closeModal('{{ modal_id }}');
+        });
+    });
+    
+    // Close modal when pressing escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeModal('{{ modal_id }}');
+        }
+    });
+    
+    // Add to global modalHandlers if not exists
+    if (typeof window.modalHandlers === 'undefined') {
+        window.modalHandlers = {};
+    }
+    
+    // Register open and close functions for this modal
+    window.modalHandlers['{{ modal_id }}'] = {
+        open: function() { openModal('{{ modal_id }}'); },
+        close: function() { closeModal('{{ modal_id }}'); }
+    };
+});
+
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    }
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    }
+}
+</script> 

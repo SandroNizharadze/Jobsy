@@ -1,0 +1,65 @@
+{% load static %}
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Common Tailwind UI Components -->
+{% include 'core/components/base/scripts_common_tailwind.html' %}
+
+<!-- Custom Site Scripts -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize all modals
+    document.querySelectorAll('[id$="_modal"]').forEach(modal => {
+        const modalId = modal.id;
+        const isStatic = modal.hasAttribute('data-static-backdrop');
+        TailwindModal.init(modalId, isStatic);
+    });
+    
+    // Initialize all dropdowns
+    document.querySelectorAll('[id$="_dropdown"]').forEach(dropdown => {
+        const dropdownId = dropdown.id.replace('_dropdown', '');
+        TailwindDropdown.init(dropdownId);
+    });
+    
+    // Initialize all tabs
+    document.querySelectorAll('[id$="_tabs"]').forEach(tabs => {
+        const tabsId = tabs.id;
+        TailwindTabs.init(tabsId);
+    });
+    
+    // Initialize all carousels
+    document.querySelectorAll('[id$="_carousel"]').forEach(carousel => {
+        const carouselId = carousel.id;
+        TailwindCarousel.init(carouselId);
+    });
+    
+    // Handle data-toggle="modal" elements
+    document.querySelectorAll('[data-toggle="modal"]').forEach(trigger => {
+        const targetId = trigger.getAttribute('data-target');
+        if (targetId) {
+            trigger.addEventListener('click', function(e) {
+                e.preventDefault();
+                TailwindModal.open(targetId.replace('#', ''));
+            });
+        }
+    });
+    
+    // Handle data-dismiss="modal" elements
+    document.querySelectorAll('[data-dismiss="modal"]').forEach(trigger => {
+        const modal = trigger.closest('[id$="_modal"]');
+        if (modal) {
+            trigger.addEventListener('click', function(e) {
+                e.preventDefault();
+                TailwindModal.close(modal.id);
+            });
+        }
+    });
+    
+    // Handle auto-dismiss alerts
+    TailwindAlert.initAutoDismiss();
+});
+</script>
+
+<!-- Page-specific scripts -->
+{% block page_scripts %}{% endblock %} 

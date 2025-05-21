@@ -1,0 +1,123 @@
+{% comment %}
+This is a reusable button component using Tailwind CSS.
+Usage:
+{% include 'core/components/common/button_tailwind.html' with 
+    button_text="Button Text" 
+    button_type="primary" (options: primary, secondary, success, danger, warning, info, light, dark, link)
+    button_size="md" (options: sm, md, lg)
+    button_url="#" (optional, if not provided, renders as <button> instead of <a>)
+    button_class="" (optional, additional classes)
+    is_outline=True (optional, default: False)
+    is_block=True (optional, default: False)
+    is_disabled=True (optional, default: False)
+    icon_class="fas fa-plus" (optional)
+    icon_position="left" (optional, default: left, options: left, right)
+    onclick="myFunction()" (optional)
+%}
+{% endcomment %}
+
+{% with 
+    base_class="inline-flex items-center justify-center rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
+    primary_class="bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500"
+    secondary_class="bg-gray-500 hover:bg-gray-600 text-white focus:ring-gray-400"
+    success_class="bg-green-600 hover:bg-green-700 text-white focus:ring-green-500"
+    danger_class="bg-red-600 hover:bg-red-700 text-white focus:ring-red-500"
+    warning_class="bg-yellow-500 hover:bg-yellow-600 text-white focus:ring-yellow-400"
+    info_class="bg-blue-400 hover:bg-blue-500 text-white focus:ring-blue-300"
+    light_class="bg-gray-100 hover:bg-gray-200 text-gray-800 focus:ring-gray-300"
+    dark_class="bg-gray-800 hover:bg-gray-900 text-white focus:ring-gray-700"
+    link_class="text-blue-600 hover:text-blue-800 hover:underline"
+    
+    outline_primary_class="border border-blue-600 text-blue-600 hover:bg-blue-50 focus:ring-blue-500"
+    outline_secondary_class="border border-gray-500 text-gray-500 hover:bg-gray-50 focus:ring-gray-400"
+    outline_success_class="border border-green-600 text-green-600 hover:bg-green-50 focus:ring-green-500"
+    outline_danger_class="border border-red-600 text-red-600 hover:bg-red-50 focus:ring-red-500"
+    outline_warning_class="border border-yellow-500 text-yellow-500 hover:bg-yellow-50 focus:ring-yellow-400"
+    outline_info_class="border border-blue-400 text-blue-400 hover:bg-blue-50 focus:ring-blue-300"
+    outline_light_class="border border-gray-300 text-gray-600 hover:bg-gray-50 focus:ring-gray-300"
+    outline_dark_class="border border-gray-800 text-gray-800 hover:bg-gray-100 focus:ring-gray-700"
+    
+    size_sm="px-3 py-1.5 text-xs"
+    size_md="px-4 py-2 text-sm"
+    size_lg="px-5 py-2.5 text-base"
+%}
+
+{% if button_url %}
+<a href="{{ button_url }}" 
+   class="{{ base_class }} 
+          {% if is_outline %}
+            {% if button_type == 'primary' %}{{ outline_primary_class }}
+            {% elif button_type == 'secondary' %}{{ outline_secondary_class }}
+            {% elif button_type == 'success' %}{{ outline_success_class }}
+            {% elif button_type == 'danger' %}{{ outline_danger_class }}
+            {% elif button_type == 'warning' %}{{ outline_warning_class }}
+            {% elif button_type == 'info' %}{{ outline_info_class }}
+            {% elif button_type == 'light' %}{{ outline_light_class }}
+            {% elif button_type == 'dark' %}{{ outline_dark_class }}
+            {% else %}{{ outline_primary_class }}{% endif %}
+          {% else %}
+            {% if button_type == 'primary' %}{{ primary_class }}
+            {% elif button_type == 'secondary' %}{{ secondary_class }}
+            {% elif button_type == 'success' %}{{ success_class }}
+            {% elif button_type == 'danger' %}{{ danger_class }}
+            {% elif button_type == 'warning' %}{{ warning_class }}
+            {% elif button_type == 'info' %}{{ info_class }}
+            {% elif button_type == 'light' %}{{ light_class }}
+            {% elif button_type == 'dark' %}{{ dark_class }}
+            {% elif button_type == 'link' %}{{ link_class }}
+            {% else %}{{ primary_class }}{% endif %}
+          {% endif %}
+          {% if button_size == 'sm' %}{{ size_sm }}
+          {% elif button_size == 'lg' %}{{ size_lg }}
+          {% else %}{{ size_md }}{% endif %}
+          {% if is_block %}w-full{% endif %}
+          {% if is_disabled %}opacity-50 cursor-not-allowed pointer-events-none{% endif %}
+          {{ button_class|default:'' }}"
+   {% if onclick %}onclick="{{ onclick }}"{% endif %}
+   {% if is_disabled %}aria-disabled="true"{% endif %}
+>
+    {% if icon_class and icon_position != 'right' %}<i class="{{ icon_class }} mr-2"></i>{% endif %}
+    {{ button_text }}
+    {% if icon_class and icon_position == 'right' %}<i class="{{ icon_class }} ml-2"></i>{% endif %}
+</a>
+{% else %}
+<button type="button"
+        class="{{ base_class }} 
+               {% if is_outline %}
+                 {% if button_type == 'primary' %}{{ outline_primary_class }}
+                 {% elif button_type == 'secondary' %}{{ outline_secondary_class }}
+                 {% elif button_type == 'success' %}{{ outline_success_class }}
+                 {% elif button_type == 'danger' %}{{ outline_danger_class }}
+                 {% elif button_type == 'warning' %}{{ outline_warning_class }}
+                 {% elif button_type == 'info' %}{{ outline_info_class }}
+                 {% elif button_type == 'light' %}{{ outline_light_class }}
+                 {% elif button_type == 'dark' %}{{ outline_dark_class }}
+                 {% else %}{{ outline_primary_class }}{% endif %}
+               {% else %}
+                 {% if button_type == 'primary' %}{{ primary_class }}
+                 {% elif button_type == 'secondary' %}{{ secondary_class }}
+                 {% elif button_type == 'success' %}{{ success_class }}
+                 {% elif button_type == 'danger' %}{{ danger_class }}
+                 {% elif button_type == 'warning' %}{{ warning_class }}
+                 {% elif button_type == 'info' %}{{ info_class }}
+                 {% elif button_type == 'light' %}{{ light_class }}
+                 {% elif button_type == 'dark' %}{{ dark_class }}
+                 {% elif button_type == 'link' %}{{ link_class }}
+                 {% else %}{{ primary_class }}{% endif %}
+               {% endif %}
+               {% if button_size == 'sm' %}{{ size_sm }}
+               {% elif button_size == 'lg' %}{{ size_lg }}
+               {% else %}{{ size_md }}{% endif %}
+               {% if is_block %}w-full{% endif %}
+               {% if is_disabled %}opacity-50 cursor-not-allowed{% endif %}
+               {{ button_class|default:'' }}"
+        {% if onclick %}onclick="{{ onclick }}"{% endif %}
+        {% if is_disabled %}disabled{% endif %}
+>
+    {% if icon_class and icon_position != 'right' %}<i class="{{ icon_class }} mr-2"></i>{% endif %}
+    {{ button_text }}
+    {% if icon_class and icon_position == 'right' %}<i class="{{ icon_class }} ml-2"></i>{% endif %}
+</button>
+{% endif %}
+
+{% endwith %} 

@@ -1,0 +1,143 @@
+{% comment %}
+This is a reusable tab component using Tailwind CSS.
+Usage:
+{% include 'core/components/common/tabs_tailwind.html' with 
+    tabs_id="uniqueTabsId" (required)
+    tabs=tabs_list (list of dictionaries with 'id', 'title', 'content' or 'content_template')
+    active_tab="tab1" (optional, default: first tab)
+    tab_style="underline" (optional, default: underline, options: underline, pills, buttons)
+%}
+
+Example tabs_list:
+[
+    {'id': 'tab1', 'title': 'Tab 1', 'content': 'Tab 1 content'},
+    {'id': 'tab2', 'title': 'Tab 2', 'content_template': 'path/to/template.html'},
+    {'id': 'tab3', 'title': 'Tab 3', 'content': 'Tab 3 content'}
+]
+
+If content_template is provided, it will be included instead of content.
+{% endcomment %}
+
+<div id="{{ tabs_id }}" class="w-full">
+    <!-- Tab navigation -->
+    <div class="border-b border-gray-200">
+        <nav class="-mb-px flex {% if tab_style == 'pills' or tab_style == 'buttons' %}space-x-2{% endif %}" aria-label="{{ tabs_id }}_tabs">
+            {% for tab in tabs %}
+                <button id="{{ tab.id }}_tab" 
+                        class="{% if tab_style == 'pills' %}
+                                 px-4 py-2 rounded-md text-sm font-medium
+                                 {% if tab.id == active_tab|default:tabs.0.id %}
+                                   bg-blue-600 text-white
+                                 {% else %}
+                                   text-gray-600 hover:text-gray-800 hover:bg-gray-100
+                                 {% endif %}
+                               {% elif tab_style == 'buttons' %}
+                                 px-4 py-2 border rounded-md text-sm font-medium
+                                 {% if tab.id == active_tab|default:tabs.0.id %}
+                                   border-blue-600 bg-blue-600 text-white
+                                 {% else %}
+                                   border-gray-300 text-gray-600 hover:text-gray-800 hover:bg-gray-50
+                                 {% endif %}
+                               {% else %}
+                                 py-4 px-6 text-center border-b-2 text-sm font-medium
+                                 {% if tab.id == active_tab|default:tabs.0.id %}
+                                   border-blue-600 text-blue-600
+                                 {% else %}
+                                   border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300
+                                 {% endif %}
+                               {% endif %}"
+                        onclick="switchTab('{{ tabs_id }}', '{{ tab.id }}')"
+                        aria-controls="{{ tab.id }}_content"
+                        {% if tab.id == active_tab|default:tabs.0.id %}
+                        aria-selected="true"
+                        {% else %}
+                        aria-selected="false"
+                        {% endif %}
+                        type="button">
+                    {{ tab.title }}
+                </button>
+            {% endfor %}
+        </nav>
+    </div>
+    
+    <!-- Tab content -->
+    <div class="py-4">
+        {% for tab in tabs %}
+            <div id="{{ tab.id }}_content" 
+                 class="tab-content {% if tab.id != active_tab|default:tabs.0.id %}hidden{% endif %}">
+                {% if tab.content_template %}
+                    {% include tab.content_template %}
+                {% else %}
+                    {{ tab.content|safe }}
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+function switchTab(tabsId, tabId) {
+    // Get all tabs and contents
+    const tabsContainer = document.getElementById(tabsId);
+    if (!tabsContainer) return;
+    
+    const tabs = tabsContainer.querySelectorAll('button[id$="_tab"]');
+    const tabContents = tabsContainer.querySelectorAll('div[id$="_content"]');
+    
+    // Determine tab style
+    let tabStyle = 'underline';
+    if (tabs.length > 0) {
+        const firstTab = tabs[0];
+        if (firstTab.classList.contains('rounded-md') && !firstTab.classList.contains('border')) {
+            tabStyle = 'pills';
+        } else if (firstTab.classList.contains('border')) {
+            tabStyle = 'buttons';
+        }
+    }
+    
+    // Hide all tab contents and deactivate all tabs
+    tabs.forEach(tab => {
+        const isActive = tab.id === tabId + '_tab';
+        tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        
+        // Apply appropriate styling based on tab style
+        if (tabStyle === 'pills') {
+            if (isActive) {
+                tab.classList.add('bg-blue-600', 'text-white');
+                tab.classList.remove('text-gray-600', 'hover:text-gray-800', 'hover:bg-gray-100');
+            } else {
+                tab.classList.remove('bg-blue-600', 'text-white');
+                tab.classList.add('text-gray-600', 'hover:text-gray-800', 'hover:bg-gray-100');
+            }
+        } else if (tabStyle === 'buttons') {
+            if (isActive) {
+                tab.classList.add('border-blue-600', 'bg-blue-600', 'text-white');
+                tab.classList.remove('border-gray-300', 'text-gray-600', 'hover:text-gray-800', 'hover:bg-gray-50');
+            } else {
+                tab.classList.remove('border-blue-600', 'bg-blue-600', 'text-white');
+                tab.classList.add('border-gray-300', 'text-gray-600', 'hover:text-gray-800', 'hover:bg-gray-50');
+            }
+        } else {
+            // Default underline style
+            if (isActive) {
+                tab.classList.add('border-blue-600', 'text-blue-600');
+                tab.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+            } else {
+                tab.classList.remove('border-blue-600', 'text-blue-600');
+                tab.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+            }
+        }
+    });
+    
+    // Hide all tab contents
+    tabContents.forEach(content => {
+        content.classList.add('hidden');
+    });
+    
+    // Show the selected tab content
+    const activeContent = document.getElementById(tabId + '_content');
+    if (activeContent) {
+        activeContent.classList.remove('hidden');
+    }
+}
+</script> 

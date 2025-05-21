@@ -65,6 +65,57 @@
   }
 
   document.addEventListener('DOMContentLoaded', function() {
+    // Custom tab implementation for Tailwind
+    const setupTabs = () => {
+      const tabButtons = document.querySelectorAll('[data-tab-toggle="tab"]');
+      const tabPanes = document.querySelectorAll('.tab-pane');
+      
+      // Hide all tab panes initially except the first one
+      tabPanes.forEach((pane, index) => {
+        if (index === 0) {
+          pane.classList.remove('hidden');
+          pane.classList.add('block');
+        } else {
+          pane.classList.add('hidden');
+          pane.classList.remove('block');
+        }
+      });
+      
+      // Add click event to tab buttons
+      tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const targetId = this.getAttribute('data-tab-target');
+          const targetPane = document.querySelector(targetId);
+          
+          // Hide all panes
+          tabPanes.forEach(pane => {
+            pane.classList.add('hidden');
+            pane.classList.remove('block');
+          });
+          
+          // Show target pane
+          if (targetPane) {
+            targetPane.classList.remove('hidden');
+            targetPane.classList.add('block');
+          }
+          
+          // Update active state on buttons
+          tabButtons.forEach(btn => {
+            // Remove active styling
+            btn.classList.remove('border-blue-500', 'text-blue-600');
+            btn.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+          });
+          
+          // Add active styling to clicked button
+          this.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+          this.classList.add('border-blue-500', 'text-blue-600');
+        });
+      });
+    };
+    
+    // Initialize tabs
+    setupTabs();
+    
     // Check URL parameters to show correct tabs
     const urlParams = new URLSearchParams(window.location.search);
     const tabParam = urlParams.get('tab');
@@ -74,19 +125,6 @@
       const jobActivityTab = document.getElementById('job-activity-tab');
       if (jobActivityTab) {
         jobActivityTab.click();
-      }
-    }
-    
-    // Initialize Bootstrap modals for rejection reasons
-    const rejectionModal = document.getElementById('rejectionReasonsViewModal');
-    if (rejectionModal) {
-      // Make sure Bootstrap's Modal is available
-      if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-        // Initialize the modal
-        new bootstrap.Modal(rejectionModal);
-        console.log('Rejection reasons modal initialized');
-      } else {
-        console.warn('Bootstrap Modal JS is not loaded');
       }
     }
     

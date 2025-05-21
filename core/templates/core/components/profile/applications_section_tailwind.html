@@ -4,13 +4,13 @@
   <!-- Main Activity Tabs -->
   <div class="border-b border-gray-200">
     <nav class="-mb-px flex space-x-8 px-6 pt-4" aria-label="Tabs">
-      <button class="border-blue-500 text-blue-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" id="applications-tab" data-bs-toggle="tab" data-bs-target="#applications" type="button">
+      <button class="border-blue-500 text-blue-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" id="applications-tab" data-tab-toggle="tab" data-tab-target="#applications" type="button">
         <svg class="h-5 w-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
         </svg>
         {% trans "Applications" %}
       </button>
-      <button class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" id="saved-tab" data-bs-toggle="tab" data-bs-target="#saved-jobs" type="button">
+      <button class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" id="saved-tab" data-tab-toggle="tab" data-tab-target="#saved-jobs" type="button">
         <svg class="h-5 w-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
         </svg>
@@ -21,7 +21,7 @@
   
   <div class="tab-content p-6">
     <!-- Applications Tab -->
-    <div class="tab-pane fade show active" id="applications" role="tabpanel">
+    <div class="tab-pane block" id="applications" role="tabpanel">
       {% if applications %}
       <!-- Status Explanations -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -162,7 +162,7 @@
     </div>
     
     <!-- Saved Jobs Tab -->
-    <div class="tab-pane fade" id="saved-jobs" role="tabpanel">
+    <div class="tab-pane hidden" id="saved-jobs" role="tabpanel">
       {% if saved_jobs %}
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">

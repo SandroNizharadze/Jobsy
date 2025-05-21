@@ -3,7 +3,7 @@
 <!-- Modal for displaying rejection reasons -->
 <div class="fixed inset-0 z-50 hidden overflow-y-auto" id="rejectionReasonsViewModal" aria-labelledby="rejectionReasonsViewModalLabel" aria-hidden="true">
   <div class="flex items-center justify-center min-h-screen p-4 text-center sm:block sm:p-0">
-    <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" aria-hidden="true"></div>
+    <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" aria-hidden="true" id="rejectionModalBackdrop"></div>
     
     <!-- Modal panel -->
     <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
@@ -12,7 +12,7 @@
           <h3 class="text-lg font-medium leading-6 text-yellow-800" id="rejectionReasonsViewModalLabel">
             {% trans "უარის მიზეზები" %}
           </h3>
-          <button type="button" class="bg-yellow-50 rounded-md text-yellow-600 hover:text-yellow-800 focus:outline-none" data-bs-dismiss="modal" aria-label="Close">
+          <button type="button" class="bg-yellow-50 rounded-md text-yellow-600 hover:text-yellow-800 focus:outline-none" id="closeRejectionModal" aria-label="Close">
             <span class="sr-only">Close</span>
             <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -36,7 +36,7 @@
       </div>
       
       <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-        <button type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" data-bs-dismiss="modal">
+        <button type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" id="closeRejectionModalBtn">
           {% trans "დახურვა" %}
         </button>
       </div>
@@ -74,8 +74,8 @@ function showRejectionReasons(applicationId) {
       }
       
       // Show the modal
-      const modal = new bootstrap.Modal(document.getElementById('rejectionReasonsViewModal'));
-      modal.show();
+      const modal = document.getElementById('rejectionReasonsViewModal');
+      modal.classList.remove('hidden');
     })
     .catch(error => {
       console.error('Error fetching rejection reasons:', error);
@@ -89,6 +89,15 @@ document.addEventListener('DOMContentLoaded', function() {
     button.addEventListener('click', function() {
       const applicationId = this.getAttribute('data-application-id');
       showRejectionReasons(applicationId);
+    });
+  });
+  
+  // Close modal when clicking the close button
+  const closeButtons = document.querySelectorAll('#closeRejectionModal, #closeRejectionModalBtn, #rejectionModalBackdrop');
+  closeButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const modal = document.getElementById('rejectionReasonsViewModal');
+      modal.classList.add('hidden');
     });
   });
 });

@@ -1,0 +1,559 @@
+<script>
+/**
+ * Tailwind UI Components JavaScript
+ * A collection of JavaScript utilities to replace Bootstrap functionality
+ */
+
+// Modal Utilities
+const TailwindModal = {
+    /**
+     * Opens a modal by ID
+     * @param {string} modalId - The ID of the modal to open
+     */
+    open: function(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        }
+    },
+    
+    /**
+     * Closes a modal by ID
+     * @param {string} modalId - The ID of the modal to close
+     */
+    close: function(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+    },
+    
+    /**
+     * Initializes a modal with event listeners
+     * @param {string} modalId - The ID of the modal to initialize
+     * @param {boolean} staticBackdrop - If true, clicking outside won't close the modal
+     */
+    init: function(modalId, staticBackdrop = false) {
+        const modal = document.getElementById(modalId);
+        const backdrop = document.getElementById(`${modalId}_backdrop`);
+        const closeButtons = modal.querySelectorAll('[data-modal-close]');
+        
+        // Close button click handlers
+        closeButtons.forEach(button => {
+            button.addEventListener('click', () => this.close(modalId));
+        });
+        
+        // Backdrop click handler (if not static)
+        if (backdrop && !staticBackdrop) {
+            backdrop.addEventListener('click', () => this.close(modalId));
+        }
+        
+        // Escape key handler
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
+                this.close(modalId);
+            }
+        });
+        
+        return {
+            open: () => this.open(modalId),
+            close: () => this.close(modalId)
+        };
+    }
+};
+
+// Dropdown Utilities
+const TailwindDropdown = {
+    /**
+     * Toggles a dropdown by ID
+     * @param {string} dropdownId - The ID of the dropdown to toggle
+     */
+    toggle: function(dropdownId) {
+        const dropdown = document.getElementById(`${dropdownId}_menu`);
+        if (dropdown) {
+            dropdown.classList.toggle('hidden');
+        }
+    },
+    
+    /**
+     * Opens a dropdown by ID
+     * @param {string} dropdownId - The ID of the dropdown to open
+     */
+    open: function(dropdownId) {
+        const dropdown = document.getElementById(`${dropdownId}_menu`);
+        if (dropdown) {
+            dropdown.classList.remove('hidden');
+        }
+    },
+    
+    /**
+     * Closes a dropdown by ID
+     * @param {string} dropdownId - The ID of the dropdown to close
+     */
+    close: function(dropdownId) {
+        const dropdown = document.getElementById(`${dropdownId}_menu`);
+        if (dropdown) {
+            dropdown.classList.add('hidden');
+        }
+    },
+    
+    /**
+     * Initializes a dropdown with event listeners
+     * @param {string} dropdownId - The ID of the dropdown to initialize
+     */
+    init: function(dropdownId) {
+        const button = document.getElementById(`${dropdownId}_button`);
+        const menu = document.getElementById(`${dropdownId}_menu`);
+        
+        if (!button || !menu) return;
+        
+        // Toggle dropdown on button click
+        button.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.toggle(dropdownId);
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!button.contains(e.target) && !menu.contains(e.target)) {
+                this.close(dropdownId);
+            }
+        });
+        
+        // Close dropdown on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !menu.classList.contains('hidden')) {
+                this.close(dropdownId);
+            }
+        });
+        
+        return {
+            toggle: () => this.toggle(dropdownId),
+            open: () => this.open(dropdownId),
+            close: () => this.close(dropdownId)
+        };
+    }
+};
+
+// Tab Utilities
+const TailwindTabs = {
+    /**
+     * Switches to a specific tab
+     * @param {string} tabsId - The ID of the tabs container
+     * @param {string} tabId - The ID of the tab to activate
+     */
+    switchTab: function(tabsId, tabId) {
+        // Get all tabs and contents
+        const tabsContainer = document.getElementById(tabsId);
+        if (!tabsContainer) return;
+        
+        const tabs = tabsContainer.querySelectorAll('button[id$="_tab"]');
+        const tabContents = tabsContainer.querySelectorAll('div[id$="_content"]');
+        
+        // Determine tab style
+        let tabStyle = 'underline';
+        if (tabs.length > 0) {
+            const firstTab = tabs[0];
+            if (firstTab.classList.contains('rounded-md') && !firstTab.classList.contains('border')) {
+                tabStyle = 'pills';
+            } else if (firstTab.classList.contains('border')) {
+                tabStyle = 'buttons';
+            }
+        }
+        
+        // Hide all tab contents and deactivate all tabs
+        tabs.forEach(tab => {
+            const isActive = tab.id === tabId + '_tab';
+            tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            
+            // Apply appropriate styling based on tab style
+            if (tabStyle === 'pills') {
+                if (isActive) {
+                    tab.classList.add('bg-blue-600', 'text-white');
+                    tab.classList.remove('text-gray-600', 'hover:text-gray-800', 'hover:bg-gray-100');
+                } else {
+                    tab.classList.remove('bg-blue-600', 'text-white');
+                    tab.classList.add('text-gray-600', 'hover:text-gray-800', 'hover:bg-gray-100');
+                }
+            } else if (tabStyle === 'buttons') {
+                if (isActive) {
+                    tab.classList.add('border-blue-600', 'bg-blue-600', 'text-white');
+                    tab.classList.remove('border-gray-300', 'text-gray-600', 'hover:text-gray-800', 'hover:bg-gray-50');
+                } else {
+                    tab.classList.remove('border-blue-600', 'bg-blue-600', 'text-white');
+                    tab.classList.add('border-gray-300', 'text-gray-600', 'hover:text-gray-800', 'hover:bg-gray-50');
+                }
+            } else {
+                // Default underline style
+                if (isActive) {
+                    tab.classList.add('border-blue-600', 'text-blue-600');
+                    tab.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+                } else {
+                    tab.classList.remove('border-blue-600', 'text-blue-600');
+                    tab.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+                }
+            }
+        });
+        
+        // Hide all tab contents
+        tabContents.forEach(content => {
+            content.classList.add('hidden');
+        });
+        
+        // Show the selected tab content
+        const activeContent = document.getElementById(tabId + '_content');
+        if (activeContent) {
+            activeContent.classList.remove('hidden');
+        }
+    },
+    
+    /**
+     * Initializes tabs with event listeners
+     * @param {string} tabsId - The ID of the tabs container
+     */
+    init: function(tabsId) {
+        const tabsContainer = document.getElementById(tabsId);
+        if (!tabsContainer) return;
+        
+        const tabs = tabsContainer.querySelectorAll('button[id$="_tab"]');
+        
+        tabs.forEach(tab => {
+            const tabId = tab.id.replace('_tab', '');
+            tab.addEventListener('click', () => {
+                this.switchTab(tabsId, tabId);
+            });
+        });
+        
+        return {
+            switchTab: (tabId) => this.switchTab(tabsId, tabId)
+        };
+    }
+};
+
+// Alert Utilities
+const TailwindAlert = {
+    /**
+     * Dismisses an alert
+     * @param {HTMLElement} alertElement - The alert element to dismiss
+     * @param {boolean} animate - Whether to animate the dismissal
+     */
+    dismiss: function(alertElement, animate = true) {
+        if (!alertElement) return;
+        
+        if (animate) {
+            alertElement.style.transition = 'opacity 0.3s, max-height 0.5s 0.3s';
+            alertElement.style.opacity = '0';
+            
+            setTimeout(() => {
+                alertElement.style.maxHeight = '0';
+                alertElement.style.padding = '0';
+                alertElement.style.margin = '0';
+                alertElement.style.overflow = 'hidden';
+                
+                setTimeout(() => {
+                    alertElement.remove();
+                }, 500);
+            }, 300);
+        } else {
+            alertElement.remove();
+        }
+    },
+    
+    /**
+     * Initializes auto-dismissing alerts
+     * @param {number} delay - Delay in milliseconds before dismissing
+     */
+    initAutoDismiss: function(delay = 4000) {
+        const alerts = document.querySelectorAll('.auto-dismiss');
+        
+        if (alerts.length > 0) {
+            setTimeout(() => {
+                alerts.forEach(alert => {
+                    this.dismiss(alert);
+                });
+            }, delay);
+        }
+    },
+    
+    /**
+     * Initializes dismissible alerts
+     */
+    initDismissible: function() {
+        const dismissButtons = document.querySelectorAll('[data-dismiss="alert"]');
+        
+        dismissButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const alert = button.closest('.alert');
+                if (alert) {
+                    this.dismiss(alert);
+                }
+            });
+        });
+    }
+};
+
+// Carousel Utilities
+const TailwindCarousel = {
+    /**
+     * Initializes a carousel
+     * @param {string} carouselId - The ID of the carousel container
+     * @param {Object} options - Carousel options
+     * @param {number} options.interval - Auto-advance interval in ms (0 to disable)
+     * @param {boolean} options.keyboard - Enable keyboard navigation
+     * @param {boolean} options.pause - Pause on hover
+     */
+    init: function(carouselId, options = {}) {
+        const defaults = {
+            interval: 5000,
+            keyboard: true,
+            pause: true
+        };
+        
+        const settings = {...defaults, ...options};
+        const carousel = document.getElementById(carouselId);
+        
+        if (!carousel) return;
+        
+        const slides = carousel.querySelector('.relative.flex');
+        const indicators = carousel.querySelectorAll('.carousel-indicator');
+        const prevButton = carousel.querySelector('[id$="-prev"]');
+        const nextButton = carousel.querySelector('[id$="-next"]');
+        
+        let currentSlide = 0;
+        const slideCount = indicators.length;
+        let intervalId = null;
+        
+        // Function to go to a specific slide
+        const goToSlide = (index) => {
+            if (index < 0) index = slideCount - 1;
+            if (index >= slideCount) index = 0;
+            
+            slides.style.transform = `translateX(-${index * 100}%)`;
+            currentSlide = index;
+            
+            // Update indicators
+            indicators.forEach((indicator, i) => {
+                if (i === currentSlide) {
+                    indicator.classList.add('bg-opacity-100');
+                } else {
+                    indicator.classList.remove('bg-opacity-100');
+                }
+            });
+        };
+        
+        // Set first indicator as active
+        if (indicators.length > 0) {
+            indicators[0].classList.add('bg-opacity-100');
+        }
+        
+        // Previous slide button
+        if (prevButton) {
+            prevButton.addEventListener('click', () => {
+                goToSlide(currentSlide - 1);
+                if (intervalId) {
+                    clearInterval(intervalId);
+                    startAutoAdvance();
+                }
+            });
+        }
+        
+        // Next slide button
+        if (nextButton) {
+            nextButton.addEventListener('click', () => {
+                goToSlide(currentSlide + 1);
+                if (intervalId) {
+                    clearInterval(intervalId);
+                    startAutoAdvance();
+                }
+            });
+        }
+        
+        // Indicator clicks
+        indicators.forEach((indicator, index) => {
+            indicator.addEventListener('click', () => {
+                goToSlide(index);
+                if (intervalId) {
+                    clearInterval(intervalId);
+                    startAutoAdvance();
+                }
+            });
+        });
+        
+        // Keyboard navigation
+        if (settings.keyboard) {
+            document.addEventListener('keydown', (e) => {
+                if (!carousel.contains(document.activeElement)) return;
+                
+                if (e.key === 'ArrowLeft') {
+                    goToSlide(currentSlide - 1);
+                    if (intervalId) {
+                        clearInterval(intervalId);
+                        startAutoAdvance();
+                    }
+                } else if (e.key === 'ArrowRight') {
+                    goToSlide(currentSlide + 1);
+                    if (intervalId) {
+                        clearInterval(intervalId);
+                        startAutoAdvance();
+                    }
+                }
+            });
+        }
+        
+        // Auto-advance slides
+        const startAutoAdvance = () => {
+            if (settings.interval <= 0) return;
+            
+            intervalId = setInterval(() => {
+                goToSlide(currentSlide + 1);
+            }, settings.interval);
+        };
+        
+        // Pause on hover
+        if (settings.pause && settings.interval > 0) {
+            carousel.addEventListener('mouseenter', () => {
+                if (intervalId) {
+                    clearInterval(intervalId);
+                    intervalId = null;
+                }
+            });
+            
+            carousel.addEventListener('mouseleave', () => {
+                startAutoAdvance();
+            });
+        }
+        
+        // Start auto-advance if enabled
+        if (settings.interval > 0) {
+            startAutoAdvance();
+        }
+        
+        return {
+            goToSlide,
+            next: () => goToSlide(currentSlide + 1),
+            prev: () => goToSlide(currentSlide - 1),
+            pause: () => {
+                if (intervalId) {
+                    clearInterval(intervalId);
+                    intervalId = null;
+                }
+            },
+            cycle: () => {
+                if (!intervalId && settings.interval > 0) {
+                    startAutoAdvance();
+                }
+            }
+        };
+    }
+};
+
+// Collapse Utilities
+const TailwindCollapse = {
+    /**
+     * Toggles a collapse element
+     * @param {string} collapseId - The ID of the element to collapse/expand
+     */
+    toggle: function(collapseId) {
+        const element = document.getElementById(collapseId);
+        if (!element) return;
+        
+        const isCollapsed = element.classList.contains('hidden');
+        
+        if (isCollapsed) {
+            this.show(collapseId);
+        } else {
+            this.hide(collapseId);
+        }
+    },
+    
+    /**
+     * Shows a collapsed element
+     * @param {string} collapseId - The ID of the element to expand
+     */
+    show: function(collapseId) {
+        const element = document.getElementById(collapseId);
+        if (!element) return;
+        
+        // Get any triggers for this collapse
+        const triggers = document.querySelectorAll(`[data-collapse-toggle="${collapseId}"]`);
+        
+        // Show the element
+        element.classList.remove('hidden');
+        
+        // Update aria attributes on triggers
+        triggers.forEach(trigger => {
+            trigger.setAttribute('aria-expanded', 'true');
+            
+            // If the trigger has an icon that rotates, rotate it
+            const icon = trigger.querySelector('[data-collapse-icon]');
+            if (icon) {
+                icon.classList.add('rotate-180');
+            }
+        });
+    },
+    
+    /**
+     * Hides an expanded element
+     * @param {string} collapseId - The ID of the element to collapse
+     */
+    hide: function(collapseId) {
+        const element = document.getElementById(collapseId);
+        if (!element) return;
+        
+        // Get any triggers for this collapse
+        const triggers = document.querySelectorAll(`[data-collapse-toggle="${collapseId}"]`);
+        
+        // Hide the element
+        element.classList.add('hidden');
+        
+        // Update aria attributes on triggers
+        triggers.forEach(trigger => {
+            trigger.setAttribute('aria-expanded', 'false');
+            
+            // If the trigger has an icon that rotates, un-rotate it
+            const icon = trigger.querySelector('[data-collapse-icon]');
+            if (icon) {
+                icon.classList.remove('rotate-180');
+            }
+        });
+    },
+    
+    /**
+     * Initializes collapse elements with event listeners
+     */
+    init: function() {
+        const triggers = document.querySelectorAll('[data-collapse-toggle]');
+        
+        triggers.forEach(trigger => {
+            const targetId = trigger.getAttribute('data-collapse-toggle');
+            const target = document.getElementById(targetId);
+            
+            if (!target) return;
+            
+            // Set initial aria attribute
+            const isCollapsed = target.classList.contains('hidden');
+            trigger.setAttribute('aria-expanded', !isCollapsed);
+            
+            // Add click event
+            trigger.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.toggle(targetId);
+            });
+        });
+    }
+};
+
+// Initialize components on DOM content loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize dismissible alerts
+    TailwindAlert.initDismissible();
+    
+    // Initialize auto-dismissing alerts
+    TailwindAlert.initAutoDismiss();
+    
+    // Initialize collapse elements
+    TailwindCollapse.init();
+});
+</script> 

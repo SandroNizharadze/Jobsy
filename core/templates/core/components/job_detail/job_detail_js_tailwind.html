@@ -1,0 +1,40 @@
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Activate apply modal when apply button is clicked
+    const applyBtn = document.querySelector('[data-modal-target="applyModal"]');
+    const applyModal = document.getElementById('applyModal');
+    const applyModalBackdrop = document.getElementById('applyModalBackdrop');
+    const closeApplyModal = document.getElementById('closeApplyModal');
+    const cancelApplyModal = document.getElementById('cancelApplyModal');
+    
+    if (applyBtn && applyModal) {
+        applyBtn.addEventListener('click', function() {
+            applyModal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        });
+    }
+    
+    function closeModal() {
+        if (applyModal) {
+            applyModal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+    }
+    
+    // Close modal when clicking close button or cancel button
+    if (closeApplyModal) closeApplyModal.addEventListener('click', closeModal);
+    if (cancelApplyModal) cancelApplyModal.addEventListener('click', closeModal);
+    
+    // Close modal when clicking on backdrop
+    if (applyModalBackdrop) {
+        applyModalBackdrop.addEventListener('click', closeModal);
+    }
+    
+    // Close modal when pressing escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && applyModal && !applyModal.classList.contains('hidden')) {
+            closeModal();
+        }
+    });
+});
+</script> 

@@ -1,0 +1,156 @@
+{% load i18n %}
+
+<div class="mt-20 py-4" data-aos="fade-up">
+    <div class="text-center mb-8">
+        <h3 class="text-2xl font-bold text-gray-800">{% trans "ხშირად დასმული კითხვები" %}</h3>
+    </div>
+    <div class="flex justify-center">
+        <div class="w-full max-w-3xl">
+            <div id="pricingFaq">
+                <!-- FAQ Item 1 -->
+                <div class="border border-gray-200 rounded-lg mb-4 overflow-hidden" data-aos="fade-up" data-aos-delay="100">
+                    <button class="w-full flex justify-between items-center p-4 bg-white hover:bg-gray-50 focus:outline-none" 
+                            id="faqOneBtn" 
+                            onclick="toggleAccordion('faqOne')">
+                        <span class="font-medium text-gray-800">{% trans "რატომ შეიქმნა Jobsy.ge?" %}</span>
+                        <svg id="faqOneIcon" class="h-5 w-5 text-gray-500 transform rotate-0 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div id="faqOne" class="block px-4 pb-4 bg-white">
+                        <p class="text-gray-600">
+                            {% trans "ჩვენი მისიაა დავეხმაროთ სამსახურის მაძიებლებსა და დამსაქმებლებს ურთიერთობების გამარტივებაში და შევამციროთ სივის გაგზავნიდან, გასაუბრებაზე დაბარება/არ დაბარებამდე საჭირო დრო და საშუალება მივცეთ კანდიდატებს ნებისმიერი პასუხის შემთხვევაში მიიღონ დამსაქმებლისგან ინდივიდუალური უკუკავშირი. დღესდღეობით დამსაქმებლების უმრავლესობას დროისა თუ სხვა ფაქტორების გამო უჭირს კანდიდატებისთვის სათითაოდ უკუკავშირის დაბრუნება თუ ეს უკუკავშირი უარყოფითია. ჩვენი სისტემა საშუალებას იძლევა, როგორც კანდიდატმა, მომენტალურად მიიღოთ დადებითი თუ უარყოფითი პასუხი დამსაქმებლისგან მას შემდეგ რაც თქვენს სივს განიხილავენ. მეორე მხრივ კი დამსაქმებლებს საშუალება აქვთ ცალკეული მეილების წერის გარეშე, უმოკლეს დროში მისცენ ინდივიდუალური უკუკავშირი კანდიდატებს." %}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 2 -->
+                <div class="border border-gray-200 rounded-lg mb-4 overflow-hidden" data-aos="fade-up" data-aos-delay="200">
+                    <button class="w-full flex justify-between items-center p-4 bg-white hover:bg-gray-50 focus:outline-none" 
+                            id="faqTwoBtn" 
+                            onclick="toggleAccordion('faqTwo')">
+                        <span class="font-medium text-gray-800">{% trans "რა მოვიქმოქმედო თუ გასაუბრებაზე მისულს განცხადებისგან განსხვავებული სამუშაო პირობები დამხვდა?" %}</span>
+                        <svg id="faqTwoIcon" class="h-5 w-5 text-gray-500 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div id="faqTwo" class="hidden px-4 pb-4 bg-white">
+                        <p class="text-gray-600">
+                            {% trans "ჩვენ ვცდილობთ გამოვასწოროთ სიტუაცია სამუშაო ბაზარზე. მსგავს შემთხვევაში აუცილებლად დაგვიკავშირდით Info@jobsy.ge ზე და მოვახდენთ შესაბამის რეაგირებას" %}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 3 -->
+                <div class="border border-gray-200 rounded-lg mb-4 overflow-hidden" data-aos="fade-up" data-aos-delay="300">
+                    <button class="w-full flex justify-between items-center p-4 bg-white hover:bg-gray-50 focus:outline-none" 
+                            id="faqThreeBtn" 
+                            onclick="toggleAccordion('faqThree')">
+                        <span class="font-medium text-gray-800">{% trans "როგორ შევიძინო პაკეტი?" %}</span>
+                        <svg id="faqThreeIcon" class="h-5 w-5 text-gray-500 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div id="faqThree" class="hidden px-4 pb-4 bg-white">
+                        <p class="text-gray-600">
+                            {% trans "თუ დარეგისტრირებული არ ხართ, პირველ რიგში გაიარეთ კომპანიის რეგისტრაცია საიტზე. ამის შემდეგ აირჩიეთ სასურველი პაკეტი და შეავსეთ ვაკანსიის ინფორმაცია. ვაკანსიის განხილვის შემდეგ საიტის ადმინისტრატორი დაგიკავშირდებათ მითითებული ელფოსტის საშუალებით და გამოგიგზავნით გადახდის რეკვიზიტებს. გადახდის დადასტურების შემდეგ მოხდება თქვენი ვაკანსიის განთავსება." %}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 4 -->
+                <div class="border border-gray-200 rounded-lg mb-4 overflow-hidden" data-aos="fade-up" data-aos-delay="400">
+                    <button class="w-full flex justify-between items-center p-4 bg-white hover:bg-gray-50 focus:outline-none" 
+                            id="faqFourBtn" 
+                            onclick="toggleAccordion('faqFour')">
+                        <span class="font-medium text-gray-800">{% trans "შემიძლია პაკეტის შეცვლა?" %}</span>
+                        <svg id="faqFourIcon" class="h-5 w-5 text-gray-500 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div id="faqFour" class="hidden px-4 pb-4 bg-white">
+                        <p class="text-gray-600">
+                            {% trans "უკვე ატვირთული ვაკანსიისთვის პაკეტის შეცვლა არ ხდება, გთქვენ შეგიძლიათ მომდევნო ვაკანსიის განსხვავებული პაკეტით ატვირთვა." %}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 5 -->
+                <div class="border border-gray-200 rounded-lg mb-4 overflow-hidden" data-aos="fade-up" data-aos-delay="500">
+                    <button class="w-full flex justify-between items-center p-4 bg-white hover:bg-gray-50 focus:outline-none" 
+                            id="faqFiveBtn" 
+                            onclick="toggleAccordion('faqFive')">
+                        <span class="font-medium text-gray-800">{% trans "შემიძლია ვაკანსიის დროზე ადრე წაშლა?" %}</span>
+                        <svg id="faqFiveIcon" class="h-5 w-5 text-gray-500 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div id="faqFive" class="hidden px-4 pb-4 bg-white">
+                        <p class="text-gray-600">
+                            {% trans "დიახ, იმ შემთხვევაში თუ სასურველ თანამშრომელს დროზე ადრე იპოვით, ზედმეტი სივების მიღების თავიდან ასაცილებლად შეგიძლიათ თქვენივე პროფილიდან წაშალოთ ვაკანსია." %}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 6 -->
+                <div class="border border-gray-200 rounded-lg mb-4 overflow-hidden" data-aos="fade-up" data-aos-delay="600">
+                    <button class="w-full flex justify-between items-center p-4 bg-white hover:bg-gray-50 focus:outline-none" 
+                            id="faqSixBtn" 
+                            onclick="toggleAccordion('faqSix')">
+                        <span class="font-medium text-gray-800">{% trans "პლატფორმით მომსახურების პირობები" %}</span>
+                        <svg id="faqSixIcon" class="h-5 w-5 text-gray-500 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div id="faqSix" class="hidden px-4 pb-4 bg-white">
+                        <p class="text-gray-600">
+                            {% trans "მომზადების პროცესშია" %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleAccordion(id) {
+    const content = document.getElementById(id);
+    const icon = document.getElementById(id + 'Icon');
+    
+    // Close all other accordions
+    const allContents = document.querySelectorAll('[id^="faq"]');
+    const allIcons = document.querySelectorAll('[id^="faq"][id$="Icon"]');
+    
+    allContents.forEach(item => {
+        if (item.id !== id && !item.id.endsWith('Icon') && !item.id.endsWith('Btn')) {
+            item.classList.add('hidden');
+        }
+    });
+    
+    allIcons.forEach(item => {
+        if (item.id !== id + 'Icon') {
+            item.classList.remove('rotate-180');
+        }
+    });
+    
+    // Toggle current accordion
+    content.classList.toggle('hidden');
+    
+    // Rotate icon
+    if (content.classList.contains('hidden')) {
+        icon.classList.remove('rotate-180');
+    } else {
+        icon.classList.add('rotate-180');
+    }
+}
+
+// Open the first accordion by default
+document.addEventListener('DOMContentLoaded', function() {
+    // First item is open by default
+    const firstIcon = document.getElementById('faqOneIcon');
+    if (firstIcon) {
+        firstIcon.classList.add('rotate-180');
+    }
+});
+</script> 
