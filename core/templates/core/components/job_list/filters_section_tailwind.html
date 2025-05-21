@@ -1,0 +1,154 @@
+{% load i18n %}
+{% load core_extras %}
+
+<!-- Filtering Section -->
+<div id="filters" class="mb-6 shadow-sm rounded-3xl bg-jobsy-yellow border-none scroll-mt-24 {% if not request.GET.show_filters %}hidden{% endif %}">
+  <div class="p-6">
+    <form method="get" action="{% url 'job_list' %}" id="filter-form">
+      <input type="hidden" name="show_filters" value="1">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="col-span-1 md:col-span-4">
+          <input type="text" 
+                 class="w-full rounded-lg px-4 py-3 border-gray-300 filter-auto-submit" 
+                 name="search" 
+                 placeholder="{% trans "მოძებნა / კომპანია" %}" 
+                 value="{{ request.GET.search|default:'' }}">
+        </div>
+        
+        <div>
+          <select class="w-full rounded-lg px-4 py-3 border-gray-300 filter-auto-submit" name="category">
+            <option value="">{% trans "კატეგორია" %}</option>
+            {% for category in categories %}
+              <option value="{{ category }}" {% if request.GET.category == category %}selected{% endif %}>{{ category }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        
+        <div>
+          <select class="w-full rounded-lg px-4 py-3 border-gray-300 filter-auto-submit" name="location">
+            <option value="">{% trans "ლოკაცია" %}</option>
+            {% for location in locations %}
+              <option value="{{ location }}" {% if request.GET.location == location %}selected{% endif %}>{{ location }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        
+        <div>
+          <select class="w-full rounded-lg px-4 py-3 border-gray-300 filter-auto-submit" name="experience">
+            <option value="">{% trans "გამოცდილება" %}</option>
+            <option value="entry" {% if request.GET.experience == "entry" %}selected{% endif %}>{% trans "დამწყები" %}</option>
+            <option value="mid" {% if request.GET.experience == "mid" %}selected{% endif %}>{% trans "საშუალო" %}</option>
+            <option value="senior" {% if request.GET.experience == "senior" %}selected{% endif %}>{% trans "პროფესიონალი" %}</option>
+          </select>
+        </div>
+        
+        <div>
+          <select class="w-full rounded-lg px-4 py-3 border-gray-300 filter-auto-submit" name="premium_level">
+            <option value="">{% trans "Premium Level" %}</option>
+            <option value="standard" {% if request.GET.premium_level == "standard" %}selected{% endif %}>Standard</option>
+            <option value="premium" {% if request.GET.premium_level == "premium" %}selected{% endif %}>Premium</option>
+            <option value="premium_plus" {% if request.GET.premium_level == "premium_plus" %}selected{% endif %}>Premium +</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="mt-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1">{% trans "მინიმალური ანაზღაურება" %}</label>
+        <input type="range" 
+               class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer filter-auto-submit" 
+               min="0" max="10000" step="500" 
+               name="salary_min" 
+               value="{{ request.GET.salary_min|default:0 }}" 
+               id="salary-slider">
+        <div class="flex justify-between mt-1 text-sm text-gray-600">
+          <span id="salary-value">₾ {{ request.GET.salary_min|default:0 }}</span>
+          <span>₾ 10,000+</span>
+        </div>
+      </div>
+      
+      <div class="mt-4">
+        <div class="flex flex-wrap gap-4">
+          <label class="inline-flex items-center">
+            <input class="form-checkbox h-5 w-5 text-blue-600 filter-auto-submit" 
+                   type="checkbox" 
+                   name="job_preferences" 
+                   value="სრული განაკვეთი" 
+                   id="full-time" 
+                   {% if 'სრული განაკვეთი' in job_preferences %}checked{% endif %}>
+            <span class="ml-2 text-gray-700">{% trans "სრული განაკვეთი" %}</span>
+          </label>
+          
+          <label class="inline-flex items-center">
+            <input class="form-checkbox h-5 w-5 text-blue-600 filter-auto-submit" 
+                   type="checkbox" 
+                   name="job_preferences" 
+                   value="ნახევარი განაკვეთი" 
+                   id="part-time" 
+                   {% if 'ნახევარი განაკვეთი' in job_preferences %}checked{% endif %}>
+            <span class="ml-2 text-gray-700">{% trans "ნახევარი განაკვეთი" %}</span>
+          </label>
+          
+          <label class="inline-flex items-center">
+            <input class="form-checkbox h-5 w-5 text-blue-600 filter-auto-submit" 
+                   type="checkbox" 
+                   name="job_preferences" 
+                   value="დისტანციური" 
+                   id="remote" 
+                   {% if 'დისტანციური' in job_preferences %}checked{% endif %}>
+            <span class="ml-2 text-gray-700">{% trans "დისტანციური" %}</span>
+          </label>
+          
+          <label class="inline-flex items-center">
+            <input class="form-checkbox h-5 w-5 text-blue-600 filter-auto-submit" 
+                   type="checkbox" 
+                   name="job_preferences" 
+                   value="სტაჟირება" 
+                   id="internship" 
+                   {% if 'სტაჟირება' in job_preferences %}checked{% endif %}>
+            <span class="ml-2 text-gray-700">{% trans "სტაჟირება" %}</span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="flex justify-end mt-6">
+        <button type="button" 
+                id="reset-filters" 
+                class="px-5 py-2.5 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors">
+          <i class="fas fa-redo mr-2"></i>{% trans "გასუფთავება" %}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="flex justify-between items-center mb-6">
+  <h2 class="font-bold text-2xl text-gray-800">
+    {% trans "ვაკანსიები" %} 
+    {% if filtered %}
+      <span class="text-sm font-normal">({{ jobs|length }} {% trans "შედეგი" %})</span>
+    {% elif show_filters %}
+      <span class="text-sm font-normal">({{ jobs|length }} {% trans "შედეგი" %})</span>
+    {% endif %}
+  </h2>
+  
+  {% if not request.GET.show_filters %}
+  <a href="{% url 'job_list' %}?show_filters=1#filters" 
+     class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+    <i class="fas fa-filter mr-2"></i>{% trans "ფილტრები" %}
+  </a>
+  {% endif %}
+  
+  {% if filtered %}
+  <div class="flex flex-wrap gap-2">
+    {% for filter_name, filter_value in active_filters.items %}
+      <div class="bg-gray-100 text-gray-800 py-1 px-3 rounded-full text-sm">
+        {{ filter_name }}: {{ filter_value }}
+        <a href="{{ filter_remove_urls|get_item:filter_name }}" 
+           class="ml-1 text-red-500 filter-remove-link" 
+           data-filter="{{ filter_name }}">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %} 

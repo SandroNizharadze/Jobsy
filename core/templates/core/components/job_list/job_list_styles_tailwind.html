@@ -1,0 +1,52 @@
+{% load static %}
+{% load i18n %}
+
+<style>
+  /* Premium+ card special styling */
+  .premium-plus-card {
+    box-shadow: 0 5px 15px rgba(166, 77, 255, 0.2) !important;
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* Add subtle glow effect on hover */
+  .premium-plus-card:hover {
+    box-shadow: 0 8px 25px rgba(166, 77, 255, 0.3) !important;
+  }
+
+  /* Custom Tailwind colors */
+  :root {
+    --jobsy-yellow: #ffe066;
+  }
+  
+  .bg-jobsy-yellow {
+    background-color: var(--jobsy-yellow);
+  }
+  
+  /* Range slider styling */
+  input[type="range"] {
+    -webkit-appearance: none;
+    height: 8px;
+    border-radius: 5px;
+    background: #e5e7eb;
+    outline: none;
+  }
+  
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #3b82f6;
+    cursor: pointer;
+  }
+  
+  input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #3b82f6;
+    cursor: pointer;
+  }
+</style> 

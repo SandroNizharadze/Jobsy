@@ -149,7 +149,7 @@ def profile(request):
                         # Save the user profile with the new picture
                         user_profile.save()
                     
-                    # Handle company_logo upload specifically for S3 if needed
+                    # Handle company logo upload
                     if 'company_logo' in request.FILES:
                         logger.info("Processing new company logo")
                         
@@ -171,7 +171,7 @@ def profile(request):
                             # For non-S3 storage
                             updated_employer.company_logo = request.FILES['company_logo']
                     
-                    # Save the updated employer profile
+                    # Save the employer profile
                     updated_employer.save()
                     
                     # Return success message and redirect
@@ -198,13 +198,13 @@ def profile(request):
     
     # Choose template based on user role or template parameter
     if template_param == 'employer':
-        template = 'core/employer_profile.html'
+        template = 'core/employer_profile_tailwind.html'
     elif template_param == 'user':
-        template = 'core/user_profile.html'
+        template = 'core/user_profile_tailwind.html'
     elif is_employer:
-        template = 'core/employer_profile.html'
+        template = 'core/employer_profile_tailwind.html'
     else:
-        template = 'core/user_profile.html'
+        template = 'core/user_profile_tailwind.html'
     
     return render(request, template, context)
 
@@ -212,42 +212,44 @@ def profile(request):
 @require_POST
 def remove_cv(request):
     """
-    Remove the CV file from user profile and S3 bucket
+    Remove CV file from user profile and storage
     """
     try:
-        logger.info(f"Starting CV removal for user {request.user.username}")
-        # Get user profile with select_related for more efficient querying
-        user_profile = UserProfile.objects.select_related('user').get(user=request.user)
+        # Get the user's profile
+        user_profile = request.user.userprofile
         
-        # Store the file path before deleting
-        if user_profile.cv:
-            file_name = user_profile.cv.name
-            logger.info(f"User has CV: {file_name}")
-            
-            # For S3 storage, we need to delete the file from S3 first
+        # Check if there is a CV to remove
+        if not user_profile.cv:
+            logger.warning(f"No CV found to remove for user {request.user.username}")
+            return JsonResponse({'success': False, 'error': 'No CV found'}, status=400)
+        
+        # Get the CV file path
+        cv_path = user_profile.cv.name
+        logger.info(f"Attempting to remove CV: {cv_path} for user {request.user.username}")
+        
+        # Delete from storage (handling both S3 and local storage)
+        try:
             if hasattr(settings, 'USE_S3') and settings.USE_S3:
-                try:
-                    logger.info(f"Attempting to delete file from S3: {file_name}")
-                    
-                    # Use the same storage backend as used for upload
-                    storage = PrivateMediaStorage()
-                    storage.delete(file_name)
-                    logger.info("Successfully deleted file from S3")
-                except Exception as e:
-                    logger.error(f"Error deleting file from S3: {str(e)}")
-                    # Continue with the profile update even if the file deletion fails
-                    # The file will be orphaned in S3 but the user experience will not be broken
+                # For S3 storage
+                logger.info(f"Using S3 storage to delete file: {cv_path}")
+                storage = PrivateMediaStorage()
+                if storage.exists(cv_path):
+                    storage.delete(cv_path)
+                    logger.info(f"Successfully deleted CV from S3: {cv_path}")
+                else:
+                    logger.warning(f"CV file not found in S3: {cv_path}")
             else:
-                # For local storage, use the standard delete method
-                try:
-                    file_path = user_profile.cv.path
-                    logger.info(f"Attempting to delete local file: {file_path}")
-                    user_profile.cv.delete(save=False)
-                    logger.info("Successfully deleted file using standard method")
-                except Exception as e:
-                    logger.error(f"Error with standard file delete: {str(e)}")
-        else:
-            logger.warning(f"User {request.user.username} has no CV to remove")
+                # For local storage
+                logger.info(f"Using local storage to delete file")
+                if default_storage.exists(cv_path):
+                    default_storage.delete(cv_path)
+                    logger.info(f"Successfully deleted CV from local storage: {cv_path}")
+                else:
+                    logger.warning(f"CV file not found in local storage: {cv_path}")
+        except Exception as e:
+            # Log the error but continue to update the profile
+            logger.error(f"Error deleting CV file: {str(e)}")
+            logger.error(traceback.format_exc())
         
         # Update the profile fields regardless of delete success
         user_profile.cv = None

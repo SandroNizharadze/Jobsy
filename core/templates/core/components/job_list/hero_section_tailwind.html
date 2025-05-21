@@ -1,0 +1,23 @@
+{% load static %}
+{% load i18n %}
+
+<section class="relative">
+  <div class="container mx-auto relative">
+    <div class="flex flex-col lg:flex-row items-center min-h-[400px]">
+      <div class="w-full lg:w-1/2">
+        <div class="bg-jobsy-yellow rounded-3xl p-8 lg:p-10 mb-4 h-full">
+          <h1 class="font-extrabold text-4xl text-white mb-4">{% trans "ჩვენი ვაკანსიები დაგეხმარება!" %}</h1>
+          <p class="text-xl text-white mb-6">{% trans "საუკეთესო სამსახურის მოძიებაში ჯობსის ვაკანსიები დაგეხმარება" %}</p>
+          <a href="{% url 'job_list' %}?show_filters=1#filters" 
+             class="inline-block bg-[#0a2342] text-white font-semibold py-3 px-8 rounded-xl text-lg transition-all hover:bg-opacity-90">
+            {% trans "ყველა ვაკანსია" %}
+          </a>
+        </div>
+      </div>
+      <div class="hidden lg:block w-1/2 relative min-h-[400px]">
+        <img src="{% static 'images/hero_woman.png' %}" alt="Hero" 
+             class="absolute bottom-[-33px] right-0 max-h-[128%] z-10">
+      </div>
+    </div>
+  </div>
+</section> 

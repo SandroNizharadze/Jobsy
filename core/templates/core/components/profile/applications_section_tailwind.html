@@ -1,0 +1,262 @@
+{% load i18n %}
+
+<div class="bg-white rounded-xl shadow-md overflow-hidden">
+  <!-- Main Activity Tabs -->
+  <div class="border-b border-gray-200">
+    <nav class="-mb-px flex space-x-8 px-6 pt-4" aria-label="Tabs">
+      <button class="border-blue-500 text-blue-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" id="applications-tab" data-bs-toggle="tab" data-bs-target="#applications" type="button">
+        <svg class="h-5 w-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+        </svg>
+        {% trans "Applications" %}
+      </button>
+      <button class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" id="saved-tab" data-bs-toggle="tab" data-bs-target="#saved-jobs" type="button">
+        <svg class="h-5 w-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+        </svg>
+        {% trans "შენახული" %}
+      </button>
+    </nav>
+  </div>
+  
+  <div class="tab-content p-6">
+    <!-- Applications Tab -->
+    <div class="tab-pane fade show active" id="applications" role="tabpanel">
+      {% if applications %}
+      <!-- Status Explanations -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+          <h5 class="font-medium text-green-800 mb-2">{% trans "გასაუბრება" %}</h5>
+          <p class="text-sm text-green-700">{% trans "ნიშნავს რომ კომპანიამ განიხილა თქვენი კანდიდატურა, თვლის რომ შეესაბამებით პოზიციას და დაგიკავშირდებიან გასაუბრებაზე დასაბარებლად" %}</p>
+        </div>
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <h5 class="font-medium text-yellow-800 mb-2">{% trans "რეზერვი" %}</h5>
+          <p class="text-sm text-yellow-700">{% trans "ნიშნავს, რომ კომპანიამ განიხილა თქვენი კანდიდატურა, თვლის რომ არ შეესაბამებით პოზიციას და ამ ეტაპზე ვერ აგიყვანენ, თუმცა თქვენი სივი შეინახება ბაზაში მომავალში დაინტერესების შემთვევაში დასაკონტაქტებლად" %}</p>
+        </div>
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <h5 class="font-medium text-blue-800 mb-2">{% trans "განხილვის პროცესში" %}</h5>
+          <p class="text-sm text-blue-700">{% trans "ნიშნავს რომ თქვენი კანდიდატურა ჯერ არ განუხილავთ" %}</p>
+        </div>
+      </div>
+      
+      <div id="applications-container">
+        <!-- Applications List -->
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {% trans "Position" %}
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {% trans "Company" %}
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {% trans "Applied On" %}
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {% trans "Status" %}
+                </th>
+                <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {% trans "Action" %}
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              {% for application in applications %}
+              <tr class="{% if application.status == 'გასაუბრება' %}bg-green-50{% elif application.status == 'რეზერვი' %}bg-yellow-50{% endif %} hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-gray-900">
+                    {% if application.job %}
+                      {{ application.job.title }}
+                    {% else %}
+                      {{ application.job_title|default:"Deleted Job" }}
+                    {% endif %}
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  {% if application.job %}
+                    <div class="flex items-center">
+                      {% if application.job.employer_profile.company_logo %}
+                        <img src="{{ application.job.employer_profile.company_logo.url }}" alt="Company Logo" class="h-8 w-8 mr-2 object-contain">
+                      {% endif %}
+                      <div class="text-sm text-gray-900">{{ application.job.company }}</div>
+                    </div>
+                  {% else %}
+                    <div class="text-sm text-gray-900">{{ application.job_company|default:"Deleted Company" }}</div>
+                  {% endif %}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900">{{ application.applied_at|date:"d M Y" }}</div>
+                  <div class="text-sm text-gray-500">{{ application.applied_at|time:"H:i" }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  {% if application.status == 'განხილვის_პროცესში' %}
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                      {% trans "განხილვის პროცესში" %}
+                    </span>
+                  {% elif application.status == 'გასაუბრება' %}
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                      {% trans "გასაუბრება" %}
+                    </span>
+                  {% elif application.status == 'რეზერვი' %}
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                      {% trans "რეზერვი" %}
+                    </span>
+                    {% if application.rejection_reasons.all %}
+                      <button type="button" class="text-xs text-blue-600 hover:text-blue-800 mt-1 block view-rejection-reasons" data-application-id="{{ application.id }}">
+                        {% trans "View Reasons" %}
+                      </button>
+                    {% endif %}
+                  {% elif application.status == 'pending' %}
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                      {% trans "Pending" %}
+                    </span>
+                  {% elif application.status == 'reviewed' %}
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                      {% trans "Reviewed" %}
+                    </span>
+                  {% elif application.status == 'interviewed' %}
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800">
+                      {% trans "Interviewed" %}
+                    </span>
+                  {% elif application.status == 'offered' %}
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                      {% trans "Offer Extended" %}
+                    </span>
+                  {% endif %}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
+                  {% if application.job %}
+                    <a href="{% url 'job_detail' application.job.id %}" class="text-blue-600 hover:text-blue-900 mr-3">
+                      <svg class="h-5 w-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                      </svg>
+                    </a>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% else %}
+      <div class="text-center py-12">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">{% trans "No Applications Yet" %}</h3>
+        <p class="mt-1 text-sm text-gray-500">{% trans "You haven't applied to any jobs yet." %}</p>
+        <div class="mt-6">
+          <a href="{% url 'job_list' %}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            {% trans "Browse Job Listings" %}
+          </a>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    
+    <!-- Saved Jobs Tab -->
+    <div class="tab-pane fade" id="saved-jobs" role="tabpanel">
+      {% if saved_jobs %}
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                {% trans "ვაკანსია" %}
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                {% trans "კომპანია" %}
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                {% trans "შენახვის თარიღი" %}
+              </th>
+              <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                {% trans "ქმედებები" %}
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            {% for saved in saved_jobs %}
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm font-medium text-gray-900">
+                  {% if saved.job %}
+                    {{ saved.job.title }}
+                  {% else %}
+                    {{ saved.job_title|default:"Deleted Job" }}
+                  {% endif %}
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                {% if saved.job %}
+                  <div class="flex items-center">
+                    {% if saved.job.employer_profile.company_logo %}
+                      <img src="{{ saved.job.employer_profile.company_logo.url }}" alt="Company Logo" class="h-8 w-8 mr-2 object-contain">
+                    {% endif %}
+                    <div class="text-sm text-gray-900">{{ saved.job.company }}</div>
+                  </div>
+                {% else %}
+                  <div class="text-sm text-gray-900">{{ saved.job_company|default:"Deleted Company" }}</div>
+                {% endif %}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900">{{ saved.saved_at|date:"d M Y" }}</div>
+                <div class="text-sm text-gray-500">{{ saved.saved_at|time:"H:i" }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-center">
+                <div class="flex justify-center space-x-3">
+                  {% if saved.job %}
+                    <a href="{% url 'job_detail' saved.job.id %}" class="text-blue-600 hover:text-blue-900">
+                      <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                      </svg>
+                    </a>
+                    <a href="{% url 'job_detail' saved.job.id %}?apply=true" class="text-green-600 hover:text-green-900">
+                      <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                    </a>
+                    <form action="{% url 'unsave_job' saved.job.id %}" method="post" class="inline">
+                      {% csrf_token %}
+                      <button type="submit" class="text-red-600 hover:text-red-900">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                      </button>
+                    </form>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="text-center py-12">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">{% trans "შენახული ვაკანსიები არ გაქვთ" %}</h3>
+        <p class="mt-1 text-sm text-gray-500">{% trans "თქვენს მიერ შენახული ვაკანსიები აქ გამოჩნდება" %}</p>
+        <div class="mt-6">
+          <a href="{% url 'job_list' %}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            {% trans "ვაკანსიების გადახედვა" %}
+          </a>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div> 

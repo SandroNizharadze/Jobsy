@@ -37,28 +37,28 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle search form submission
     const searchInput = document.querySelector('input[name="search"]');
     if (searchInput) {
-        const searchButton = searchInput.nextElementSibling;
+    const searchButton = searchInput.nextElementSibling;
+    
+    searchButton.addEventListener('click', function() {
+        const currentUrl = new URL(window.location.href);
+        const searchValue = searchInput.value.trim();
         
-        searchButton.addEventListener('click', function() {
-            const currentUrl = new URL(window.location.href);
-            const searchValue = searchInput.value.trim();
-            
-            if (searchValue) {
-                currentUrl.searchParams.set('search', searchValue);
-            } else {
-                currentUrl.searchParams.delete('search');
-            }
-            
-            window.location.href = currentUrl.toString();
-        });
+        if (searchValue) {
+            currentUrl.searchParams.set('search', searchValue);
+        } else {
+            currentUrl.searchParams.delete('search');
+        }
         
-        // Also submit on Enter key
-        searchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                searchButton.click();
-            }
-        });
+        window.location.href = currentUrl.toString();
+    });
+    
+    // Also submit on Enter key
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            searchButton.click();
+        }
+    });
     }
     
     // Function to create the rejection reasons modal

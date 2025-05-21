@@ -1,0 +1,30 @@
+{% extends 'core/base_tailwind.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Jobsy - ვაკანსიები" %}{% endblock %}
+
+{% block extra_head %}
+{% include 'core/components/job_list/job_list_styles_tailwind.html' %}
+{% endblock %}
+
+{% block hero_section %}
+{% include 'core/components/job_list/hero_section_tailwind.html' %}
+{% endblock %}
+
+{% block content %}
+<!-- Content wrapper with increased width -->
+<div class="w-[130%] max-w-7xl mx-auto relative left-1/2 -translate-x-1/2">
+    {% include 'core/components/job_list/filters_section_tailwind.html' %}
+    {% include 'core/components/job_list/job_cards_tailwind.html' %}
+    {% include 'core/components/job_list/pagination_tailwind.html' %}
+</div>
+{% endblock %}
+
+{% block bottom_section %}
+{% include 'core/components/job_list/employer_cta_tailwind.html' %}
+{% endblock %}
+
+{% block extra_js %}
+{% include 'core/components/job_list/job_list_js_tailwind.html' %}
+{% endblock %} 

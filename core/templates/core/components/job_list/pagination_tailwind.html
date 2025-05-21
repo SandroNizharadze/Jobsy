@@ -1,0 +1,63 @@
+{% load i18n %}
+
+<!-- Pagination (only shown on main page) -->
+{% if not show_filters and jobs.paginator.num_pages > 1 %}
+<div class="flex justify-center mt-12">
+  <nav aria-label="Page navigation">
+    <ul class="flex space-x-1">
+      {% if jobs.has_previous %}
+      <li>
+        <a class="pagination-link flex items-center justify-center w-10 h-10 border border-gray-300 rounded-md text-gray-600 hover:bg-gray-100" 
+           href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+           aria-label="First">
+          <span aria-hidden="true">&laquo;&laquo;</span>
+        </a>
+      </li>
+      <li>
+        <a class="pagination-link flex items-center justify-center w-10 h-10 border border-gray-300 rounded-md text-gray-600 hover:bg-gray-100" 
+           href="?page={{ jobs.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+           aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      {% endif %}
+      
+      {% for num in jobs.paginator.page_range %}
+        {% if jobs.number == num %}
+        <li>
+          <a class="flex items-center justify-center w-10 h-10 border border-blue-600 bg-blue-600 text-white rounded-md" 
+             href="#" 
+             aria-current="page">
+            {{ num }}
+          </a>
+        </li>
+        {% elif num > jobs.number|add:'-3' and num < jobs.number|add:'3' %}
+        <li>
+          <a class="pagination-link flex items-center justify-center w-10 h-10 border border-gray-300 rounded-md text-gray-600 hover:bg-gray-100" 
+             href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+            {{ num }}
+          </a>
+        </li>
+        {% endif %}
+      {% endfor %}
+      
+      {% if jobs.has_next %}
+      <li>
+        <a class="pagination-link flex items-center justify-center w-10 h-10 border border-gray-300 rounded-md text-gray-600 hover:bg-gray-100" 
+           href="?page={{ jobs.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+           aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+      <li>
+        <a class="pagination-link flex items-center justify-center w-10 h-10 border border-gray-300 rounded-md text-gray-600 hover:bg-gray-100" 
+           href="?page={{ jobs.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+           aria-label="Last">
+          <span aria-hidden="true">&raquo;&raquo;</span>
+        </a>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+</div>
+{% endif %} 

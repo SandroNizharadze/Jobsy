@@ -1,0 +1,285 @@
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Check if URL has show_filters parameter and filters should be visible
+  if (window.location.href.includes('show_filters=1') && window.location.hash === '#filters') {
+    const filtersSection = document.getElementById('filters');
+    if (filtersSection) {
+      filtersSection.classList.remove('hidden');
+    }
+  }
+
+  // Salary slider
+  const salarySlider = document.getElementById('salary-slider');
+  const salaryValue = document.getElementById('salary-value');
+  
+  if (salarySlider && salaryValue) {
+    // Update display value while sliding
+    salarySlider.addEventListener('input', function() {
+      salaryValue.textContent = '₾ ' + salarySlider.value;
+    });
+    
+    // Filter after slider stops (when user releases mouse)
+    salarySlider.addEventListener('change', function() {
+      applyFiltersWithAjax();
+    });
+  }
+  
+  // Auto-submit on select changes
+  const filterSelects = document.querySelectorAll('select.filter-auto-submit');
+  filterSelects.forEach(function(select) {
+    select.addEventListener('change', function() {
+      applyFiltersWithAjax();
+    });
+  });
+  
+  // Auto-submit on text input (with debounce)
+  const searchInput = document.querySelector('input[name="search"]');
+  if (searchInput) {
+    let searchTimeout;
+    searchInput.addEventListener('input', function() {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(function() {
+        applyFiltersWithAjax();
+      }, 500); // Wait 500ms after user stops typing
+    });
+  }
+  
+  // Auto-submit on checkbox changes
+  const filterCheckboxes = document.querySelectorAll('.filter-auto-submit[type="checkbox"]');
+  filterCheckboxes.forEach(function(checkbox) {
+    checkbox.addEventListener('change', function() {
+      applyFiltersWithAjax();
+    });
+  });
+  
+  // Reset filters button
+  const resetFiltersBtn = document.getElementById('reset-filters');
+  if (resetFiltersBtn) {
+    resetFiltersBtn.addEventListener('click', function() {
+      // Reset all form inputs
+      const form = document.getElementById('filter-form');
+      if (form) {
+        // Reset text inputs and selects
+        form.querySelectorAll('input[type="text"], select').forEach(function(input) {
+          input.value = '';
+        });
+        
+        // Reset checkboxes
+        form.querySelectorAll('input[type="checkbox"]').forEach(function(checkbox) {
+          checkbox.checked = false;
+        });
+        
+        // Reset range slider
+        const salarySlider = form.querySelector('input[type="range"]');
+        if (salarySlider) {
+          salarySlider.value = 0;
+          const salaryValue = document.getElementById('salary-value');
+          if (salaryValue) {
+            salaryValue.textContent = '₾ 0';
+          }
+        }
+        
+        // Apply the reset filters
+        applyFiltersWithAjax();
+      }
+    });
+  }
+  
+  // Variables to track AJAX state
+  let currentRequest = null;
+  
+  // AJAX-based filtering to avoid page refreshes
+  function applyFiltersWithAjax() {
+    const form = document.getElementById('filter-form');
+    if (!form) return;
+    
+    // Cancel any in-progress request
+    if (currentRequest) {
+      currentRequest.abort();
+    }
+    
+    // Create form data object
+    const formData = new FormData(form);
+    const searchParams = new URLSearchParams();
+    
+    // Add all form values to search params
+    for (const [key, value] of formData.entries()) {
+      // Skip empty values
+      if (value !== '' && key !== 'job_preferences') {
+        searchParams.append(key, value);
+      }
+    }
+    
+    // Handle job preferences checkboxes (combine them)
+    const checkedPreferences = [];
+    form.querySelectorAll('input[name="job_preferences"]:checked').forEach(function(checkbox) {
+      checkedPreferences.push(checkbox.value);
+    });
+    
+    if (checkedPreferences.length > 0) {
+      searchParams.append('job_preferences', checkedPreferences.join(','));
+    }
+    
+    // Ensure the filters stay visible
+    searchParams.append('show_filters', '1');
+    searchParams.append('ajax', '1'); // Add indicator for AJAX request
+    
+    // Show a subtle loading indicator
+    const contentContainer = document.querySelector('.px-6');
+    if (contentContainer) {
+      contentContainer.style.opacity = '0.6';
+      contentContainer.style.transition = 'opacity 0.2s';
+    }
+    
+    // Update URL without refreshing the page (for bookmarking and sharing)
+    const newUrl = window.location.pathname + '?' + searchParams.toString() + (window.location.hash || '');
+    window.history.pushState({ path: newUrl }, '', newUrl);
+    
+    // Make AJAX request
+    currentRequest = new XMLHttpRequest();
+    currentRequest.open('GET', '{% url "job_list" %}?' + searchParams.toString(), true);
+    
+    currentRequest.onload = function() {
+      if (this.status >= 200 && this.status < 400) {
+        // Success!
+        const response = this.responseText;
+        
+        // Parse the HTML response
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(response, 'text/html');
+        
+        // Update the job count in the heading
+        updateJobCount(doc);
+        
+        // Update the active filters display
+        updateActiveFilters(doc);
+        
+        // Replace the entire job listings container with the new content
+        replaceJobListings(doc, contentContainer);
+            
+        // Update pagination if it exists
+        updatePagination(doc);
+                    
+        // Reattach event listeners for filter removal links
+        attachFilterRemoveListeners();
+        
+        currentRequest = null;
+      } else {
+        // Error handler
+        console.error('Server returned an error');
+        if (contentContainer) {
+          contentContainer.style.opacity = '1';
+        }
+        currentRequest = null;
+      }
+    };
+    
+    currentRequest.onerror = function() {
+      // Connection error
+      console.error('Connection error');
+      if (contentContainer) {
+        contentContainer.style.opacity = '1';
+      }
+      currentRequest = null;
+    };
+    
+    currentRequest.send();
+  }
+  
+  // Function to update job count
+  function updateJobCount(doc) {
+    const resultCount = doc.querySelector('h2 span');
+    if (resultCount) {
+      const currentHeading = document.querySelector('h2');
+      if (currentHeading) {
+        const currentSpan = currentHeading.querySelector('span');
+        if (currentSpan) {
+          currentSpan.textContent = resultCount.textContent;
+        } else {
+          const newSpan = document.createElement('span');
+          newSpan.textContent = resultCount.textContent;
+          newSpan.className = 'text-sm font-normal';
+          currentHeading.appendChild(newSpan);
+        }
+      }
+    }
+  }
+  
+  // Function to update active filters display
+  function updateActiveFilters(doc) {
+    const newActiveFilters = doc.querySelector('.flex.flex-wrap.gap-2');
+    const currentActiveFilters = document.querySelector('.flex.flex-wrap.gap-2');
+    
+    if (newActiveFilters && currentActiveFilters) {
+      currentActiveFilters.innerHTML = newActiveFilters.innerHTML;
+    } else if (newActiveFilters) {
+      // If active filters don't exist in current page but exist in response
+      const filtersContainer = document.querySelector('.flex.justify-between.items-center.mb-6');
+      if (filtersContainer) {
+        const newActiveFiltersElement = document.createElement('div');
+        newActiveFiltersElement.className = 'flex flex-wrap gap-2';
+        newActiveFiltersElement.innerHTML = newActiveFilters.innerHTML;
+        filtersContainer.appendChild(newActiveFiltersElement);
+      }
+    } else if (currentActiveFilters && !newActiveFilters) {
+      // Remove active filters if they no longer exist in the response
+      currentActiveFilters.remove();
+    }
+  }
+  
+  // Function to replace job listings
+  function replaceJobListings(doc, contentContainer) {
+    const newContentContainer = doc.querySelector('.px-6');
+    
+    if (newContentContainer && contentContainer) {
+      // Replace the entire content container with animation
+      contentContainer.innerHTML = newContentContainer.innerHTML;
+      
+      // Restore opacity with a slight delay for smooth transition
+      setTimeout(function() {
+        contentContainer.style.opacity = '1';
+      }, 100);
+      
+      // Reattach event listeners to any new elements
+      reattachEventListeners();
+    }
+  }
+  
+  // Function to update pagination
+  function updatePagination(doc) {
+    const newPagination = doc.querySelector('.flex.justify-center.mt-12');
+    const currentPagination = document.querySelector('.flex.justify-center.mt-12');
+    
+    if (newPagination && currentPagination) {
+      currentPagination.innerHTML = newPagination.innerHTML;
+    } else if (newPagination) {
+      // If pagination doesn't exist but should be added
+      const contentParent = document.querySelector('.px-6').parentElement;
+      contentParent.appendChild(newPagination.cloneNode(true));
+    } else if (currentPagination) {
+      // If pagination exists but should be removed
+      currentPagination.remove();
+    }
+  }
+  
+  // Function to reattach event listeners after DOM updates
+  function reattachEventListeners() {
+    // Add hover effects to job cards if needed
+    // (Note: We're using Tailwind hover classes instead of JS for most hover effects)
+  }
+  
+  // Function to attach event listeners to filter removal links
+  function attachFilterRemoveListeners() {
+    const filterRemoveLinks = document.querySelectorAll('.filter-remove-link');
+    filterRemoveLinks.forEach(function(link) {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = this.getAttribute('href');
+      });
+    });
+  }
+  
+  // Initial attachment of filter remove listeners
+  attachFilterRemoveListeners();
+});
+</script> 

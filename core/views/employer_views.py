@@ -78,7 +78,7 @@ def employer_home(request):
         'all_jobs': all_jobs,
         'recent_applicants': recent_applicants,
     }
-    return render(request, 'core/employer_dashboard_tailwind.html', context)
+    return render(request, 'core/employer_home_tailwind.html', context)
 
 @login_required
 @user_passes_test(is_employer)
@@ -346,7 +346,7 @@ def update_application_status(request, application_id):
         return JsonResponse({'status': 'success'})
     
     # Redirect back to the applications page
-    return redirect('job_applications', job_id=application.job.id)
+    return redirect('job_applications', job_id=application.job.id) 
 
 @login_required
 @user_passes_test(is_employer)
@@ -377,7 +377,7 @@ def get_job_details(request, job_id):
         'premium_level': job.premium_level,
     }
     
-    return JsonResponse(job_data)
+    return JsonResponse(job_data) 
 
 def company_profile(request, employer_id):
     """

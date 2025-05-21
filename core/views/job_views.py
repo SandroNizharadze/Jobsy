@@ -164,7 +164,7 @@ def job_list(request):
     }
     
     # Return the appropriate template based on the request type
-    template = 'core/job_list.html'
+    template = 'core/job_list_tailwind.html'
     
     return render(request, template, context)
 
@@ -196,7 +196,7 @@ def job_detail(request, job_id):
         'is_saved': is_saved,
         'is_expired': is_expired,
     }
-    return render(request, 'core/job_detail.html', context)
+    return render(request, 'core/job_detail_tailwind.html', context)
 
 def apply_job(request, job_id):
     """

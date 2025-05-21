@@ -9,6 +9,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Global icon sizing fixes */
+        .fas, .far, .fab, .fa {
+            font-size: 1em;
+            line-height: inherit;
+            vertical-align: middle;
+        }
+        
+        /* Fix for specific icon areas */
+        button .fas, button .far, 
+        a .fas, a .far, 
+        .alert .fas, .alert .far {
+            font-size: 0.875em;
+        }
+    </style>
     {% block extra_head %}{% endblock %}
 </head>
 

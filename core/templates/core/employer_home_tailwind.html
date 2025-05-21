@@ -1,0 +1,284 @@
+{% extends 'core/base_tailwind.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Employer Home" %} | Jobsy{% endblock %}
+
+{% block content %}
+<div class="container mx-auto py-10 px-4">
+  <h1 class="text-3xl font-bold mb-6">
+    {% blocktrans %}Welcome, {{ employer_profile.company_name|default:employer_profile.user_profile.user.first_name }}{% endblocktrans %}
+  </h1>
+  
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <!-- Stats Cards -->
+    <div>
+      <div class="bg-white rounded-xl shadow-sm p-6 text-center h-full">
+        <h5 class="text-gray-700 font-medium mb-2">{% trans "Active Jobs" %}</h5>
+        <p class="text-4xl font-bold">{{ active_jobs }}</p>
+      </div>
+    </div>
+    
+    <div>
+      <div class="bg-white rounded-xl shadow-sm p-6 text-center h-full">
+        <h5 class="text-gray-700 font-medium mb-2">{% trans "Total Jobs" %}</h5>
+        <p class="text-4xl font-bold">{{ total_jobs }}</p>
+      </div>
+    </div>
+    
+    <div>
+      <div class="bg-white rounded-xl shadow-sm p-6 text-center h-full">
+        <h5 class="text-gray-700 font-medium mb-2">{% trans "Total Applicants" %}</h5>
+        <p class="text-4xl font-bold">{{ total_applicants }}</p>
+      </div>
+    </div>
+    
+    <div>
+      <div class="bg-white rounded-xl shadow-sm p-6 text-center h-full">
+        <h5 class="text-gray-700 font-medium mb-2">{% trans "Unread Applications" %}</h5>
+        <p class="text-4xl font-bold">{{ unread_applicants }}</p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Job Listings -->
+  <div class="bg-white rounded-xl shadow-md overflow-hidden mb-8">
+    <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+      <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+        <svg class="w-5 h-5 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+        </svg>
+        {% trans "My Job Listings" %}
+      </h2>
+    </div>
+    
+    <div class="p-6">
+      {% if all_jobs %}
+        <div class="space-y-4">
+          {% for job in all_jobs %}
+            <div class="border border-gray-200 rounded-lg p-4 {% if job.status == 'approved' %}border-green-200 bg-green-50{% elif job.status == 'pending_review' %}border-yellow-200 bg-yellow-50{% elif job.status == 'rejected' %}border-red-200 bg-red-50{% endif %}">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h3 class="font-medium text-gray-900">{{ job.title }}</h3>
+                  <div class="flex flex-wrap items-center mt-2 text-sm text-gray-600">
+                    {% if job.location %}
+                      <span class="flex items-center mr-4 mb-2">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        {{ job.location }}
+                      </span>
+                    {% endif %}
+                    <span class="flex items-center mb-2">
+                      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      {{ job.posted_at|date:"M d, Y" }}
+                    </span>
+                  </div>
+                </div>
+                
+                <div class="flex flex-col items-end">
+                  <!-- Status Badge -->
+                  {% if job.status == 'approved' %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      {% trans "Active" %}
+                    </span>
+                  {% elif job.status == 'pending_review' %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                      {% trans "Pending Review" %}
+                    </span>
+                  {% elif job.status == 'rejected' %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                      {% trans "Rejected" %}
+                    </span>
+                  {% endif %}
+                  
+                  <!-- Premium Badge -->
+                  {% if job.premium_level == 'premium' %}
+                    <span class="mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      Premium
+                    </span>
+                  {% elif job.premium_level == 'premium_plus' %}
+                    <span class="mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                      Premium+
+                    </span>
+                  {% endif %}
+                  
+                  <!-- Applications Count -->
+                  {% if job.unread_applications_count > 0 %}
+                    <span class="mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                      {{ job.unread_applications_count }} {% trans "New" %}
+                    </span>
+                  {% endif %}
+                </div>
+              </div>
+              
+              <div class="mt-4 flex flex-wrap gap-2">
+                <a href="{% url 'job_detail' job.id %}" class="inline-flex items-center px-3 py-1 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                  </svg>
+                  {% trans "View" %}
+                </a>
+                
+                <a href="{% url 'job_applications' job.id %}" class="inline-flex items-center px-3 py-1 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                  </svg>
+                  {% trans "Applicants" %}
+                </a>
+                
+                <a href="{% url 'edit_job' job.id %}" class="inline-flex items-center px-3 py-1 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                  </svg>
+                  {% trans "Edit" %}
+                </a>
+                
+                <form method="post" action="{% url 'delete_job' job.id %}" class="inline" onsubmit="return confirm('{% trans "Are you sure you want to delete this job?" %}');">
+                  {% csrf_token %}
+                  <button type="submit" class="inline-flex items-center px-3 py-1 border border-gray-300 text-xs font-medium rounded-md text-red-700 bg-white hover:bg-red-50">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                    {% trans "Delete" %}
+                  </button>
+                </form>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-center py-8">
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">{% trans "No jobs found" %}</h3>
+          <p class="mt-1 text-sm text-gray-500">{% trans "Get started by creating a new job" %}</p>
+          <div class="mt-6">
+            <a href="{% url 'post_job' %}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+              {% trans "Add Job" %}
+            </a>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  
+  <!-- Recent Applications -->
+  <div class="bg-white rounded-xl shadow-md overflow-hidden">
+    <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+      <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+        <svg class="w-5 h-5 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+        </svg>
+        {% trans "Recent Applications" %}
+      </h2>
+    </div>
+    
+    <div class="p-6">
+      {% if recent_applicants %}
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {% trans "Applicant" %}
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {% trans "Job" %}
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {% trans "Date" %}
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {% trans "Status" %}
+                </th>
+                <th scope="col" class="relative px-6 py-3">
+                  <span class="sr-only">{% trans "View" %}</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              {% for application in recent_applicants %}
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="flex-shrink-0 h-10 w-10">
+                        {% if application.user and application.user.userprofile.profile_picture %}
+                          <img class="h-10 w-10 rounded-full" src="{{ application.user.userprofile.profile_picture.url }}" alt="">
+                        {% else %}
+                          <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                          </div>
+                        {% endif %}
+                      </div>
+                      <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900">
+                          {% if application.user %}
+                            {{ application.user.get_full_name|default:application.user.username }}
+                          {% else %}
+                            {{ application.guest_name }}
+                          {% endif %}
+                        </div>
+                        <div class="text-sm text-gray-500">
+                          {% if application.user %}
+                            {{ application.user.email }}
+                          {% else %}
+                            {{ application.guest_email }}
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">{{ application.job.title }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">{{ application.applied_at|date:"M d, Y" }}</div>
+                    <div class="text-sm text-gray-500">{{ application.applied_at|time:"H:i" }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                      {% if application.status == 'განხილვის_პროცესში' %}bg-yellow-100 text-yellow-800
+                      {% elif application.status == 'გასაუბრება' %}bg-green-100 text-green-800
+                      {% elif application.status == 'რეზერვი' %}bg-red-100 text-red-800
+                      {% else %}bg-gray-100 text-gray-800{% endif %}">
+                      {{ application.get_status_display }}
+                    </span>
+                    {% if not application.is_read %}
+                      <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                        {% trans "New" %}
+                      </span>
+                    {% endif %}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <a href="{% url 'job_applications' application.job.id %}" class="text-blue-600 hover:text-blue-900">
+                      {% trans "View" %}
+                    </a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="text-center py-8">
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">{% trans "No applications yet" %}</h3>
+          <p class="mt-1 text-sm text-gray-500">{% trans "Once you receive applications, they will appear here" %}</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %} 
