@@ -1,0 +1,215 @@
+{% extends 'core/base_tailwind.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Application Details" %} | {{ application.user.get_full_name }} | Jobsy{% endblock %}
+
+{% block content %}
+<div class="container mx-auto py-8 px-4">
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">{% trans "Application Details" %}</h1>
+        <p class="text-sm text-gray-600">{{ job.title }} - {{ job.company }}</p>
+      </div>
+      <a href="{% url 'job_applications' job.id %}" class="text-blue-600 hover:text-blue-800 flex items-center">
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        {% trans "Back to Applications" %}
+      </a>
+    </div>
+  </div>
+
+  <!-- Applicant Information -->
+  <div class="bg-white rounded-xl shadow-sm mb-8">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h2 class="text-lg font-semibold text-gray-900">{% trans "Applicant Information" %}</h2>
+    </div>
+    <div class="p-6">
+      <div class="flex items-start">
+        <div class="flex-shrink-0">
+          {% if application.user.userprofile.profile_picture %}
+            <img class="h-16 w-16 rounded-full object-cover" 
+                 src="{{ application.user.userprofile.profile_picture.url }}" 
+                 alt="{{ application.user.get_full_name }}">
+          {% else %}
+            <div class="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center">
+              <svg class="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
+            </div>
+          {% endif %}
+        </div>
+        <div class="ml-6">
+          <h3 class="text-lg font-medium text-gray-900">{{ application.user.get_full_name }}</h3>
+          <p class="text-gray-600">{{ application.user.email }}</p>
+          <p class="text-sm text-gray-500 mt-1">{% trans "Applied on" %} {{ application.applied_at|date:"M d, Y" }} at {{ application.applied_at|time:"H:i" }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Details -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <!-- Left Column -->
+    <div>
+      <!-- Status -->
+      <div class="bg-white rounded-xl shadow-sm mb-8">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-lg font-semibold text-gray-900">{% trans "Application Status" %}</h2>
+        </div>
+        <div class="p-6">
+          <select class="application-status-select w-full rounded-lg border-gray-300 text-sm
+            {% if application.status == 'განხილვის_პროცესში' %}bg-blue-100 text-blue-800
+            {% elif application.status == 'გასაუბრება' %}bg-green-100 text-green-800
+            {% elif application.status == 'რეზერვი' %}bg-yellow-100 text-yellow-800{% endif %}"
+            data-application-id="{{ application.id }}">
+            <option value="განხილვის_პროცესში" {% if application.status == 'განხილვის_პროცესში' %}selected{% endif %}>
+              {% trans "განხილვის პროცესში" %}
+            </option>
+            <option value="გასაუბრება" {% if application.status == 'გასაუბრება' %}selected{% endif %}>
+              {% trans "გასაუბრება" %}
+            </option>
+            <option value="რეზერვი" {% if application.status == 'რეზერვი' %}selected{% endif %}>
+              {% trans "რეზერვი" %}
+            </option>
+          </select>
+          
+          <!-- Status Explanation -->
+          <div class="mt-4 text-sm">
+            {% if application.status == 'განხილვის_პროცესში' %}
+              <p class="text-blue-700">{% trans "ნიშნავს რომ კანდიდატურა ჯერ არ განგიხილავთ" %}</p>
+            {% elif application.status == 'გასაუბრება' %}
+              <p class="text-green-700">{% trans "ნიშნავს რომ განიხილეთ კანდიდატურა, თვლით რომ შეესაბამება პოზიციას და დაუკავშირდებით გასაუბრებაზე დასაბარებლად" %}</p>
+            {% elif application.status == 'რეზერვი' %}
+              <p class="text-yellow-700">{% trans "ნიშნავს, რომ განიხილეთ კანდიდატურა, თვლით რომ არ შეესაბამება პოზიციას და ამ ეტაპზე ვერ აიყვანთ, თუმცა მისი სივი შეინახება ბაზაში მომავალში დაინტერესების შემთვევაში დასაკონტაქტებლად" %}</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Resume -->
+      <div class="bg-white rounded-xl shadow-sm">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-lg font-semibold text-gray-900">{% trans "Resume" %}</h2>
+        </div>
+        <div class="p-6">
+          {% if application.user %}
+            <a href="{% url 'view_user_cv' application.user.id %}" 
+               class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+               target="_blank">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+              </svg>
+              {% trans "View Resume" %}
+            </a>
+            <a href="{% url 'view_user_cv' application.user.id %}" 
+               class="ml-3 inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+               download>
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+              </svg>
+              {% trans "Download" %}
+            </a>
+          {% else %}
+            <a href="{{ application.resume.url }}" 
+               class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+               target="_blank">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+              </svg>
+              {% trans "View Resume" %}
+            </a>
+            <a href="{{ application.resume.url }}" 
+               class="ml-3 inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+               download>
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+              </svg>
+              {% trans "Download" %}
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column -->
+    <div>
+      <!-- Cover Letter -->
+      <div class="bg-white rounded-xl shadow-sm">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-lg font-semibold text-gray-900">{% trans "Cover Letter" %}</h2>
+        </div>
+        <div class="p-6">
+          <div class="prose max-w-none">
+            {{ application.cover_letter|linebreaks }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Status select styling and functionality
+    const statusSelect = document.querySelector('.application-status-select');
+    if (statusSelect) {
+      statusSelect.addEventListener('change', function() {
+        const status = this.value;
+        const applicationId = this.dataset.applicationId;
+        
+        // Update styling
+        this.className = 'application-status-select w-full rounded-lg border-gray-300 text-sm ';
+        if (status === 'განხილვის_პროცესში') {
+          this.classList.add('bg-blue-100', 'text-blue-800');
+        } else if (status === 'გასაუბრება') {
+          this.classList.add('bg-green-100', 'text-green-800');
+        } else if (status === 'რეზერვი') {
+          this.classList.add('bg-yellow-100', 'text-yellow-800');
+        }
+        
+        // Send status update
+        fetch(`/employer/applications/${applicationId}/update-status/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+          },
+          body: `status=${status}`,
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Update the status explanation
+            const explanationDiv = document.querySelector('.status-explanation');
+            if (explanationDiv) {
+              let explanation = '';
+              if (status === 'განხილვის_პროცესში') {
+                explanation = '{% trans "ნიშნავს რომ კანდიდატურა ჯერ არ განგიხილავთ" %}';
+                explanationDiv.className = 'text-blue-700';
+              } else if (status === 'გასაუბრება') {
+                explanation = '{% trans "ნიშნავს რომ განიხილეთ კანდიდატურა, თვლით რომ შეესაბამება პოზიციას და დაუკავშირდებით გასაუბრებაზე დასაბარებლად" %}';
+                explanationDiv.className = 'text-green-700';
+              } else if (status === 'რეზერვი') {
+                explanation = '{% trans "ნიშნავს, რომ განიხილეთ კანდიდატურა, თვლით რომ არ შეესაბამება პოზიციას და ამ ეტაპზე ვერ აიყვანთ, თუმცა მისი სივი შეინახება ბაზაში მომავალში დაინტერესების შემთვევაში დასაკონტაქტებლად" %}';
+                explanationDiv.className = 'text-yellow-700';
+              }
+              explanationDiv.textContent = explanation;
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+      });
+    }
+  });
+</script>
+{% endblock %}
+{% endblock %} 

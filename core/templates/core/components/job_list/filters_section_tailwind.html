@@ -2,7 +2,7 @@
 {% load core_extras %}
 
 <!-- Filtering Section -->
-<div id="filters" class="bg-amber-100 rounded-2xl shadow-sm mb-6 {% if not request.GET.show_filters %}hidden{% endif %} scroll-mt-24">
+<div id="filters" class="bg-amber-200 rounded-2xl shadow-sm mb-6 {% if not request.GET.show_filters %}hidden{% endif %} scroll-mt-24">
     <div class="p-6">
         <form method="get" action="{% url 'job_list' %}" id="filter-form">
             <input type="hidden" name="show_filters" value="1">
@@ -137,7 +137,7 @@
     <div class="flex flex-wrap items-center gap-2">
         {% if not request.GET.show_filters %}
         <a href="{% url 'job_list' %}?show_filters=1#filters" 
-           class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+           class="inline-flex items-center px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-700 transition-colors">
             <i class="fas fa-filter mr-2"></i>{% trans "ფილტრები" %}
         </a>
         {% endif %}

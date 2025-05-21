@@ -3,6 +3,7 @@ Legacy module that re-exports view functions from modular files.
 This maintains backward compatibility while transitioning to a modular structure.
 """
 
+from django.shortcuts import redirect
 from .auth_views import login_view, logout_view, register, is_employer
 from .job_views import job_list, job_detail, apply_job, remove_from_query_string
 from .employer_views import (
@@ -17,8 +18,8 @@ from .admin_views import create_admin, assign_employer, is_admin
 # Re-export utility functions for backward compatibility
 def home_redirect(request):
     """Redirect to appropriate home page based on user role"""
-    if request.user.is_authenticated and is_employer(request.user):
-        return redirect('employer_home')
+    if request.user.is_authenticated:
+        return redirect('profile')
     return redirect('job_list')
 
 # Import required modules to support the above functions

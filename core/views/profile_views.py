@@ -38,51 +38,39 @@ def profile(request):
     # Initialize form
     form = UserProfileForm(instance=user_profile)
     
-    # Handle profile picture upload
-    if request.method == 'POST' and request.POST.get('form_type') == 'user_profile':
-        form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
-        if form.is_valid():
-            try:
-                # Handle profile picture upload
-                if 'profile_picture' in request.FILES:
-                    logger.info("Processing new profile picture")
-                    
-                    # Special handling for S3 storage
-                    if hasattr(settings, 'USE_S3') and settings.USE_S3:
-                        logger.info("Processing profile picture with S3 storage")
-                        profile_picture = request.FILES['profile_picture']
-                        
-                        # Use PublicMediaStorage for profile pictures
-                        storage = PublicMediaStorage()
-                        file_path = f"profile_pictures/{profile_picture.name}"
-                        
-                        # Save the file to S3
-                        storage.save(file_path, profile_picture)
-                        
-                        # Update the model with the file path
-                        user_profile.profile_picture.name = file_path
-                    else:
-                        # For non-S3 storage
-                        user_profile.profile_picture = request.FILES['profile_picture']
-                
-                # Save the updated profile
-                user_profile.save()
-                
-                # Return success message and redirect
+    # Handle form submission
+    if request.method == 'POST':
+        form_type = request.POST.get('form_type')
+        
+        if form_type == 'user_profile':
+            form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
+            if form.is_valid():
+                form.save()
+                if is_ajax:
+                    return JsonResponse({'success': True})
                 messages.success(request, "Profile updated successfully!")
-                return redirect('profile')
-            except Exception as e:
-                logger.error(f"Error updating profile: {str(e)}")
-                messages.error(request, f"Error updating profile: {str(e)}")
+                return redirect('edit_profile')
+        
+        elif form_type == 'employer_form' and user_profile.role == 'employer':
+            employer_form = EmployerProfileForm(request.POST, request.FILES, instance=user_profile.employer_profile)
+            if employer_form.is_valid():
+                employer_form.save()
+                messages.success(request, "Company profile updated successfully!")
+                return redirect('edit_profile')
     
-    # Get filter parameters
+    # Get filters from query params
     name_filter = request.GET.get('name', '')
     status_filter = request.GET.get('status', '')
     tab = request.GET.get('tab', 'profile')
     template_param = request.GET.get('template', '')
     
-    # Start with all user's applications
-    applications_query = JobApplication.objects.filter(user=request.user)
+    # Get user's applications with proper joins
+    applications = JobApplication.objects.filter(
+        user=request.user
+    ).select_related(
+        'job',
+        'job__employer'
+    ).order_by('-applied_at')
     
     # Apply name filter if provided
     if name_filter:
@@ -92,97 +80,28 @@ def profile(request):
         # Search in company name as well
         name_filter_q |= Q(job__company__icontains=name_filter)
         name_filter_q |= Q(job_company__icontains=name_filter)
-        
-        applications_query = applications_query.filter(name_filter_q)
+        applications = applications.filter(name_filter_q)
     
     # Apply status filter if provided
     if status_filter:
-        applications_query = applications_query.filter(status=status_filter)
+        applications = applications.filter(status=status_filter)
     
-    # Get applications ordered by most recent first
-    applications = applications_query.order_by('-applied_at')
-    
-    # Get user's saved jobs
-    saved_jobs = SavedJob.objects.filter(user=request.user).order_by('-saved_at')
+    # Get user's saved jobs with proper joins
+    saved_jobs = SavedJob.objects.filter(
+        user=request.user
+    ).select_related(
+        'job',
+        'job__employer'
+    ).order_by('-saved_at')
     
     # Determine if employer profile form should be shown
     is_employer = (user_profile.role == 'employer')
     employer_form = None
-    
-    # Handle employer form if needed
     if is_employer:
         try:
-            employer_profile = user_profile.employer_profile
+            employer_form = EmployerProfileForm(instance=user_profile.employer_profile)
         except EmployerProfile.DoesNotExist:
-            employer_profile = EmployerProfile(user_profile=user_profile)
-            employer_profile.save()
-        
-        if request.method == 'POST' and request.POST.get('form_type') == 'employer_form':
-            employer_form = EmployerProfileForm(request.POST, request.FILES, instance=employer_profile)
-            if employer_form.is_valid():
-                try:
-                    # Temporarily save the instance without committing
-                    updated_employer = employer_form.save(commit=False)
-                    
-                    # Handle profile picture upload for employer
-                    if 'profile_picture' in request.FILES:
-                        logger.info("Processing new profile picture for employer")
-                        
-                        # Special handling for S3 storage
-                        if hasattr(settings, 'USE_S3') and settings.USE_S3:
-                            logger.info("Processing profile picture with S3 storage")
-                            profile_picture = request.FILES['profile_picture']
-                            
-                            # Use PublicMediaStorage for profile pictures
-                            storage = PublicMediaStorage()
-                            file_path = f"profile_pictures/{profile_picture.name}"
-                            
-                            # Save the file to S3
-                            storage.save(file_path, profile_picture)
-                            
-                            # Update the model with the file path
-                            user_profile.profile_picture.name = file_path
-                        else:
-                            # For non-S3 storage
-                            user_profile.profile_picture = request.FILES['profile_picture']
-                        
-                        # Save the user profile with the new picture
-                        user_profile.save()
-                    
-                    # Handle company logo upload
-                    if 'company_logo' in request.FILES:
-                        logger.info("Processing new company logo")
-                        
-                        # Special handling for S3 storage
-                        if hasattr(settings, 'USE_S3') and settings.USE_S3:
-                            logger.info("Processing company logo with S3 storage")
-                            company_logo = request.FILES['company_logo']
-                            
-                            # Use PublicMediaStorage for company logos
-                            storage = PublicMediaStorage()
-                            file_path = f"company_logos/{company_logo.name}"
-                            
-                            # Save the file to S3
-                            storage.save(file_path, company_logo)
-                            
-                            # Update the model with the file path
-                            updated_employer.company_logo.name = file_path
-                        else:
-                            # For non-S3 storage
-                            updated_employer.company_logo = request.FILES['company_logo']
-                    
-                    # Save the employer profile
-                    updated_employer.save()
-                    
-                    # Return success message and redirect
-                    messages.success(request, "Employer profile updated successfully!")
-                    return redirect('profile')
-                except Exception as e:
-                    logger.error(f"Error updating employer profile: {str(e)}")
-                    messages.error(request, f"Error updating employer profile: {str(e)}")
-            # Don't reset the form on validation errors
-        else:
-            employer_form = EmployerProfileForm(instance=employer_profile)
+            pass
     
     context = {
         'user_profile': user_profile,
@@ -198,11 +117,11 @@ def profile(request):
     
     # Choose template based on user role or template parameter
     if template_param == 'employer':
-        template = 'core/employer_profile_tailwind.html'
+        template = 'core/employer_edit_profile_tailwind.html'
     elif template_param == 'user':
         template = 'core/user_profile_tailwind.html'
     elif is_employer:
-        template = 'core/employer_profile_tailwind.html'
+        template = 'core/employer_edit_profile_tailwind.html'
     else:
         template = 'core/user_profile_tailwind.html'
     
@@ -256,7 +175,8 @@ def remove_cv(request):
         user_profile.save(update_fields=['cv'])
         
         logger.info(f"CV successfully removed for user {request.user.username}")
-        return JsonResponse({'success': True})
+        messages.success(request, "CV removed successfully.")
+        return redirect('edit_profile')
     except Exception as e:
         logger.error(f"Error removing CV: {str(e)}")
         return JsonResponse({'success': False, 'error': str(e)}, status=400)

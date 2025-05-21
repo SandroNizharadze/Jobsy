@@ -70,17 +70,6 @@
       const tabButtons = document.querySelectorAll('[data-tab-toggle="tab"]');
       const tabPanes = document.querySelectorAll('.tab-pane');
       
-      // Hide all tab panes initially except the first one
-      tabPanes.forEach((pane, index) => {
-        if (index === 0) {
-          pane.classList.remove('hidden');
-          pane.classList.add('block');
-        } else {
-          pane.classList.add('hidden');
-          pane.classList.remove('block');
-        }
-      });
-      
       // Add click event to tab buttons
       tabButtons.forEach(button => {
         button.addEventListener('click', function() {
@@ -127,7 +116,37 @@
         jobActivityTab.click();
       }
     }
-    
+
+    // Setup sub-tabs in job activity section
+    const activityTabButtons = document.querySelectorAll('[data-activity-tab]');
+    const activityPanes = document.querySelectorAll('[data-activity-pane]');
+
+    activityTabButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const targetId = this.getAttribute('data-activity-tab');
+        
+        // Hide all activity panes
+        activityPanes.forEach(pane => {
+          pane.classList.add('hidden');
+        });
+        
+        // Show target pane
+        const targetPane = document.querySelector(`[data-activity-pane="${targetId}"]`);
+        if (targetPane) {
+          targetPane.classList.remove('hidden');
+        }
+        
+        // Update active state
+        activityTabButtons.forEach(btn => {
+          btn.classList.remove('bg-blue-500', 'text-white');
+          btn.classList.add('bg-gray-100', 'text-gray-700');
+        });
+        
+        this.classList.remove('bg-gray-100', 'text-gray-700');
+        this.classList.add('bg-blue-500', 'text-white');
+      });
+    });
+
     // Show CV upload form
     const showCvFormBtn = document.getElementById('show-cv-form-btn');
     const cvInitialBtn = document.getElementById('cv-initial-btn');

@@ -55,99 +55,119 @@
       {% if all_jobs %}
         <div class="space-y-4">
           {% for job in all_jobs %}
-            <div class="border border-gray-200 rounded-lg p-4 {% if job.status == 'approved' %}border-green-200 bg-green-50{% elif job.status == 'pending_review' %}border-yellow-200 bg-yellow-50{% elif job.status == 'rejected' %}border-red-200 bg-red-50{% endif %}">
-              <div class="flex justify-between items-start">
-                <div>
-                  <h3 class="font-medium text-gray-900">{{ job.title }}</h3>
-                  <div class="flex flex-wrap items-center mt-2 text-sm text-gray-600">
-                    {% if job.location %}
+            {% if job.status == 'approved' %}
+              <a href="{% url 'job_applications' job.id %}" class="block">
+            {% endif %}
+              <div class="border border-gray-200 rounded-lg p-4 {% if job.status == 'approved' %}border-green-200 bg-green-50 hover:bg-green-100 transition-colors{% elif job.status == 'pending_review' %}border-yellow-200 bg-yellow-50{% elif job.status == 'rejected' %}border-red-200 bg-red-50{% endif %}">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h3 class="font-medium text-gray-900">{{ job.title }}</h3>
+                      {% if job.status == 'approved' and job.new_applications_count > 0 %}
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                          {{ job.new_applications_count }} {% trans "New" %}
+                        </span>
+                      {% endif %}
+                    </div>
+                    <div class="flex flex-wrap items-center mt-2 text-sm text-gray-600">
+                      {% if job.location %}
+                        <span class="flex items-center mr-4 mb-2">
+                          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                          </svg>
+                          {{ job.location }}
+                        </span>
+                      {% endif %}
                       <span class="flex items-center mr-4 mb-2">
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
-                        {{ job.location }}
+                        {% trans "Posted:" %} {{ job.posted_at|date:"M d, Y" }}
+                      </span>
+                      <span class="flex items-center mb-2">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        {% trans "Expires:" %} {{ job.expires_at|date:"M d, Y" }}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div class="flex flex-col items-end">
+                    <!-- Status Badge -->
+                    {% if job.status == 'approved' %}
+                      <div class="flex items-center gap-3">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          {% trans "Active" %}
+                        </span>
+                        <span class="text-sm font-medium text-gray-900">
+                          {{ job.total_applications_count }} {% trans "Applicants" %}
+                        </span>
+                      </div>
+                    {% elif job.status == 'pending_review' %}
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                        {% trans "Pending Review" %}
+                      </span>
+                    {% elif job.status == 'rejected' %}
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                        {% trans "Rejected" %}
                       </span>
                     {% endif %}
-                    <span class="flex items-center mb-2">
-                      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                      </svg>
-                      {{ job.posted_at|date:"M d, Y" }}
-                    </span>
+                    
+                    <!-- Premium Badge -->
+                    {% if job.premium_level == 'premium' %}
+                      <span class="mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        Premium
+                      </span>
+                    {% elif job.premium_level == 'premium_plus' %}
+                      <span class="mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                        Premium+
+                      </span>
+                    {% endif %}
                   </div>
                 </div>
                 
-                <div class="flex flex-col items-end">
-                  <!-- Status Badge -->
+                {% if job.status == 'rejected' %}
+                  <div class="mt-3 p-3 bg-red-50 border border-red-200 rounded-md">
+                    <p class="text-sm text-red-700">
+                      <strong>{% trans "Rejection Reason:" %}</strong> {{ job.admin_feedback }}
+                    </p>
+                  </div>
+                {% endif %}
+                
+                <div class="mt-4 flex flex-wrap gap-2">
                   {% if job.status == 'approved' %}
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      {% trans "Active" %}
-                    </span>
-                  {% elif job.status == 'pending_review' %}
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                      {% trans "Pending Review" %}
-                    </span>
-                  {% elif job.status == 'rejected' %}
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                      {% trans "Rejected" %}
-                    </span>
+                    <a href="{% url 'job_detail' job.id %}" class="inline-flex items-center px-3 py-1 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                      </svg>
+                      {% trans "View" %}
+                    </a>
                   {% endif %}
                   
-                  <!-- Premium Badge -->
-                  {% if job.premium_level == 'premium' %}
-                    <span class="mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                      Premium
-                    </span>
-                  {% elif job.premium_level == 'premium_plus' %}
-                    <span class="mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                      Premium+
-                    </span>
-                  {% endif %}
+                  <a href="{% url 'edit_job' job.id %}" class="inline-flex items-center px-3 py-1 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
+                    {% trans "Edit" %}
+                  </a>
                   
-                  <!-- Applications Count -->
-                  {% if job.unread_applications_count > 0 %}
-                    <span class="mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                      {{ job.unread_applications_count }} {% trans "New" %}
-                    </span>
-                  {% endif %}
+                  <form method="post" action="{% url 'delete_job' job.id %}" class="inline" onsubmit="return confirm('{% trans "Are you sure you want to delete this job?" %}');">
+                    {% csrf_token %}
+                    <button type="submit" class="inline-flex items-center px-3 py-1 border border-gray-300 text-xs font-medium rounded-md text-red-700 bg-white hover:bg-red-50">
+                      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                      </svg>
+                      {% trans "Delete" %}
+                    </button>
+                  </form>
                 </div>
               </div>
-              
-              <div class="mt-4 flex flex-wrap gap-2">
-                <a href="{% url 'job_detail' job.id %}" class="inline-flex items-center px-3 py-1 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                  </svg>
-                  {% trans "View" %}
-                </a>
-                
-                <a href="{% url 'job_applications' job.id %}" class="inline-flex items-center px-3 py-1 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                  </svg>
-                  {% trans "Applicants" %}
-                </a>
-                
-                <a href="{% url 'edit_job' job.id %}" class="inline-flex items-center px-3 py-1 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                  </svg>
-                  {% trans "Edit" %}
-                </a>
-                
-                <form method="post" action="{% url 'delete_job' job.id %}" class="inline" onsubmit="return confirm('{% trans "Are you sure you want to delete this job?" %}');">
-                  {% csrf_token %}
-                  <button type="submit" class="inline-flex items-center px-3 py-1 border border-gray-300 text-xs font-medium rounded-md text-red-700 bg-white hover:bg-red-50">
-                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                    </svg>
-                    {% trans "Delete" %}
-                  </button>
-                </form>
-              </div>
-            </div>
+            {% if job.status == 'approved' %}
+              </a>
+            {% endif %}
           {% endfor %}
         </div>
       {% else %}

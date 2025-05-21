@@ -1,15 +1,15 @@
 {% load static %}
 {% load i18n %}
 
-<section class="relative overflow-hidden">
+<section class="bg-gray-900 pb-16 pt-24">
     <div class="container mx-auto px-4">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center min-h-[400px]">
             <div>
-                <div class="bg-amber-300 rounded-2xl p-8 md:p-10 h-full">
+                <div class="p-8 md:p-10 h-full">
                     <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-4">{% trans "ჩვენი ვაკანსიები დაგეხმარება!" %}</h1>
-                    <p class="text-xl text-white mb-6">{% trans "საუკეთესო სამსახურის მოძიებაში ჯობსის ვაკანსიები დაგეხმარება" %}</p>
+                    <p class="text-xl text-blue-100 mb-6">{% trans "საუკეთესო სამსახურის მოძიებაში ჯობსის ვაკანსიები დაგეხმარება" %}</p>
                     <a href="{% url 'job_list' %}?show_filters=1#filters" 
-                       class="inline-block bg-gray-900 hover:bg-gray-800 text-white font-semibold px-8 py-3 rounded-xl text-lg transition-colors">
+                       class="inline-block bg-amber-400 hover:bg-amber-500 text-blue-900 font-semibold px-8 py-3 rounded-xl text-lg transition-colors">
                         {% trans "ყველა ვაკანსია" %}
                     </a>
                 </div>
@@ -17,7 +17,7 @@
             <div class="hidden lg:flex justify-end items-end relative min-h-[400px]">
                 <img src="{% static 'images/hero_woman.png' %}" 
                      alt="Hero" 
-                     class="absolute bottom-0 right-0 h-auto max-h-[500px] object-contain z-10">
+                     class="absolute bottom-[-64px] right-0 h-auto max-h-[500px] object-contain z-10">
             </div>
         </div>
     </div>

@@ -158,8 +158,8 @@ def register(request):
                         'employer_form': employer_form
                     })
                 
-                messages.success(request, "Registration successful! You can now post jobs after admin approval.")
-                return redirect('employer_dashboard')
+                messages.success(request, "Registration successful! Please complete your employer profile.")
+                return redirect('profile')
             else:
                 # Handle form errors
                 logger.warning(f"Form validation errors: {form.errors} / {employer_form.errors}")

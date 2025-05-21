@@ -17,7 +17,6 @@
           </th>
           <th class="py-4 px-6 bg-blue-50 text-center border-b relative">
             <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-              <span class="bg-blue-500 text-white text-xs px-3 py-1 rounded-full font-medium">{% trans "პოპულარული" %}</span>
             </div>
             <span class="block text-lg font-bold text-gray-900">{% trans "პრემიუმი" %}</span>
             <span class="block text-2xl font-bold text-gray-900 mt-1">50₾</span>
@@ -179,31 +178,7 @@
           </td>
         </tr>
         
-        <!-- Action Row -->
-        <tr>
-          <td class="py-6 px-6"></td>
-          <td class="py-6 px-6 text-center">
-            <a href="{% url 'post_job' %}?premium_level=standard" 
-               class="inline-block w-full py-3 px-6 text-center font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors duration-200 package-select-btn" 
-               data-package="standard">
-              {% trans "აირჩიე" %}
-            </a>
-          </td>
-          <td class="py-6 px-6 text-center bg-blue-50">
-            <a href="{% url 'post_job' %}?premium_level=premium" 
-               class="inline-block w-full py-3 px-6 text-center font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-200 package-select-btn" 
-               data-package="premium">
-              {% trans "აირჩიე" %}
-            </a>
-          </td>
-          <td class="py-6 px-6 text-center bg-purple-50">
-            <a href="{% url 'post_job' %}?premium_level=premium_plus" 
-               class="inline-block w-full py-3 px-6 text-center font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors duration-200 package-select-btn" 
-               data-package="premium-plus">
-              {% trans "აირჩიე" %}
-            </a>
-          </td>
-        </tr>
+        
       </tbody>
     </table>
   </div>

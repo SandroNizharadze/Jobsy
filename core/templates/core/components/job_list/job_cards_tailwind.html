@@ -4,7 +4,7 @@
 <!-- Job listings container -->
 <div class="container mx-auto px-4 py-8">
   {% if not show_filters %}
-    <!-- Premium+ Section Header (main page only) -->
+    <!-- Premium+ Section -->
     <h3 class="my-4 pt-2 text-gray-800 font-semibold border-b border-gray-100 pb-4 mb-5">
       <div class="flex items-center">
         <span class="mr-2 flex items-center justify-center w-7 h-7 bg-purple-500 rounded-full text-white">
@@ -16,196 +16,408 @@
         პრემიუმ+ ვაკანსიები
       </div>
     </h3>
-  {% endif %}
-  
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-    {% for job in jobs %}
-      {% if job.premium_level == 'premium_plus' %}
-        <!-- Premium Plus Job Card -->
-        <a href="{% url 'job_detail' job_id=job.id %}" class="block h-full">
-          <div class="bg-amber-100 rounded-2xl border-2 border-purple-500 p-5 shadow-sm hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200 h-full flex flex-col cursor-pointer">
-            <div class="flex-1">
-              <div class="flex justify-between items-start mb-4">
-                <div>
-                  {% if job.company.logo %}
-                    <img src="{{ job.company.logo.url }}" alt="{{ job.company.company_name }}" class="w-12 h-12 object-contain rounded-md">
-                  {% else %}
-                    <div class="w-12 h-12 bg-gray-200 rounded-md flex items-center justify-center">
-                      <i class="fas fa-building text-gray-400"></i>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      {% for job in jobs %}
+        {% if job.premium_level == 'premium_plus' %}
+          <!-- Premium Plus Job Card -->
+          <a href="{% url 'job_detail' job_id=job.id %}" class="block h-full">
+            <div class="bg-amber-100 rounded-2xl border-2 border-purple-500 p-5 shadow-sm hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200 h-full flex flex-col cursor-pointer">
+              <div class="flex-1">
+                <div class="flex justify-between items-start mb-4">
+                  <div>
+                    <div class="text-sm font-medium text-gray-700">{{ job.company }}</div>
+                  </div>
+                  <div class="flex space-x-1">
+                    <span class="bg-purple-500 text-white text-xs px-2 py-1 rounded-full">Premium+</span>
+                    {% if job.remote %}
+                      <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full">{% trans "Remote" %}</span>
+                    {% endif %}
+                  </div>
+                </div>
+                
+                <h3 class="text-lg font-bold mb-3 text-purple-900">{{ job.title }}</h3>
+                
+                <div class="mb-4">
+                  <div class="flex items-center text-sm text-gray-600 mb-1">
+                    <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>
+                    <span>{{ job.location }}</span>
+                  </div>
+                  
+                  {% if job.salary_min or job.salary_max %}
+                    <div class="flex items-center text-sm text-gray-600 mb-1">
+                      <i class="fas fa-money-bill-wave mr-2 text-gray-400"></i>
+                      <span>
+                        {% if job.salary_min and job.salary_max %}
+                          {{ job.salary_min }} - {{ job.salary_max }} {{ job.get_salary_currency_display }}
+                        {% elif job.salary_min %}
+                          {% trans "From" %} {{ job.salary_min }} {{ job.get_salary_currency_display }}
+                        {% elif job.salary_max %}
+                          {% trans "Up to" %} {{ job.salary_max }} {{ job.get_salary_currency_display }}
+                        {% endif %}
+                      </span>
                     </div>
                   {% endif %}
-                </div>
-                <div class="flex space-x-1">
-                  <span class="bg-purple-500 text-white text-xs px-2 py-1 rounded-full">Premium+</span>
-                  {% if job.remote %}
-                    <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full">{% trans "Remote" %}</span>
-                  {% endif %}
+                  
+                  <div class="flex items-center text-sm text-gray-600">
+                    <i class="fas fa-briefcase mr-2 text-gray-400"></i>
+                    <span>{{ job.job_preferences }}</span>
+                  </div>
                 </div>
               </div>
               
-              <h3 class="text-lg font-bold mb-1 text-purple-900">{{ job.title }}</h3>
-              <p class="text-sm text-gray-600 mb-3">{{ job.company.company_name }}</p>
-              
-              <div class="mb-4">
-                <div class="flex items-center text-sm text-gray-600 mb-1">
-                  <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>
-                  <span>{{ job.location }}</span>
-                </div>
-                
-                {% if job.salary_min or job.salary_max %}
-                  <div class="flex items-center text-sm text-gray-600 mb-1">
-                    <i class="fas fa-money-bill-wave mr-2 text-gray-400"></i>
-                    <span>
-                      {% if job.salary_min and job.salary_max %}
-                        {{ job.salary_min }} - {{ job.salary_max }} {{ job.get_salary_currency_display }}
-                      {% elif job.salary_min %}
-                        {% trans "From" %} {{ job.salary_min }} {{ job.get_salary_currency_display }}
-                      {% elif job.salary_max %}
-                        {% trans "Up to" %} {{ job.salary_max }} {{ job.get_salary_currency_display }}
-                      {% endif %}
-                    </span>
+              <div class="mt-auto flex justify-between items-end">
+                <div class="text-xs text-gray-500">{{ job.created_at|date:"M j" }}</div>
+                {% if job.employer.company_logo %}
+                  <img src="{{ job.employer.company_logo.url }}" alt="{{ job.employer.company_name }}" class="w-12 h-12 object-cover rounded-full border-2 border-purple-200">
+                {% else %}
+                  <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center border-2 border-purple-200">
+                    <i class="fas fa-building text-gray-400"></i>
                   </div>
                 {% endif %}
-                
-                <div class="flex items-center text-sm text-gray-600">
-                  <i class="fas fa-briefcase mr-2 text-gray-400"></i>
-                  <span>{{ job.job_preferences }}</span>
-                </div>
               </div>
             </div>
-            
-            <div class="mt-auto">
-              <div class="text-xs text-gray-500">{{ job.created_at|date:"M j" }}</div>
-            </div>
-          </div>
-        </a>
-      {% elif job.premium_level == 'premium' %}
-        <!-- Premium Job Card -->
-        <a href="{% url 'job_detail' job_id=job.id %}" class="block h-full">
-          <div class="bg-white rounded-2xl border border-blue-500 p-5 shadow-sm hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200 h-full flex flex-col cursor-pointer">
-            <div class="flex-1">
-              <div class="flex justify-between items-start mb-4">
-                <div>
-                  {% if job.company.logo %}
-                    <img src="{{ job.company.logo.url }}" alt="{{ job.company.company_name }}" class="w-12 h-12 object-contain rounded-md">
-                  {% else %}
-                    <div class="w-12 h-12 bg-gray-200 rounded-md flex items-center justify-center">
-                      <i class="fas fa-building text-gray-400"></i>
-                    </div>
-                  {% endif %}
-                </div>
-                <div class="flex space-x-1">
-                  <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">Premium</span>
-                  {% if job.remote %}
-                    <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full">{% trans "Remote" %}</span>
-                  {% endif %}
-                </div>
-              </div>
-              
-              <h3 class="text-lg font-bold mb-1 text-blue-900">{{ job.title }}</h3>
-              <p class="text-sm text-gray-600 mb-3">{{ job.company.company_name }}</p>
-              
-              <div class="mb-4">
-                <div class="flex items-center text-sm text-gray-600 mb-1">
-                  <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>
-                  <span>{{ job.location }}</span>
-                </div>
-                
-                {% if job.salary_min or job.salary_max %}
-                  <div class="flex items-center text-sm text-gray-600 mb-1">
-                    <i class="fas fa-money-bill-wave mr-2 text-gray-400"></i>
-                    <span>
-                      {% if job.salary_min and job.salary_max %}
-                        {{ job.salary_min }} - {{ job.salary_max }} {{ job.get_salary_currency_display }}
-                      {% elif job.salary_min %}
-                        {% trans "From" %} {{ job.salary_min }} {{ job.get_salary_currency_display }}
-                      {% elif job.salary_max %}
-                        {% trans "Up to" %} {{ job.salary_max }} {{ job.get_salary_currency_display }}
-                      {% endif %}
-                    </span>
-                  </div>
-                {% endif %}
-                
-                <div class="flex items-center text-sm text-gray-600">
-                  <i class="fas fa-briefcase mr-2 text-gray-400"></i>
-                  <span>{{ job.job_preferences }}</span>
-                </div>
-              </div>
-            </div>
-            
-            <div class="mt-auto">
-              <div class="text-xs text-gray-500">{{ job.created_at|date:"M j" }}</div>
-            </div>
-          </div>
-        </a>
-      {% else %}
-        <!-- Standard Job Card -->
-        <a href="{% url 'job_detail' job_id=job.id %}" class="block h-full">
-          <div class="bg-white rounded-2xl border border-amber-300 p-5 shadow-sm hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200 h-full flex flex-col cursor-pointer">
-            <div class="flex-1">
-              <div class="flex justify-between items-start mb-4">
-                <div>
-                  {% if job.company.logo %}
-                    <img src="{{ job.company.logo.url }}" alt="{{ job.company.company_name }}" class="w-12 h-12 object-contain rounded-md">
-                  {% else %}
-                    <div class="w-12 h-12 bg-gray-200 rounded-md flex items-center justify-center">
-                      <i class="fas fa-building text-gray-400"></i>
-                    </div>
-                  {% endif %}
-                </div>
-                <div class="flex space-x-1">
-                  {% if job.remote %}
-                    <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full">{% trans "Remote" %}</span>
-                  {% endif %}
-                </div>
-              </div>
-              
-              <h3 class="text-lg font-bold mb-1 text-amber-900">{{ job.title }}</h3>
-              <p class="text-sm text-gray-600 mb-3">{{ job.company.company_name }}</p>
-              
-              <div class="mb-4">
-                <div class="flex items-center text-sm text-gray-600 mb-1">
-                  <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>
-                  <span>{{ job.location }}</span>
-                </div>
-                
-                {% if job.salary_min or job.salary_max %}
-                  <div class="flex items-center text-sm text-gray-600 mb-1">
-                    <i class="fas fa-money-bill-wave mr-2 text-gray-400"></i>
-                    <span>
-                      {% if job.salary_min and job.salary_max %}
-                        {{ job.salary_min }} - {{ job.salary_max }} {{ job.get_salary_currency_display }}
-                      {% elif job.salary_min %}
-                        {% trans "From" %} {{ job.salary_min }} {{ job.get_salary_currency_display }}
-                      {% elif job.salary_max %}
-                        {% trans "Up to" %} {{ job.salary_max }} {{ job.get_salary_currency_display }}
-                      {% endif %}
-                    </span>
-                  </div>
-                {% endif %}
-                
-                <div class="flex items-center text-sm text-gray-600">
-                  <i class="fas fa-briefcase mr-2 text-gray-400"></i>
-                  <span>{{ job.job_preferences }}</span>
-                </div>
-              </div>
-            </div>
-            
-            <div class="mt-auto">
-              <div class="text-xs text-gray-500">{{ job.created_at|date:"M j" }}</div>
-            </div>
-          </div>
-        </a>
-      {% endif %}
-    {% empty %}
-      <div class="col-span-full text-center py-12">
-        <div class="mx-auto max-w-md">
-          <img src="{% static 'core/images/no_results.svg' %}" alt="No results" class="w-48 h-48 mx-auto mb-4">
-          <h3 class="text-xl font-bold mb-2">{% trans "No jobs found" %}</h3>
-          <p class="text-gray-600 mb-6">{% trans "Try adjusting your search filters or check back later for new opportunities." %}</p>
-          <a href="{% url 'job_list' %}" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">{% trans "View All Jobs" %}</a>
-        </div>
+          </a>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <!-- Premium Section -->
+    <h3 class="my-4 pt-2 text-gray-800 font-semibold border-b border-gray-100 pb-4 mb-5">
+      <div class="flex items-center">
+        <span class="mr-2 flex items-center justify-center w-7 h-7 bg-blue-500 rounded-full text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M2.5.5A.5.5 0 0 1 3 0h10a.5.5 0 0 1 .5.5c0 .538-.012 1.05-.034 1.536a3 3 0 1 1-1.133 5.89c-.79 1.865-1.878 2.777-2.833 3.011v2.173l1.425.356c.194.048.377.135.537.255L13.3 15.1a.5.5 0 0 1-.3.9H3a.5.5 0 0 1-.3-.9l1.838-1.379c.16-.12.343-.207.537-.255L6.5 13.11v-2.173c-.955-.234-2.043-1.146-2.833-3.012a3 3 0 1 1-1.132-5.89A33.076 33.076 0 0 1 2.5.5zm.099 2.54a2 2 0 0 0 .72 3.935c-.333-1.05-.588-2.346-.72-3.935zm10.083 3.935a2 2 0 0 0 .72-3.935c-.133 1.59-.388 2.885-.72 3.935z"/>
+          </svg>
+        </span>
+        პრემიუმ ვაკანსიები
       </div>
-    {% endfor %}
-  </div>
+    </h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      {% for job in jobs %}
+        {% if job.premium_level == 'premium' %}
+          <!-- Premium Job Card -->
+          <a href="{% url 'job_detail' job_id=job.id %}" class="block h-full">
+            <div class="bg-white rounded-2xl border border-blue-500 p-5 shadow-sm hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200 h-full flex flex-col cursor-pointer">
+              <div class="flex-1">
+                <div class="flex justify-between items-start mb-4">
+                  <div>
+                    <div class="text-sm font-medium text-gray-700">{{ job.company }}</div>
+                  </div>
+                  <div class="flex space-x-1">
+                    <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">Premium</span>
+                    {% if job.remote %}
+                      <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full">{% trans "Remote" %}</span>
+                    {% endif %}
+                  </div>
+                </div>
+                
+                <h3 class="text-lg font-bold mb-3 text-blue-900">{{ job.title }}</h3>
+                
+                <div class="mb-4">
+                  <div class="flex items-center text-sm text-gray-600 mb-1">
+                    <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>
+                    <span>{{ job.location }}</span>
+                  </div>
+                  
+                  {% if job.salary_min or job.salary_max %}
+                    <div class="flex items-center text-sm text-gray-600 mb-1">
+                      <i class="fas fa-money-bill-wave mr-2 text-gray-400"></i>
+                      <span>
+                        {% if job.salary_min and job.salary_max %}
+                          {{ job.salary_min }} - {{ job.salary_max }} {{ job.get_salary_currency_display }}
+                        {% elif job.salary_min %}
+                          {% trans "From" %} {{ job.salary_min }} {{ job.get_salary_currency_display }}
+                        {% elif job.salary_max %}
+                          {% trans "Up to" %} {{ job.salary_max }} {{ job.get_salary_currency_display }}
+                        {% endif %}
+                      </span>
+                    </div>
+                  {% endif %}
+                  
+                  <div class="flex items-center text-sm text-gray-600">
+                    <i class="fas fa-briefcase mr-2 text-gray-400"></i>
+                    <span>{{ job.job_preferences }}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="mt-auto flex justify-between items-end">
+                <div class="text-xs text-gray-500">{{ job.created_at|date:"M j" }}</div>
+                {% if job.employer.company_logo %}
+                  <img src="{{ job.employer.company_logo.url }}" alt="{{ job.employer.company_name }}" class="w-12 h-12 object-cover rounded-full border-2 border-blue-200">
+                {% else %}
+                  <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center border-2 border-blue-200">
+                    <i class="fas fa-building text-gray-400"></i>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </a>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <!-- Standard Jobs -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {% for job in jobs %}
+        {% if job.premium_level == 'standard' or not job.premium_level %}
+          <!-- Standard Job Card -->
+          <a href="{% url 'job_detail' job_id=job.id %}" class="block h-full">
+            <div class="bg-white rounded-2xl border border-amber-300 p-5 shadow-sm hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200 h-full flex flex-col cursor-pointer">
+              <div class="flex-1">
+                <div class="flex justify-between items-start mb-4">
+                  <div>
+                    <div class="text-sm font-medium text-gray-700">{{ job.company }}</div>
+                  </div>
+                  <div class="flex space-x-1">
+                    {% if job.remote %}
+                      <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full">{% trans "Remote" %}</span>
+                    {% endif %}
+                  </div>
+                </div>
+                
+                <h3 class="text-lg font-bold mb-3 text-amber-900">{{ job.title }}</h3>
+                
+                <div class="mb-4">
+                  <div class="flex items-center text-sm text-gray-600 mb-1">
+                    <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>
+                    <span>{{ job.location }}</span>
+                  </div>
+                  
+                  {% if job.salary_min or job.salary_max %}
+                    <div class="flex items-center text-sm text-gray-600 mb-1">
+                      <i class="fas fa-money-bill-wave mr-2 text-gray-400"></i>
+                      <span>
+                        {% if job.salary_min and job.salary_max %}
+                          {{ job.salary_min }} - {{ job.salary_max }} {{ job.get_salary_currency_display }}
+                        {% elif job.salary_min %}
+                          {% trans "From" %} {{ job.salary_min }} {{ job.get_salary_currency_display }}
+                        {% elif job.salary_max %}
+                          {% trans "Up to" %} {{ job.salary_max }} {{ job.get_salary_currency_display }}
+                        {% endif %}
+                      </span>
+                    </div>
+                  {% endif %}
+                  
+                  <div class="flex items-center text-sm text-gray-600">
+                    <i class="fas fa-briefcase mr-2 text-gray-400"></i>
+                    <span>{{ job.job_preferences }}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="mt-auto flex justify-between items-end">
+                <div class="text-xs text-gray-500">{{ job.created_at|date:"M j" }}</div>
+                {% if job.employer.company_logo %}
+                  <img src="{{ job.employer.company_logo.url }}" alt="{{ job.employer.company_name }}" class="w-12 h-12 object-cover rounded-full border-2 border-amber-200">
+                {% else %}
+                  <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center border-2 border-amber-200">
+                    <i class="fas fa-building text-gray-400"></i>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </a>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% if show_filters %}
+    <!-- When filters are shown, display all jobs without sections -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {% for job in jobs %}
+        {% if job.premium_level == 'premium_plus' %}
+          <!-- Premium Plus Job Card -->
+          <a href="{% url 'job_detail' job_id=job.id %}" class="block h-full">
+            <div class="bg-amber-100 rounded-2xl border-2 border-purple-500 p-5 shadow-sm hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200 h-full flex flex-col cursor-pointer">
+              <div class="flex-1">
+                <div class="flex justify-between items-start mb-4">
+                  <div>
+                    <div class="text-sm font-medium text-gray-700">{{ job.company }}</div>
+                  </div>
+                  <div class="flex space-x-1">
+                    <span class="bg-purple-500 text-white text-xs px-2 py-1 rounded-full">Premium+</span>
+                    {% if job.remote %}
+                      <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full">{% trans "Remote" %}</span>
+                    {% endif %}
+                  </div>
+                </div>
+                
+                <h3 class="text-lg font-bold mb-3 text-purple-900">{{ job.title }}</h3>
+                
+                <div class="mb-4">
+                  <div class="flex items-center text-sm text-gray-600 mb-1">
+                    <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>
+                    <span>{{ job.location }}</span>
+                  </div>
+                  
+                  {% if job.salary_min or job.salary_max %}
+                    <div class="flex items-center text-sm text-gray-600 mb-1">
+                      <i class="fas fa-money-bill-wave mr-2 text-gray-400"></i>
+                      <span>
+                        {% if job.salary_min and job.salary_max %}
+                          {{ job.salary_min }} - {{ job.salary_max }} {{ job.get_salary_currency_display }}
+                        {% elif job.salary_min %}
+                          {% trans "From" %} {{ job.salary_min }} {{ job.get_salary_currency_display }}
+                        {% elif job.salary_max %}
+                          {% trans "Up to" %} {{ job.salary_max }} {{ job.get_salary_currency_display }}
+                        {% endif %}
+                      </span>
+                    </div>
+                  {% endif %}
+                  
+                  <div class="flex items-center text-sm text-gray-600">
+                    <i class="fas fa-briefcase mr-2 text-gray-400"></i>
+                    <span>{{ job.job_preferences }}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="mt-auto flex justify-between items-end">
+                <div class="text-xs text-gray-500">{{ job.created_at|date:"M j" }}</div>
+                {% if job.employer.company_logo %}
+                  <img src="{{ job.employer.company_logo.url }}" alt="{{ job.employer.company_name }}" class="w-12 h-12 object-cover rounded-full border-2 border-purple-200">
+                {% else %}
+                  <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center border-2 border-purple-200">
+                    <i class="fas fa-building text-gray-400"></i>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </a>
+        {% elif job.premium_level == 'premium' %}
+          <!-- Premium Job Card -->
+          <a href="{% url 'job_detail' job_id=job.id %}" class="block h-full">
+            <div class="bg-white rounded-2xl border border-blue-500 p-5 shadow-sm hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200 h-full flex flex-col cursor-pointer">
+              <div class="flex-1">
+                <div class="flex justify-between items-start mb-4">
+                  <div>
+                    <div class="text-sm font-medium text-gray-700">{{ job.company }}</div>
+                  </div>
+                  <div class="flex space-x-1">
+                    <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">Premium</span>
+                    {% if job.remote %}
+                      <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full">{% trans "Remote" %}</span>
+                    {% endif %}
+                  </div>
+                </div>
+                
+                <h3 class="text-lg font-bold mb-3 text-blue-900">{{ job.title }}</h3>
+                
+                <div class="mb-4">
+                  <div class="flex items-center text-sm text-gray-600 mb-1">
+                    <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>
+                    <span>{{ job.location }}</span>
+                  </div>
+                  
+                  {% if job.salary_min or job.salary_max %}
+                    <div class="flex items-center text-sm text-gray-600 mb-1">
+                      <i class="fas fa-money-bill-wave mr-2 text-gray-400"></i>
+                      <span>
+                        {% if job.salary_min and job.salary_max %}
+                          {{ job.salary_min }} - {{ job.salary_max }} {{ job.get_salary_currency_display }}
+                        {% elif job.salary_min %}
+                          {% trans "From" %} {{ job.salary_min }} {{ job.get_salary_currency_display }}
+                        {% elif job.salary_max %}
+                          {% trans "Up to" %} {{ job.salary_max }} {{ job.get_salary_currency_display }}
+                        {% endif %}
+                      </span>
+                    </div>
+                  {% endif %}
+                  
+                  <div class="flex items-center text-sm text-gray-600">
+                    <i class="fas fa-briefcase mr-2 text-gray-400"></i>
+                    <span>{{ job.job_preferences }}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="mt-auto flex justify-between items-end">
+                <div class="text-xs text-gray-500">{{ job.created_at|date:"M j" }}</div>
+                {% if job.employer.company_logo %}
+                  <img src="{{ job.employer.company_logo.url }}" alt="{{ job.employer.company_name }}" class="w-12 h-12 object-cover rounded-full border-2 border-blue-200">
+                {% else %}
+                  <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center border-2 border-blue-200">
+                    <i class="fas fa-building text-gray-400"></i>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </a>
+        {% else %}
+          <!-- Standard Job Card -->
+          <a href="{% url 'job_detail' job_id=job.id %}" class="block h-full">
+            <div class="bg-white rounded-2xl border border-amber-300 p-5 shadow-sm hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200 h-full flex flex-col cursor-pointer">
+              <div class="flex-1">
+                <div class="flex justify-between items-start mb-4">
+                  <div>
+                    <div class="text-sm font-medium text-gray-700">{{ job.company }}</div>
+                  </div>
+                  <div class="flex space-x-1">
+                    {% if job.remote %}
+                      <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full">{% trans "Remote" %}</span>
+                    {% endif %}
+                  </div>
+                </div>
+                
+                <h3 class="text-lg font-bold mb-3 text-amber-900">{{ job.title }}</h3>
+                
+                <div class="mb-4">
+                  <div class="flex items-center text-sm text-gray-600 mb-1">
+                    <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>
+                    <span>{{ job.location }}</span>
+                  </div>
+                  
+                  {% if job.salary_min or job.salary_max %}
+                    <div class="flex items-center text-sm text-gray-600 mb-1">
+                      <i class="fas fa-money-bill-wave mr-2 text-gray-400"></i>
+                      <span>
+                        {% if job.salary_min and job.salary_max %}
+                          {{ job.salary_min }} - {{ job.salary_max }} {{ job.get_salary_currency_display }}
+                        {% elif job.salary_min %}
+                          {% trans "From" %} {{ job.salary_min }} {{ job.get_salary_currency_display }}
+                        {% elif job.salary_max %}
+                          {% trans "Up to" %} {{ job.salary_max }} {{ job.get_salary_currency_display }}
+                        {% endif %}
+                      </span>
+                    </div>
+                  {% endif %}
+                  
+                  <div class="flex items-center text-sm text-gray-600">
+                    <i class="fas fa-briefcase mr-2 text-gray-400"></i>
+                    <span>{{ job.job_preferences }}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="mt-auto flex justify-between items-end">
+                <div class="text-xs text-gray-500">{{ job.created_at|date:"M j" }}</div>
+                {% if job.employer.company_logo %}
+                  <img src="{{ job.employer.company_logo.url }}" alt="{{ job.employer.company_name }}" class="w-12 h-12 object-cover rounded-full border-2 border-amber-200">
+                {% else %}
+                  <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center border-2 border-amber-200">
+                    <i class="fas fa-building text-gray-400"></i>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </a>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% if not jobs %}
+    <div class="col-span-full text-center py-12">
+      <div class="mx-auto max-w-md">
+        <img src="{% static 'core/images/no_results.svg' %}" alt="No results" class="w-48 h-48 mx-auto mb-4">
+        <h3 class="text-xl font-bold mb-2">{% trans "No jobs found" %}</h3>
+        <p class="text-gray-600 mb-6">{% trans "Try adjusting your search filters or check back later for new opportunities." %}</p>
+        <a href="{% url 'job_list' %}" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">{% trans "View All Jobs" %}</a>
+      </div>
+    </div>
+  {% endif %}
 </div> 

@@ -60,7 +60,7 @@ def employer_home(request):
             'applications',
             filter=Q(applications__is_read=False)
         )
-    ).order_by('status_order', '-posted_at')
+    ).select_related('employer').order_by('status_order', '-posted_at')
     
     # Recent applicants (last 5)
     recent_applicants = JobApplication.objects.filter(
@@ -89,9 +89,25 @@ def employer_dashboard(request):
     employer_profile = request.user.userprofile.employer_profile
 
     # All jobs for this employer with application counts
-    jobs = JobListing.objects.filter(employer=employer_profile).annotate(
+    jobs = JobListing.objects.filter(employer=employer_profile)
+
+    # Sort jobs by status (approved first, then pending review, then rejected)
+    all_jobs = jobs.annotate(
+        status_order=Case(
+            When(status='approved', then=Value(1)),
+            When(status='pending_review', then=Value(2)),
+            When(status='rejected', then=Value(3)),
+            default=Value(4),
+            output_field=IntegerField(),
+        ),
+        unread_applications_count=Count(
+            'applications',
+            filter=Q(applications__is_read=False)
+        ),
         applications_count=Count('applications')
-    )
+    ).select_related(
+        'employer'  # Include employer data to reduce queries
+    ).order_by('status_order', '-posted_at')
 
     # Metrics
     active_jobs = jobs.filter(status='approved').count()
@@ -111,13 +127,14 @@ def employer_dashboard(request):
     context = {
         'employer_profile': employer_profile,
         'jobs': jobs,
+        'all_jobs': all_jobs,
         'active_jobs': active_jobs,
         'total_applicants': total_applicants,
         'avg_applicants': avg_applicants,
         'jobs_expiring_soon': jobs_expiring_soon,
         'recent_applicants': recent_applicants,
     }
-    return render(request, 'core/employer_dashboard_tailwind.html', context)
+    return render(request, 'core/employer_profile_tailwind.html', context)
 
 @login_required
 @user_passes_test(is_employer)
@@ -151,7 +168,7 @@ def post_job(request):
             job.save()
             
             messages.success(request, "Job posting submitted for review!")
-            return redirect('employer_dashboard')
+            return redirect('profile')
     else:
         # Initialize form with premium level from URL
         form = JobListingForm(initial={'premium_level': premium_level})
@@ -175,7 +192,7 @@ def edit_job(request, job_id):
     
     if job.employer != employer_profile:
         messages.error(request, "You don't have permission to edit this job.")
-        return redirect('employer_dashboard')
+        return redirect('profile')
     
     if request.method == 'POST':
         form = JobListingForm(request.POST, instance=job)
@@ -195,7 +212,7 @@ def edit_job(request, job_id):
             # Save changes
             updated_job.save()
             
-            return redirect('employer_dashboard')
+            return redirect('profile')
     else:
         form = JobListingForm(instance=job)
     
@@ -219,13 +236,13 @@ def delete_job(request, job_id):
     
     if job.employer != employer_profile:
         messages.error(request, "You don't have permission to delete this job.")
-        return redirect('employer_dashboard')
+        return redirect('profile')
     
     # Delete the job
     job.delete()
     
     messages.success(request, "Job listing has been deleted.")
-    return redirect('employer_dashboard')
+    return redirect('profile')
 
 @login_required
 @user_passes_test(is_employer)
@@ -239,7 +256,7 @@ def job_applications(request, job_id):
     
     if job.employer != employer_profile:
         messages.error(request, "You don't have permission to view applications for this job.")
-        return redirect('employer_dashboard')
+        return redirect('profile')
     
     # Get applications for this job
     applications = JobApplication.objects.filter(job=job).select_related('user', 'job')
@@ -263,8 +280,8 @@ def job_applications(request, job_id):
     applications = applications.annotate(
         status_order=Case(
             When(status='გასაუბრება', then=Value(1)),     # Interview - first priority
-            When(status='განხილვის_პროცესში', then=Value(2)),  # In review - third priority
-            When(status='რეზერვი', then=Value(3)),        # Reserve - second priority
+            When(status='რეზერვი', then=Value(2)),        # Reserve - second priority
+            When(status='განხილვის_პროცესში', then=Value(3)),  # In review - third priority
             default=Value(4),
             output_field=IntegerField(),
         )
@@ -275,12 +292,22 @@ def job_applications(request, job_id):
     if unread_applications.exists():
         unread_applications.update(is_read=True)
     
+    # Get counts for each status
+    total_applications = applications.count()
+    review_applications = applications.filter(status='განხილვის_პროცესში').count()
+    interview_applications = applications.filter(status='გასაუბრება').count()
+    reserve_applications = applications.filter(status='რეზერვი').count()
+    
     context = {
         'job': job,
         'applications': applications,
+        'total_applications': total_applications,
+        'review_applications': review_applications,
+        'interview_applications': interview_applications,
+        'reserve_applications': reserve_applications,
     }
     
-    return render(request, 'core/employer_applications.html', context)
+    return render(request, 'core/employer_applications_tailwind.html', context)
 
 @login_required
 @user_passes_test(is_employer)
@@ -343,10 +370,10 @@ def update_application_status(request, application_id):
     
     # Check if this is an AJAX request
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return JsonResponse({'status': 'success'})
+        return JsonResponse({'success': True})
     
     # Redirect back to the applications page
-    return redirect('job_applications', job_id=application.job.id) 
+    return redirect('job_applications', job_id=application.job.id)
 
 @login_required
 @user_passes_test(is_employer)
@@ -399,3 +426,25 @@ def company_profile(request, employer_id):
     }
     
     return render(request, 'core/employer_profile_public_tailwind.html', context) 
+
+@login_required
+@user_passes_test(is_employer)
+def application_detail(request, application_id):
+    """
+    Display detailed information about a specific application
+    """
+    # Get the application and verify permission
+    application = get_object_or_404(JobApplication.objects.select_related('user', 'job'), id=application_id)
+    employer_profile = request.user.userprofile.employer_profile
+    
+    # Check if the application belongs to a job owned by this employer
+    if application.job.employer != employer_profile:
+        messages.error(request, "You don't have permission to view this application.")
+        return redirect('profile')
+    
+    context = {
+        'application': application,
+        'job': application.job,
+    }
+    
+    return render(request, 'core/employer_application_detail_tailwind.html', context) 

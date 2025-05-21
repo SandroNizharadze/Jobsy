@@ -212,13 +212,6 @@ class JobApplication(models.Model):
         ('განხილვის_პროცესში', _('განხილვის პროცესში')),
         ('გასაუბრება', _('გასაუბრება')),
         ('რეზერვი', _('რეზერვი')),
-        ('pending', _('Pending')),
-        ('reviewed', _('Reviewed')),
-        ('interviewed', _('Interviewed')),
-        ('offered', _('Offer Extended')),
-        ('accepted', _('Offer Accepted')),
-        ('rejected', _('Rejected')),
-        ('withdrawn', _('Withdrawn')),
     ]
     
     job = models.ForeignKey(JobListing, on_delete=models.SET_NULL, null=True, related_name='applications', verbose_name=_("ვაკანსია"))
