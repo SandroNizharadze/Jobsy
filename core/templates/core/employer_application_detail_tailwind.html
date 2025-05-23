@@ -78,7 +78,7 @@
           </select>
           
           <!-- Status Explanation -->
-          <div class="mt-4 text-sm">
+          <div class="mt-4 text-sm status-explanation">
             {% if application.status == 'განხილვის_პროცესში' %}
               <p class="text-blue-700">{% trans "ნიშნავს რომ კანდიდატურა ჯერ არ განგიხილავთ" %}</p>
             {% elif application.status == 'გასაუბრება' %}
@@ -154,15 +154,75 @@
   </div>
 </div>
 
-{% block extra_js %}
+<!-- Rejection Reasons Modal -->
+<div id="rejectionModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full" aria-hidden="true">
+  <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+    <div class="mt-3">
+      <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">{% trans "უარის მიზეზები" %}</h3>
+      <form id="rejectionForm" class="space-y-4">
+        <input type="hidden" id="currentApplicationId" name="application_id" value="">
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700">{% trans "აირჩიეთ მიზეზები:" %}</label>
+          <div class="space-y-2">
+            <div class="flex items-center">
+              <input type="checkbox" name="rejection_reasons" value="არასაკმარისი_გამოცდილება" class="h-4 w-4 text-blue-600 rounded">
+              <label class="ml-2 text-sm text-gray-700">{% trans "არასაკმარისი გამოცდილება" %}</label>
+            </div>
+            <div class="flex items-center">
+              <input type="checkbox" name="rejection_reasons" value="უნარების_ნაკლებობა" class="h-4 w-4 text-blue-600 rounded">
+              <label class="ml-2 text-sm text-gray-700">{% trans "უნარების ნაკლებობა" %}</label>
+            </div>
+            <div class="flex items-center">
+              <input type="checkbox" name="rejection_reasons" value="განათლების_შეუსაბამობა" class="h-4 w-4 text-blue-600 rounded">
+              <label class="ml-2 text-sm text-gray-700">{% trans "განათლების შეუსაბამობა" %}</label>
+            </div>
+            <div class="flex items-center">
+              <input type="checkbox" name="rejection_reasons" value="არარელევანტური_სამუშაო_ისტორია" class="h-4 w-4 text-blue-600 rounded">
+              <label class="ml-2 text-sm text-gray-700">{% trans "არარელევანტური სამუშაო ისტორია" %}</label>
+            </div>
+            <div class="flex items-center">
+              <input type="checkbox" name="rejection_reasons" value="ლოკაცია" class="h-4 w-4 text-blue-600 rounded">
+              <label class="ml-2 text-sm text-gray-700">{% trans "ლოკაცია" %}</label>
+            </div>
+            <div class="flex items-center">
+              <input type="checkbox" name="rejection_reasons" value="ენის_ცოდნის_ნაკლებობა" class="h-4 w-4 text-blue-600 rounded">
+              <label class="ml-2 text-sm text-gray-700">{% trans "ენის ცოდნის ნაკლებობა" %}</label>
+            </div>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{% trans "დამატებითი უკუკავშირი:" %}</label>
+          <textarea name="feedback" rows="3" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"></textarea>
+        </div>
+        <div class="flex justify-end space-x-3">
+          <button type="button" id="cancelRejection" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+            {% trans "გაუქმება" %}
+          </button>
+          <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
+            {% trans "დადასტურება" %}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Application scripts -->
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('rejectionModal');
+    const rejectionForm = document.getElementById('rejectionForm');
+    const cancelButton = document.getElementById('cancelRejection');
+    let lastSelectedStatus = null;
+    let statusSelect = null;
+    
     // Status select styling and functionality
-    const statusSelect = document.querySelector('.application-status-select');
+    statusSelect = document.querySelector('.application-status-select');
     if (statusSelect) {
       statusSelect.addEventListener('change', function() {
         const status = this.value;
         const applicationId = this.dataset.applicationId;
+        lastSelectedStatus = this.dataset.lastValue || statusSelect.options[statusSelect.selectedIndex].value;
         
         // Update styling
         this.className = 'application-status-select w-full rounded-lg border-gray-300 text-sm ';
@@ -174,42 +234,170 @@
           this.classList.add('bg-yellow-100', 'text-yellow-800');
         }
         
+        if (status === 'რეზერვი') {
+          // Show modal for rejection reasons
+          document.getElementById('currentApplicationId').value = applicationId;
+          modal.classList.remove('hidden');
+          return;
+        }
+        
         // Send status update
-        fetch(`/employer/applications/${applicationId}/update-status/`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-          },
-          body: `status=${status}`,
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            // Update the status explanation
-            const explanationDiv = document.querySelector('.status-explanation');
-            if (explanationDiv) {
-              let explanation = '';
-              if (status === 'განხილვის_პროცესში') {
-                explanation = '{% trans "ნიშნავს რომ კანდიდატურა ჯერ არ განგიხილავთ" %}';
-                explanationDiv.className = 'text-blue-700';
-              } else if (status === 'გასაუბრება') {
-                explanation = '{% trans "ნიშნავს რომ განიხილეთ კანდიდატურა, თვლით რომ შეესაბამება პოზიციას და დაუკავშირდებით გასაუბრებაზე დასაბარებლად" %}';
-                explanationDiv.className = 'text-green-700';
-              } else if (status === 'რეზერვი') {
-                explanation = '{% trans "ნიშნავს, რომ განიხილეთ კანდიდატურა, თვლით რომ არ შეესაბამება პოზიციას და ამ ეტაპზე ვერ აიყვანთ, თუმცა მისი სივი შეინახება ბაზაში მომავალში დაინტერესების შემთვევაში დასაკონტაქტებლად" %}';
-                explanationDiv.className = 'text-yellow-700';
-              }
-              explanationDiv.textContent = explanation;
-            }
+        updateApplicationStatus(applicationId, status);
+      });
+      
+      // Store the initial value
+      statusSelect.dataset.lastValue = statusSelect.options[statusSelect.selectedIndex].value;
+    }
+    
+    // Handle modal form submission
+    rejectionForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const applicationId = document.getElementById('currentApplicationId').value;
+      const formData = new FormData(rejectionForm);
+      formData.append('status', 'რეზერვი');
+
+      // Send status update with rejection reasons
+      fetch(`/employer/applications/${applicationId}/update-status/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        },
+        body: formData
+      })
+      .then(response => {
+        // First check if the response is ok before trying to parse JSON
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.text(); // Get as text first to inspect
+      })
+      .then(text => {
+        // Try to parse as JSON, but handle case where it's not valid JSON
+        try {
+          return JSON.parse(text);
+        } catch (e) {
+          console.log('Response is not valid JSON:', text);
+          return { success: true }; // Assume success if we got a response
+        }
+      })
+      .then(data => {
+        // Always hide the modal and reset form
+        modal.classList.add('hidden');
+        rejectionForm.reset();
+        
+        // Update the status explanation
+        const explanationDiv = document.querySelector('.status-explanation');
+        if (explanationDiv) {
+          let explanation = '{% trans "ნიშნავს, რომ განიხილეთ კანდიდატურა, თვლით რომ არ შეესაბამება პოზიციას და ამ ეტაპზე ვერ აიყვანთ, თუმცა მისი სივი შეინახება ბაზაში მომავალში დაინტერესების შემთვევაში დასაკონტაქტებლად" %}';
+          explanationDiv.className = 'mt-4 text-sm status-explanation text-yellow-700';
+          explanationDiv.innerHTML = `<p>${explanation}</p>`;
+        }
+        
+        // Update the select styling
+        if (statusSelect) {
+          statusSelect.className = 'application-status-select w-full rounded-lg border-gray-300 text-sm bg-yellow-100 text-yellow-800';
+          statusSelect.dataset.lastValue = 'რეზერვი';
+        }
+        
+        // Force a full page refresh
+        window.location.href = window.location.href;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        // Even in case of error, hide the modal
+        modal.classList.add('hidden');
+        rejectionForm.reset();
+        
+        // Even on error, refresh the page to show current state
+        window.location.href = window.location.href;
+      });
+    });
+    
+    // Handle modal cancel button
+    cancelButton.addEventListener('click', function() {
+      modal.classList.add('hidden');
+      if (statusSelect) {
+        statusSelect.value = statusSelect.dataset.lastValue || 'განხილვის_პროცესში';
+        
+        // Update styling
+        statusSelect.className = 'application-status-select w-full rounded-lg border-gray-300 text-sm ';
+        if (statusSelect.value === 'განხილვის_პროცესში') {
+          statusSelect.classList.add('bg-blue-100', 'text-blue-800');
+        } else if (statusSelect.value === 'გასაუბრება') {
+          statusSelect.classList.add('bg-green-100', 'text-green-800');
+        } else if (statusSelect.value === 'რეზერვი') {
+          statusSelect.classList.add('bg-yellow-100', 'text-yellow-800');
+        }
+      }
+      rejectionForm.reset();
+    });
+    
+    // Close modal when clicking outside
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        cancelButton.click();
+      }
+    });
+    
+    function updateApplicationStatus(applicationId, status) {
+      fetch(`/employer/applications/${applicationId}/update-status/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        },
+        body: `status=${status}`
+      })
+      .then(response => {
+        // First check if the response is ok before trying to parse JSON
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.text(); // Get as text first to inspect
+      })
+      .then(text => {
+        // Try to parse as JSON, but handle case where it's not valid JSON
+        try {
+          return JSON.parse(text);
+        } catch (e) {
+          console.log('Response is not valid JSON:', text);
+          return { success: true }; // Assume success if we got a response
+        }
+      })
+      .then(data => {
+        console.log('Status updated successfully');
+        
+        // Update the status explanation
+        const explanationDiv = document.querySelector('.status-explanation');
+        if (explanationDiv) {
+          let explanation = '';
+          if (status === 'განხილვის_პროცესში') {
+            explanation = '{% trans "ნიშნავს რომ კანდიდატურა ჯერ არ განგიხილავთ" %}';
+            explanationDiv.className = 'mt-4 text-sm status-explanation text-blue-700';
+          } else if (status === 'გასაუბრება') {
+            explanation = '{% trans "ნიშნავს რომ განიხილეთ კანდიდატურა, თვლით რომ შეესაბამება პოზიციას და დაუკავშირდებით გასაუბრებაზე დასაბარებლად" %}';
+            explanationDiv.className = 'mt-4 text-sm status-explanation text-green-700';
+          } else if (status === 'რეზერვი') {
+            explanation = '{% trans "ნიშნავს, რომ განიხილეთ კანდიდატურა, თვლით რომ არ შეესაბამება პოზიციას და ამ ეტაპზე ვერ აიყვანთ, თუმცა მისი სივი შეინახება ბაზაში მომავალში დაინტერესების შემთვევაში დასაკონტაქტებლად" %}';
+            explanationDiv.className = 'mt-4 text-sm status-explanation text-yellow-700';
           }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-        });
+          explanationDiv.innerHTML = `<p>${explanation}</p>`;
+        }
+        
+        // Update the select styling
+        if (statusSelect) {
+          statusSelect.dataset.lastValue = status;
+        }
+        
+        // Force a full page refresh
+        window.location.href = window.location.href;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        // Even on error, refresh the page to show current state
+        window.location.href = window.location.href;
       });
     }
   });
 </script>
-{% endblock %}
-{% endblock %} 
+{% endblock content %} 

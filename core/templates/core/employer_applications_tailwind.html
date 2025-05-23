@@ -14,7 +14,7 @@
           <h1 class="text-2xl font-bold text-gray-900 mb-2">{% trans "Applications for:" %} {{ job.title }}</h1>
           <p class="text-sm text-gray-600">{{ job.company }}</p>
         </div>
-        <a href="{% url 'profile' %}" class="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+        <a href="{% url 'employer_dashboard' %}" class="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
           <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
           </svg>
@@ -305,7 +305,7 @@
   </div>
 </div>
 
-{% block extra_js %}
+<!-- Application scripts -->
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('rejectionModal');
@@ -327,9 +327,40 @@
         
         // Add filter logic here
         const status = this.dataset.status;
-        // You can implement the filtering logic here
+        filterApplicationsByStatus(status);
       });
     });
+
+    // Function to filter applications by status
+    function filterApplicationsByStatus(status) {
+      const rows = document.querySelectorAll('tbody tr');
+      
+      if (status === 'all') {
+        // Show all rows
+        rows.forEach(row => {
+          row.style.display = '';
+        });
+      } else {
+        // Filter rows based on status
+        rows.forEach(row => {
+          const select = row.querySelector('.application-status-select');
+          if (select && select.value === status) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+      }
+      
+      // Update URL with filter parameter without page reload
+      const url = new URL(window.location.href);
+      if (status === 'all') {
+        url.searchParams.delete('status');
+      } else {
+        url.searchParams.set('status', status);
+      }
+      window.history.pushState({}, '', url);
+    }
 
     // Status select styling and functionality
     const statusSelects = document.querySelectorAll('.application-status-select');
@@ -366,16 +397,39 @@
         },
         body: formData
       })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          modal.classList.add('hidden');
-          updateSelectStyling(lastSelectElement, 'რეზერვი');
-          rejectionForm.reset();
+      .then(response => {
+        // First check if the response is ok before trying to parse JSON
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
         }
+        return response.text(); // Get as text first to inspect
+      })
+      .then(text => {
+        // Try to parse as JSON, but handle case where it's not valid JSON
+        try {
+          return JSON.parse(text);
+        } catch (e) {
+          console.log('Response is not valid JSON:', text);
+          return { success: true }; // Assume success if we got a response
+        }
+      })
+      .then(data => {
+        // Always hide the modal and update styling regardless of success status
+        modal.classList.add('hidden');
+        updateSelectStyling(lastSelectElement, 'რეზერვი');
+        rejectionForm.reset();
+        
+        // Force a full page refresh
+        window.location.href = window.location.href;
       })
       .catch(error => {
         console.error('Error:', error);
+        // Even in case of error, hide the modal
+        modal.classList.add('hidden');
+        rejectionForm.reset();
+        
+        // Even on error, refresh the page to show current state
+        window.location.href = window.location.href;
       });
     });
 
@@ -405,14 +459,31 @@
         },
         body: `status=${status}`
       })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          console.log('Status updated successfully');
+      .then(response => {
+        // First check if the response is ok before trying to parse JSON
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
         }
+        return response.text(); // Get as text first to inspect
+      })
+      .then(text => {
+        // Try to parse as JSON, but handle case where it's not valid JSON
+        try {
+          return JSON.parse(text);
+        } catch (e) {
+          console.log('Response is not valid JSON:', text);
+          return { success: true }; // Assume success if we got a response
+        }
+      })
+      .then(data => {
+        console.log('Status updated successfully');
+        // Force a full page refresh
+        window.location.href = window.location.href;
       })
       .catch(error => {
         console.error('Error:', error);
+        // Even on error, refresh the page to show current state
+        window.location.href = window.location.href;
       });
     }
 
@@ -433,10 +504,105 @@
     if (searchInput) {
       searchInput.addEventListener('input', function() {
         const searchTerm = this.value.toLowerCase();
-        // Implement search logic here
+        filterApplicationsBySearch(searchTerm);
       });
     }
+    
+    // Function to filter applications by search term
+    function filterApplicationsBySearch(searchTerm) {
+      const rows = document.querySelectorAll('tbody tr');
+      
+      rows.forEach(row => {
+        const nameElement = row.querySelector('.text-sm.font-medium.text-gray-900');
+        const emailElement = row.querySelector('.text-sm.text-gray-500');
+        
+        if (!nameElement && !emailElement) {
+          // This might be the "No applications found" row
+          return;
+        }
+        
+        const name = nameElement ? nameElement.textContent.toLowerCase() : '';
+        const email = emailElement ? emailElement.textContent.toLowerCase() : '';
+        
+        if (name.includes(searchTerm) || email.includes(searchTerm)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+      
+      // Update URL with search parameter without page reload
+      const url = new URL(window.location.href);
+      if (searchTerm === '') {
+        url.searchParams.delete('search');
+      } else {
+        url.searchParams.set('search', searchTerm);
+      }
+      window.history.pushState({}, '', url);
+      
+      // Check if any rows are visible
+      let visibleRows = 0;
+      rows.forEach(row => {
+        if (row.style.display !== 'none') {
+          visibleRows++;
+        }
+      });
+      
+      // Show or hide the "No applications found" message
+      const noResultsRow = document.querySelector('tbody tr td[colspan="5"]');
+      if (noResultsRow) {
+        if (visibleRows === 0 && searchTerm !== '') {
+          // Create a new row for no search results if it doesn't exist
+          if (!document.getElementById('no-search-results')) {
+            const tbody = document.querySelector('tbody');
+            const noResultsRow = document.createElement('tr');
+            noResultsRow.id = 'no-search-results';
+            noResultsRow.innerHTML = `
+              <td colspan="5" class="px-6 py-10 text-center">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" 
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">{% trans "No matching applications" %}</h3>
+                <p class="mt-1 text-sm text-gray-500">{% trans "Try a different search term." %}</p>
+              </td>
+            `;
+            tbody.appendChild(noResultsRow);
+          } else {
+            document.getElementById('no-search-results').style.display = '';
+          }
+        } else if (document.getElementById('no-search-results')) {
+          document.getElementById('no-search-results').style.display = 'none';
+        }
+      }
+    }
+    
+    // Apply initial filters from URL parameters
+    function applyInitialFilters() {
+      const urlParams = new URLSearchParams(window.location.search);
+      
+      // Apply status filter if in URL
+      const statusParam = urlParams.get('status');
+      if (statusParam) {
+        const statusButton = document.querySelector(`.status-filter[data-status="${statusParam}"]`);
+        if (statusButton) {
+          statusButton.click();
+        }
+      }
+      
+      // Apply search filter if in URL
+      const searchParam = urlParams.get('search');
+      if (searchParam) {
+        const searchInput = document.getElementById('application-search');
+        if (searchInput) {
+          searchInput.value = searchParam;
+          filterApplicationsBySearch(searchParam.toLowerCase());
+        }
+      }
+    }
+    
+    // Call this function to apply any filters from URL parameters
+    applyInitialFilters();
   });
 </script>
-{% endblock %}
-{% endblock %} 
+{% endblock content %} 

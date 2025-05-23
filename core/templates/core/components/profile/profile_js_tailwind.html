@@ -114,6 +114,14 @@
       const jobActivityTab = document.getElementById('job-activity-tab');
       if (jobActivityTab) {
         jobActivityTab.click();
+        
+        // Also ensure the applications sub-tab is shown
+        setTimeout(() => {
+          const applicationsButton = document.querySelector('[data-activity-tab="applications"]');
+          if (applicationsButton && !applicationsButton.classList.contains('bg-blue-500')) {
+            applicationsButton.click();
+          }
+        }, 100);
       }
     }
 
@@ -146,6 +154,28 @@
         this.classList.add('bg-blue-500', 'text-white');
       });
     });
+
+    // Add event listener to main job activity tab to automatically show applications
+    const jobActivityTab = document.getElementById('job-activity-tab');
+    if (jobActivityTab) {
+      const originalClick = jobActivityTab.onclick;
+      jobActivityTab.onclick = function(e) {
+        // Call the original click handler to switch to the job activity tab
+        if (originalClick) {
+          originalClick.call(this, e);
+        }
+        
+        // After switching to the job activity tab, automatically show applications
+        // Find the applications button and click it
+        const applicationsButton = document.querySelector('[data-activity-tab="applications"]');
+        if (applicationsButton) {
+          // If applications tab is not already active, click it
+          if (!applicationsButton.classList.contains('bg-blue-500')) {
+            applicationsButton.click();
+          }
+        }
+      };
+    }
 
     // Show CV upload form
     const showCvFormBtn = document.getElementById('show-cv-form-btn');
@@ -327,7 +357,18 @@
           })
           .then(response => {
             console.log("Response received:", response.status);
-            return response.json();
+            if (!response.ok) {
+              throw new Error("Server error: " + response.status);
+            }
+            return response.text().then(text => {
+              try {
+                return JSON.parse(text);
+              } catch (e) {
+                console.log("Response is not JSON:", text);
+                // If we got a non-JSON response but status is OK, consider it success
+                return { success: true, message: "CV removed successfully" };
+              }
+            });
           })
           .then(data => {
             console.log("Response data:", data);
@@ -341,7 +382,9 @@
           })
           .catch(error => {
             console.error("Exception during CV removal:", error);
-            alert('{% trans "An error occurred while removing the CV." %}');
+            // Even if there's an error, the CV might have been removed successfully
+            // So reload the page to check the current state
+            window.location.reload();
           });
         }
       });

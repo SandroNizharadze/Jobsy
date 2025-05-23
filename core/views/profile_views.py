@@ -175,8 +175,14 @@ def remove_cv(request):
         user_profile.save(update_fields=['cv'])
         
         logger.info(f"CV successfully removed for user {request.user.username}")
-        messages.success(request, "CV removed successfully.")
-        return redirect('edit_profile')
+        
+        # Check if it's an AJAX request
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        if is_ajax:
+            return JsonResponse({'success': True, 'message': "CV removed successfully."})
+        else:
+            messages.success(request, "CV removed successfully.")
+            return redirect('edit_profile')
     except Exception as e:
         logger.error(f"Error removing CV: {str(e)}")
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
