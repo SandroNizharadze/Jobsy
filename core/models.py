@@ -490,3 +490,51 @@ def set_job_expiration(sender, instance, **kwargs):
         instance.expires_at = timezone.now() + timedelta(days=30)
         # Save without triggering this signal again
         JobListing.objects.filter(pk=instance.pk).update(expires_at=instance.expires_at)
+
+class PricingPackage(models.Model):
+    PACKAGE_TYPE_CHOICES = [
+        ('standard', _('Standard')),
+        ('premium', _('Premium')),
+        ('premium_plus', _('Premium Plus')),
+    ]
+    
+    package_type = models.CharField(max_length=20, choices=PACKAGE_TYPE_CHOICES, unique=True, verbose_name=_("Package Type"))
+    name = models.CharField(max_length=100, verbose_name=_("Package Name"))
+    original_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name=_("Original Price"))
+    current_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=_("Current Price"))
+    description = models.CharField(max_length=255, verbose_name=_("Description"))
+    is_popular = models.BooleanField(default=False, verbose_name=_("Is Popular"))
+    is_free = models.BooleanField(default=False, verbose_name=_("Is Free"))
+    is_active = models.BooleanField(default=True, verbose_name=_("Active"))
+    display_order = models.PositiveSmallIntegerField(default=0, verbose_name=_("Display Order"))
+    
+    class Meta:
+        verbose_name = _("Pricing Package")
+        verbose_name_plural = _("Pricing Packages")
+        ordering = ['display_order', 'package_type']
+    
+    def __str__(self):
+        return self.name
+    
+    def has_discount(self):
+        """Check if this package has a discount (original price is set)"""
+        return self.original_price is not None and self.original_price > 0
+    
+    def get_absolute_url(self):
+        """Return the URL for creating a job with this package"""
+        return f"/post-job/?premium_level={self.package_type}"
+
+class PricingFeature(models.Model):
+    package = models.ForeignKey(PricingPackage, on_delete=models.CASCADE, related_name='features', verbose_name=_("Package"))
+    text = models.CharField(max_length=255, verbose_name=_("Feature Text"))
+    is_included = models.BooleanField(default=True, verbose_name=_("Is Included"))
+    display_order = models.PositiveSmallIntegerField(default=0, verbose_name=_("Display Order"))
+    
+    class Meta:
+        verbose_name = _("Pricing Feature")
+        verbose_name_plural = _("Pricing Features")
+        ordering = ['display_order', 'id']
+    
+    def __str__(self):
+        status = _("Included") if self.is_included else _("Not Included")
+        return f"{self.text} - {status}"

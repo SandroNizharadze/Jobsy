@@ -11,20 +11,25 @@
       <thead>
         <tr>
           <th class="py-4 px-6 bg-gray-50 text-left text-gray-600 font-medium border-b"></th>
-          <th class="py-4 px-6 bg-gray-50 text-center border-b">
-            <span class="block text-lg font-bold text-gray-900">{% trans "სტანდარტული" %}</span>
-            <span class="block text-2xl font-bold text-gray-900 mt-1">{% trans "უფასო" %}</span>
-          </th>
-          <th class="py-4 px-6 bg-blue-50 text-center border-b relative">
+          
+          {% for package in pricing_packages %}
+          <th class="py-4 px-6 {% if package.package_type == 'premium' %}bg-blue-50{% elif package.package_type == 'premium_plus' %}bg-purple-50{% else %}bg-gray-50{% endif %} text-center border-b relative">
+            {% if package.is_popular %}
             <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+              <span class="inline-block px-2 py-1 bg-blue-500 text-white text-xs rounded-full shadow">{% trans "პოპულარული" %}</span>
             </div>
-            <span class="block text-lg font-bold text-gray-900">{% trans "პრემიუმი" %}</span>
-            <span class="block text-2xl font-bold text-gray-900 mt-1">50₾</span>
+            {% endif %}
+            <span class="block text-lg font-bold text-gray-900">{{ package.name }}</span>
+            <span class="block text-2xl font-bold text-gray-900 mt-1">
+              {% if package.is_free %}
+                {% trans "უფასო" %}
+              {% else %}
+                {{ package.current_price }}₾
+              {% endif %}
+            </span>
           </th>
-          <th class="py-4 px-6 bg-purple-50 text-center border-b">
-            <span class="block text-lg font-bold text-gray-900">{% trans "პრემიუმ+" %}</span>
-            <span class="block text-2xl font-bold text-gray-900 mt-1">60₾</span>
-          </th>
+          {% endfor %}
+          
         </tr>
       </thead>
       <tbody>

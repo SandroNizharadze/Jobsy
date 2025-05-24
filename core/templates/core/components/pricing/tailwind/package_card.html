@@ -1,0 +1,95 @@
+{% load i18n %}
+
+<div class="relative flex flex-col bg-white rounded-2xl shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden
+    {% if package.is_popular %}border-2 border-blue-500 transform scale-[1.02] z-10{% endif %}">
+  
+  {% if package.is_popular %}
+  <!-- Popular Badge -->
+  <div class="absolute top-0 right-0">
+    <div class="bg-blue-500 text-white text-xs font-bold uppercase py-1 px-4 rotate-45 transform translate-x-[20%] translate-y-[110%] shadow-sm">
+      {% trans "პოპულარული" %}
+    </div>
+  </div>
+  {% endif %}
+  
+  <div class="p-6 pb-0">
+    <div class="flex items-center justify-between mb-4">
+      <div class="inline-flex items-center justify-center w-12 h-12 rounded-full 
+          {% if package.package_type == 'premium' %}bg-blue-100 text-blue-600
+          {% elif package.package_type == 'premium_plus' %}bg-purple-100 text-purple-600
+          {% else %}bg-blue-100 text-blue-600{% endif %}">
+        {% if package.package_type == 'standard' %}
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        {% elif package.package_type == 'premium' %}
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+        {% elif package.package_type == 'premium_plus' %}
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+          </svg>
+        {% endif %}
+      </div>
+      
+      {% if package.has_discount %}
+      <div class="{% if package.package_type == 'premium_plus' %}bg-purple-100 text-purple-600{% else %}bg-blue-100 text-blue-600{% endif %} text-xs font-bold uppercase px-3 py-1 rounded-full">
+        {% trans "ფასდაკლება" %}
+      </div>
+      {% endif %}
+    </div>
+    
+    <h3 class="text-2xl font-bold text-gray-900 mb-2">{{ package.name }}</h3>
+    
+    <div class="flex items-baseline mb-2">
+      {% if package.has_discount %}
+        <span class="line-through text-gray-500 text-lg mr-2">{{ package.original_price }}₾</span>
+      {% endif %}
+      
+      {% if package.is_free %}
+        <span class="text-3xl font-bold text-green-400">{% trans "უფასო" %}</span>
+      {% else %}
+        <span class="text-3xl font-bold text-gray-900">{{ package.current_price }}<span class="text-xl">₾</span></span>
+      {% endif %}
+    </div>
+    
+    <p class="text-gray-600 mb-6">{{ package.description }}</p>
+  </div>
+  
+  <div class="flex-grow p-6 pt-0">
+    <ul class="space-y-3 mb-6">
+      {% for feature in package.features.all %}
+        <li class="flex items-start">
+          {% if feature.is_included %}
+            <svg class="h-5 w-5 text-green-500 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span class="text-gray-700">{{ feature.text }}</span>
+          {% else %}
+            <svg class="h-5 w-5 text-red-500 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            <span class="text-gray-500">{{ feature.text }}</span>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+  
+  <div class="px-6 pb-6">
+    <a href="{% url 'post_job' %}?premium_level={{ package.package_type }}" 
+       class="block w-full py-3 px-6 text-center font-medium 
+       {% if package.package_type == 'premium' %}
+         text-white bg-blue-600 hover:bg-blue-700
+       {% elif package.package_type == 'premium_plus' %}
+         text-white bg-purple-600 hover:bg-purple-700
+       {% else %}
+         text-blue-600 bg-blue-50 hover:bg-blue-100
+       {% endif %}
+       rounded-lg transition-colors duration-200 package-select-btn" 
+       data-package="{{ package.package_type }}">
+      {% trans "აირჩიე" %}
+    </a>
+  </div>
+</div> 

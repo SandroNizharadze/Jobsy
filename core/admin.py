@@ -12,6 +12,7 @@ from django.template.response import TemplateResponse
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
+from core.models import PricingPackage, PricingFeature
 
 # Add a historical data view to the admin site
 @staff_member_required
@@ -316,3 +317,24 @@ class RejectionReasonAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
 admin.site.register(RejectionReason, RejectionReasonAdmin)
+
+class PricingFeatureInline(admin.TabularInline):
+    model = PricingFeature
+    extra = 1
+    fields = ('text', 'is_included', 'display_order')
+
+@admin.register(PricingPackage)
+class PricingPackageAdmin(admin.ModelAdmin):
+    list_display = ('name', 'package_type', 'get_price_display', 'is_popular', 'is_free', 'is_active', 'display_order')
+    list_filter = ('package_type', 'is_active', 'is_popular', 'is_free')
+    search_fields = ('name', 'description')
+    ordering = ('display_order', 'package_type')
+    inlines = [PricingFeatureInline]
+    
+    def get_price_display(self, obj):
+        if obj.is_free:
+            return _("Free")
+        if obj.has_discount():
+            return f"{obj.original_price} → {obj.current_price}"
+        return f"{obj.current_price}"
+    get_price_display.short_description = _("Price")

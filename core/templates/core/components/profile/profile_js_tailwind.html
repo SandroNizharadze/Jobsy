@@ -86,6 +86,14 @@
           if (targetPane) {
             targetPane.classList.remove('hidden');
             targetPane.classList.add('block');
+            
+            // If this is the job activity tab, trigger display of applications content
+            if (targetId === '#job-activity-section') {
+              const applicationsButton = document.querySelector('[data-activity-tab="applications"]');
+              if (applicationsButton && !applicationsButton.classList.contains('bg-blue-500')) {
+                applicationsButton.click();
+              }
+            }
           }
           
           // Update active state on buttons
@@ -98,6 +106,9 @@
           // Add active styling to clicked button
           this.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
           this.classList.add('border-blue-500', 'text-blue-600');
+          
+          // Log for debugging
+          console.log(`Switched to tab: ${targetId}`);
         });
       });
     };
@@ -114,14 +125,6 @@
       const jobActivityTab = document.getElementById('job-activity-tab');
       if (jobActivityTab) {
         jobActivityTab.click();
-        
-        // Also ensure the applications sub-tab is shown
-        setTimeout(() => {
-          const applicationsButton = document.querySelector('[data-activity-tab="applications"]');
-          if (applicationsButton && !applicationsButton.classList.contains('bg-blue-500')) {
-            applicationsButton.click();
-          }
-        }, 100);
       }
     }
 
@@ -132,6 +135,7 @@
     activityTabButtons.forEach(button => {
       button.addEventListener('click', function() {
         const targetId = this.getAttribute('data-activity-tab');
+        console.log(`Clicked activity tab: ${targetId}`);
         
         // Hide all activity panes
         activityPanes.forEach(pane => {
@@ -142,6 +146,9 @@
         const targetPane = document.querySelector(`[data-activity-pane="${targetId}"]`);
         if (targetPane) {
           targetPane.classList.remove('hidden');
+          console.log(`Showing pane: ${targetId}`);
+        } else {
+          console.log(`Pane not found for: ${targetId}`);
         }
         
         // Update active state
@@ -154,28 +161,6 @@
         this.classList.add('bg-blue-500', 'text-white');
       });
     });
-
-    // Add event listener to main job activity tab to automatically show applications
-    const jobActivityTab = document.getElementById('job-activity-tab');
-    if (jobActivityTab) {
-      const originalClick = jobActivityTab.onclick;
-      jobActivityTab.onclick = function(e) {
-        // Call the original click handler to switch to the job activity tab
-        if (originalClick) {
-          originalClick.call(this, e);
-        }
-        
-        // After switching to the job activity tab, automatically show applications
-        // Find the applications button and click it
-        const applicationsButton = document.querySelector('[data-activity-tab="applications"]');
-        if (applicationsButton) {
-          // If applications tab is not already active, click it
-          if (!applicationsButton.classList.contains('bg-blue-500')) {
-            applicationsButton.click();
-          }
-        }
-      };
-    }
 
     // Show CV upload form
     const showCvFormBtn = document.getElementById('show-cv-form-btn');
@@ -388,6 +373,32 @@
           });
         }
       });
+    }
+    
+    // Debug tab structure
+    console.log("=== Tab Structure Debug ===");
+    console.log("Main tabs:", document.querySelectorAll('[data-tab-toggle="tab"]').length);
+    document.querySelectorAll('[data-tab-toggle="tab"]').forEach(tab => {
+      console.log(`Tab: ${tab.id}, Target: ${tab.getAttribute('data-tab-target')}`);
+      const target = document.querySelector(tab.getAttribute('data-tab-target'));
+      console.log(`Target exists: ${target !== null}, Display: ${target ? getComputedStyle(target).display : 'N/A'}`);
+    });
+    
+    console.log("Activity tabs:", document.querySelectorAll('[data-activity-tab]').length);
+    document.querySelectorAll('[data-activity-tab]').forEach(tab => {
+      const targetId = tab.getAttribute('data-activity-tab');
+      console.log(`Activity Tab: ${targetId}`);
+      const target = document.querySelector(`[data-activity-pane="${targetId}"]`);
+      console.log(`Target exists: ${target !== null}, Display: ${target ? getComputedStyle(target).display : 'N/A'}`);
+    });
+    
+    // Force the profile tab to be active on initial load if no tab parameter in URL
+    if (!urlParams.get('tab')) {
+      const profileTab = document.getElementById('profile-tab');
+      if (profileTab) {
+        console.log("Forcing profile tab to be active on initial load");
+        profileTab.click();
+      }
     }
   });
 </script> 

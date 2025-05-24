@@ -16,21 +16,15 @@
 
     <!-- Pricing Cards Container -->
     <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-      
-      <!-- Standard Plan -->
+      {% for package in pricing_packages %}
       <div class="pricing-card-container">
-        {% include 'core/components/pricing/tailwind/package_standard.html' %}
+        {% include 'core/components/pricing/tailwind/package_card.html' with package=package %}
       </div>
-      
-      <!-- Premium Plan (Popular) -->
-      <div class="pricing-card-container">
-        {% include 'core/components/pricing/tailwind/package_premium.html' %}
+      {% empty %}
+      <div class="col-span-3 text-center py-16">
+        <p class="text-lg text-gray-600">{% trans "No pricing packages available at the moment. Please check back later." %}</p>
       </div>
-      
-      <!-- Premium Plus Plan -->
-      <div class="pricing-card-container">
-        {% include 'core/components/pricing/tailwind/package_premium_plus.html' %}
-      </div>
+      {% endfor %}
     </div>
 
     <!-- Feature Comparison -->

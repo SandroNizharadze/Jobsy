@@ -168,4 +168,35 @@
 
 {% block extra_js %}
 {% include 'core/components/profile/profile_js_tailwind.html' %}
+
+<script>
+  // Additional script to ensure tab switching works correctly
+  document.addEventListener('DOMContentLoaded', function() {
+    // Add direct click handler to job activity tab
+    const jobActivityTab = document.getElementById('job-activity-tab');
+    if (jobActivityTab) {
+      jobActivityTab.addEventListener('click', function() {
+        console.log("Job activity tab clicked directly");
+        
+        // Show job activity section
+        const profileSection = document.getElementById('profile-section');
+        const jobActivitySection = document.getElementById('job-activity-section');
+        
+        if (profileSection && jobActivitySection) {
+          profileSection.classList.add('hidden');
+          profileSection.classList.remove('block');
+          
+          jobActivitySection.classList.remove('hidden');
+          jobActivitySection.classList.add('block');
+          
+          // Ensure applications tab is active
+          const applicationsButton = document.querySelector('[data-activity-tab="applications"]');
+          if (applicationsButton) {
+            applicationsButton.click();
+          }
+        }
+      });
+    }
+  });
+</script>
 {% endblock %}

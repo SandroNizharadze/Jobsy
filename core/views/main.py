@@ -25,6 +25,10 @@ def home_redirect(request):
 # Import required modules to support the above functions
 from django.shortcuts import redirect, render
 
+# Import the pricing models
+from core.models import PricingPackage
+
 def pricing(request):
     """Display the pricing packages page"""
-    return render(request, 'core/pricing_tailwind.html')
+    pricing_packages = PricingPackage.objects.filter(is_active=True).prefetch_related('features').order_by('display_order')
+    return render(request, 'core/pricing_tailwind.html', {'pricing_packages': pricing_packages})
